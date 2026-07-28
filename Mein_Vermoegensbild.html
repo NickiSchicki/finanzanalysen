@@ -1,13 +1,14 @@
 <!DOCTYPE html><html lang=de><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1">
 <title>Mein Vermögensbild — alles auf einen Blick</title>
-<link rel=stylesheet href="assets/site.css?v=12">
-<script defer src="assets/site-map.js?v=12"></script>
-<script defer src="assets/datenstand.js?v=12"></script>
-<script defer src="assets/site.js?v=12"></script>
-<script defer src="assets/profil.js?v=12"></script>
-<script defer src="assets/de-rente.js?v=12"></script>
-<script defer src="assets/de-kapitalertrag.js?v=12"></script>
-<script defer src="assets/de-vermoegen.js?v=12"></script>
+<link rel=stylesheet href="assets/site.css?v=13">
+<script defer src="assets/site-map.js?v=13"></script>
+<script defer src="assets/datenstand.js?v=13"></script>
+<script defer src="assets/site.js?v=13"></script>
+<script defer src="assets/profil.js?v=13"></script>
+<script defer src="assets/de-rente.js?v=13"></script>
+<script defer src="assets/de-kapitalertrag.js?v=13"></script>
+<script defer src="assets/de-vermoegen.js?v=13"></script>
+<script defer src="assets/reihen.js?v=13"></script>
 <style>
 .two{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 @media(max-width:820px){.two{grid-template-columns:1fr}}
@@ -27,6 +28,18 @@
 .wl a:hover{border-color:var(--accent);transform:translateY(-2px)}
 .wl .t{font-family:var(--serif);font-size:16px;font-weight:700;line-height:1.25;margin-bottom:4px}
 .wl .b{font-size:12.5px;color:var(--ink-2);line-height:1.45}
+.zrsteuer{display:flex;gap:18px;flex-wrap:wrap;margin:12px 0 14px}
+.zrsteuer .zl{display:block;font-size:10.5px;color:var(--ink-3);margin-bottom:5px}
+.zrsteuer .seg{margin-top:0}
+.zrsteuer .seg button{padding:6px 11px;font-size:12px}
+.zrerg{display:grid;grid-template-columns:repeat(auto-fit,minmax(158px,1fr));gap:10px;margin:14px 0 4px}
+.zrerg>div{background:var(--card);border:1px solid var(--rule);border-radius:11px;padding:13px 15px}
+.zrerg .l{font-size:11px;color:var(--ink-3);line-height:1.35}
+.zrerg .v{font-family:var(--serif);font-size:24px;font-weight:700;line-height:1.1;margin-top:4px;font-variant-numeric:tabular-nums}
+.zrerg .s{font-size:11px;color:var(--ink-3);margin-top:5px;line-height:1.45}
+.zrleg{display:flex;gap:16px;flex-wrap:wrap;font-size:11.5px;color:var(--ink-2);margin-top:8px}
+.zrleg i{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:6px;vertical-align:middle}
+.zrn{border-left:2px solid var(--accent);padding-left:12px;margin-top:14px !important}
 .aktion{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
 .btn{font-family:var(--sans);font-size:12.5px;font-weight:600;padding:8px 14px;border:1px solid var(--rule);
   background:var(--card);border-radius:9px;cursor:pointer;color:var(--ink-2)}
@@ -331,7 +344,9 @@ function auswerten(){
      (pleiteNach===null&&erbe>0?'<div class=s style="margin-top:6px">In heutiger Kaufkraft, vor Erbschaftsteuer.</div>':'')+'</div>'+
    '</div>'+
    (kapitalbedarf>0?deckungsBalken(projiziert,kapitalbedarf,deckung,jahreBisRente)+herleitung(luecke,jahreRuhestand,rr,kapitalbedarf,rAnspar,jahreBisRente,liquide,rate,verkaufserloes,bedarfRente,bedarfKredit,restJahreKredit,krate/12,bedarfPuffer,puffer):'')+
-   zeitreihenHinweis(pleiteNach,jahreRuhestand);
+   zeitreihenTest({liquide:liquide, rate:rate, jahreBisRente:jahreBisRente, verkaufserloes:verkaufserloes,
+     entnahmeJahr:entnahmeJahr, jahreRuhestand:jahreRuhestand, restJahreKredit:restJahreKredit,
+     krate:krate, infl:infl, projiziert:projiziert});
 
   // Renditehinweis: was real übrig bleibt, plus historische Einordnung
   let ein='';
@@ -380,18 +395,117 @@ function auswerten(){
 function karte(href,t,b){return '<a href="'+href+'"><div class=t>'+t+'</div><div class=b>'+b+'</div></a>';}
 
 /* Die Rechnung oben nimmt eine gleichbleibende Rendite an. Genau das ist ihre Schwäche. */
-function zeitreihenHinweis(pleiteNach,jahre){
+/* Einstellungen des Geschichtstests — bewusst nicht im Profil, es sind Szenarien */
+const ZR={land:'usa',aktien:1};
+
+/* Derselbe Plan, aber nicht gegen eine Durchschnittsrendite, sondern gegen jede
+   tatsächliche Renditefolge, die es seit 1871 gab. Ansparen und Entnehmen in
+   einem Durchlauf, damit die Reihenfolge der Jahre wirklich durchschlägt.     */
+function zeitreihenTest(o){
+  if(typeof Reihen==='undefined') return '';
+  const e=Reihen.lebenszyklus({
+    land:ZR.land, aktienAnteil:ZR.aktien,
+    start:o.liquide, sparrateJahr:o.rate, jahreAnspar:o.jahreBisRente,
+    einmalBeiRente:o.verkaufserloes,
+    // Die Kreditrate ist nominal fest und wiegt real mit den Jahren leichter
+    entnahmeJahr:j=>o.entnahmeJahr + (j<=o.restJahreKredit ? o.krate/Math.pow(1+o.infl,o.jahreBisRente+j) : 0),
+    jahreEntnahme:o.jahreRuhestand
+  });
+
+  const steuer=
+   '<div id=zrsteuer class=zrsteuer>'+
+     '<div><span class=zl>Datenreihe</span><div class="seg tone">'+
+       '<button data-land=usa'+(ZR.land==='usa'?' class=on':'')+'>USA seit 1871</button>'+
+       '<button data-land=de'+(ZR.land==='de'?' class=on':'')+'>Deutschland seit 1871</button>'+
+     '</div></div>'+
+     '<div><span class=zl>Aktienanteil</span><div class="seg tone">'+
+       ['1','0.8','0.6'].map(a=>'<button data-aktien='+a+(ZR.aktien==+a?' class=on':'')+'>'+Math.round(a*100)+' %</button>').join('')+
+     '</div></div>'+
+   '</div>';
+
+  if(!e || e.zuKurz || !e.n){
+    return '<div class=zr><div class=hl>Dein Plan durch die Geschichte</div>'+steuer+
+      '<p>Ansparen und Entnehmen ergeben zusammen '+(e?e.horizont:0)+' Jahre — mehr, als die gewählte Reihe hergibt ('+(e?e.verfuegbar:0)+' Jahre). '+
+      'Wähle die US-Reihe, sie ist die längste.</p></div>';
+  }
+
+  const quote=Math.round(e.quote*100), gescheitert=e.n-e.durchgehalten;
+  const farbe = quote===100?'var(--good)':(quote>=90?'var(--warn)':'var(--bad)');
+  const reihe = ZR.land==='usa'?'S&P 500':'deutsche Aktien';
+
   return '<div class=zr>'+
-   '<div class=hl>Was diese Rechnung nicht kann</div>'+
-   '<p>Oben steht <b>eine</b> Zahl, weil <b>eine</b> gleichbleibende Rendite unterstellt wird. So verläuft kein Anlegerleben. '+
-   'Zwei Ruheständler mit identischer Durchschnittsrendite können völlig verschieden enden — es kommt auf die <b>Reihenfolge</b> der Jahre an. '+
-   'Wer die schwachen Jahre am Anfang erwischt, entnimmt aus einem schrumpfenden Depot und dem fehlt später die Substanz.'+
-   (pleiteNach!==null?' Dass die Rechnung hier bereits mit einer glatten Rendite nach '+pleiteNach+' Jahren auf null läuft, macht das umso dringlicher.':'')+'</p>'+
-   '<p>Wie das Ergebnis über <b>alle Startjahre seit 1871</b> ausgesehen hätte — mit Erfolgsquote statt Punktschätzung — zeigen die Werkzeuge auf echten Zeitreihen:</p>'+
+   '<div class=hl>Dein Plan durch die Geschichte</div>'+
+   '<p>Bis hierher steht überall <b>eine</b> Zahl, weil <b>eine</b> gleichbleibende Rendite unterstellt wird. So verläuft kein Anlegerleben. '+
+   'Deshalb läuft derselbe Plan hier durch <b>jede tatsächliche Renditefolge</b>, die es gab: '+e.n+' Startjahre von '+e.erstesJahr+' bis '+e.letztesJahr+', '+
+   'jeweils '+o.jahreBisRente+' Jahre ansparen und '+o.jahreRuhestand+' Jahre entnehmen, real gerechnet.</p>'+
+   steuer+
+   '<div class=zrerg>'+
+     '<div><div class=l>Hätte gehalten in</div><div class=v style="color:'+farbe+'">'+quote+' %</div>'+
+       '<div class=s>'+e.durchgehalten+' von '+e.n+' Startjahren'+(gescheitert?' · in '+gescheitert+' ging das Geld vorher aus':'')+'</div></div>'+
+     '<div><div class=l>Kapital bei Rentenbeginn</div><div class=v>'+eur(e.medianBeiRente)+'</div>'+
+       '<div class=s>Median der Geschichte · deine Annahme oben: '+eur(o.projiziert)+'</div></div>'+
+     '<div><div class=l>Am Ende übrig</div><div class=v>'+eur(e.median)+'</div>'+
+       '<div class=s>Median · schwaches Zehntel '+eur(e.p10)+' · starkes '+eur(e.p90)+'</div></div>'+
+     '<div><div class=l>Schlechtestes Startjahr</div><div class=v'+(e.schlechtestes.pleiteNach!==null?' style="color:var(--bad)"':'')+'>'+e.schlechtestes.jahr+'</div>'+
+       '<div class=s>'+(e.schlechtestes.pleiteNach!==null
+          ? 'Kapital nach '+e.schlechtestes.pleiteNach+' Ruhestandsjahren aufgebraucht'
+          : 'am Ende noch '+eur(e.schlechtestes.ende))+'</div></div>'+
+   '</div>'+
+   zrChart(e,o)+
+   '<p class=zrn>'+deutung(e,o,quote)+'</p>'+
+   '<p>Die beiden Werkzeuge rechnen dasselbe ausführlicher — mit Portfolio-Mix, Glidepath, Leitplanken und der Heatmap aller Startjahre:</p>'+
    '<div class=wl>'+
-   karte('Lebenszyklus_Simulator.html','Ein ganzes Finanzleben, durchgerechnet','Ansparen und Entnehmen gekoppelt durch echte historische Sequenzen — Perzentil-Fächer statt einer Zahl, USA oder Deutschland.')+
-   karte('Geschichts_Stresstest.html','Der Geschichts-Stresstest','Hätte der Entnahmeplan in <i>jedem</i> Startjahr gehalten? Erfolgsquote, Spaghetti-Chart und Heatmap der Startjahre.')+
+   karte('Lebenszyklus_Simulator.html','Ein ganzes Finanzleben, durchgerechnet','Ansparen und Entnehmen gekoppelt durch echte Sequenzen — Perzentil-Fächer statt einer Zahl.')+
+   karte('Geschichts_Stresstest.html','Der Geschichts-Stresstest','Erfolgsquote, Spaghetti-Chart und Heatmap: welche Jahrgänge es traf und welche nicht.')+
    '</div></div>';
+}
+
+/* Ein Satz, der sagt, was die Verteilung für diesen Plan bedeutet */
+function deutung(e,o,quote){
+  const abw=o.projiziert>0 ? e.medianBeiRente/o.projiziert : null;
+  let s='';
+  if(quote===100) s='In keinem einzigen Startjahr ging das Geld aus. Das ist eine Aussage über die Vergangenheit, keine Garantie — die Zukunft muss diese Renditen erst noch liefern. ';
+  else if(quote>=90) s='In den allermeisten Startjahren hielt der Plan, aber nicht in allen. Die Ausfälle sind keine Ausreißer, sondern die Jahrgänge mit schwachem Beginn. ';
+  else s='<b style="color:var(--bad)">Ein erheblicher Teil der Startjahre hätte nicht gereicht.</b> Nicht wegen einer schlechten Durchschnittsrendite, sondern wegen ihrer Reihenfolge. ';
+  if(abw && abw>1.25) s+='Auffällig ist der Abstand nach oben: historisch lag das Kapital bei Rentenbeginn im Median beim '+nf1(abw)+'-Fachen deiner Annahme — die Vorgabe oben ist also deutlich vorsichtiger als das, was die Geschichte lieferte. ';
+  else if(abw && abw<0.8) s+='Deine Annahme oben liegt <b>über</b> dem historischen Median — sie unterstellt einen besseren Verlauf als die Mehrheit der Startjahre brachte. ';
+  s += e.p10>0
+    ? 'Zwischen dem schwachen und dem starken Zehntel liegt am Ende der Faktor '+nf1(e.p90/e.p10)+'. Diese Spannweite ist das eigentliche Risiko, nicht der Mittelwert.'
+    : 'Selbst das schwache Zehntel endet bei null — die Lücke ist zu groß für das Kapital, nicht bloß ungünstig getimt. Hier hilft keine andere Renditeannahme, sondern nur eine höhere Sparrate, ein späterer Renteneintritt oder ein kleinerer Wunsch.';
+  if(ZR.land==='de') s+=' Die deutsche Reihe enthält 1923 und 1948 als reale Totalverluste — Fenster, die eines der beiden Jahre umfassen, brechen zwangsläufig ein.';
+  return s;
+}
+const nf1=x=>Number(x).toLocaleString('de-DE',{minimumFractionDigits:1,maximumFractionDigits:1});
+
+/* Kapital zum Renteneintritt je Startjahr — bewusst dieselbe Größe, die auch die
+   Punktschätzung oben ausgibt, damit die Vergleichslinie wirklich vergleichbar ist.
+   Die Balken unter der Nulllinie markieren Startjahre, deren Kapital in der
+   Entnahmephase trotzdem vorzeitig ausging.                                     */
+function zrChart(e,o){
+  const W=680,H=190,L=58,R=12,T=16,B=32;
+  const j0=e.laeufe[0].jahr, j1=e.laeufe[e.laeufe.length-1].jahr;
+  const vmax=Math.max(...e.laeufe.map(l=>l.beiRente), o.projiziert)*1.04||1;
+  const X=v=>L+(j1===j0?0:(v-j0)/(j1-j0))*(W-L-R);
+  const Y=v=>H-B-Math.min(v,vmax)/vmax*(H-T-B);
+  const kurz=v=>v<1000?'0':(v>=1e6?nf1(v/1e6)+' Mio':Math.round(v/1000)+'k');
+  let s='<svg viewBox="0 0 '+W+' '+H+'" style="width:100%;height:auto;display:block;margin-top:12px" xmlns="http://www.w3.org/2000/svg">';
+  s+='<text x="0" y="10" font-size="10.5" fill="#57534c">Kapital zum Renteneintritt, je Startjahr</text>';
+  [0,0.5,1].forEach(f=>{const v=vmax*f;
+    s+='<line x1="'+L+'" y1="'+Y(v)+'" x2="'+(W-R)+'" y2="'+Y(v)+'" stroke="'+(f===0?'#8b857a':'#e8e2d7')+'" stroke-width="'+(f===0?1.2:1)+'"/>'+
+       '<text x="'+(L-8)+'" y="'+(Y(v)+3.5)+'" font-size="9.5" fill="#8b857a" text-anchor="end">'+kurz(v)+'</text>';});
+  s+='<polyline points="'+e.laeufe.map(l=>X(l.jahr)+','+Y(l.beiRente)).join(' ')+'" fill="none" stroke="#1d4ed8" stroke-width="2" stroke-linejoin="round"/>';
+  const bw=(W-L-R)/Math.max(1,j1-j0);
+  e.laeufe.filter(l=>l.pleiteNach!==null).forEach(l=>{
+    s+='<rect x="'+(X(l.jahr)-Math.max(1,bw)/2)+'" y="'+(Y(0)+3)+'" width="'+Math.max(1.5,bw)+'" height="6" fill="#b91c1c" fill-opacity="0.85"/>';});
+  if(o.projiziert>0){
+    const y=Y(Math.min(o.projiziert,vmax));
+    s+='<line x1="'+L+'" y1="'+y+'" x2="'+(W-R)+'" y2="'+y+'" stroke="#c2410c" stroke-width="1.4"/>'+
+       '<text x="'+(L+4)+'" y="'+(y-5)+'" font-size="10" fill="#c2410c" font-weight="700">deine Annahme: '+eur(o.projiziert)+'</text>';}
+  [j0,Math.round((j0+j1)/2),j1].forEach(v=>{
+    s+='<text x="'+X(v)+'" y="'+(H-8)+'" font-size="9.5" fill="#8b857a" text-anchor="middle">'+v+'</text>';});
+  return s+'</svg><div class=zrleg><span><i style="background:#1d4ed8"></i>Kapital bei Renteneintritt ('+e.n+' Startjahre)</span>'+
+    '<span><i style="background:#c2410c"></i>Punktschätzung dieser Seite</span>'+
+    (e.n-e.durchgehalten>0?'<span><i style="background:#b91c1c"></i>ging im Ruhestand vorzeitig aus</span>':'')+'</div>';
 }
 
 /* Woher der Kapitalbedarf kommt — offengelegt statt behauptet */
@@ -457,6 +571,13 @@ window.addEventListener('load',()=>{
     const b=e.target.closest('#immonutzbox .seg button'); if(!b) return;
     b.parentElement.querySelectorAll('button').forEach(x=>x.classList.remove('on'));
     b.classList.add('on'); auswerten();
+  });
+  // Umschalter des Geschichtstests liegen im neu gerenderten Ergebnisbereich
+  document.addEventListener('click',e=>{
+    const b=e.target.closest('#zrsteuer button'); if(!b) return;
+    if(b.dataset.land) ZR.land=b.dataset.land;
+    if(b.dataset.aktien) ZR.aktien=parseFloat(b.dataset.aktien);
+    auswerten();
   });
   $('bLeeren').addEventListener('click',()=>{
     Profil.leeren();

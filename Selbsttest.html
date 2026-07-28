@@ -7,6 +7,7 @@
 <script defer src="assets/de-rente.js?v=4"></script>
 <script defer src="assets/de-kapitalertrag.js?v=4"></script>
 <script defer src="assets/de-vermoegen.js?v=4"></script>
+<script defer src="assets/reihen.js?v=13"></script>
 <style>
 .sum{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:12px;margin-bottom:22px}
 .sc{background:var(--card);border:1px solid var(--rule);border-radius:12px;padding:15px 17px}
@@ -59,6 +60,39 @@ function run(){
   chk(G1,'Zugangsfaktor zur Regelaltersgrenze', zugangsfaktor(regelaltersgrenzeMonate(1985),1985), 1.0, 0.0001,'Kein Ab- oder Zuschlag');
   chk(G1,'Zahlbetrag der Eckrente nach KV und Pflege', nettoRente(1913.40,2026,false), 1677.10, 0.05,'Abzüge nach § 249a SGB V, § 59 SGB XI');
   chkTrue(G1,'Kinderlosenzuschlag mindert den Zahlbetrag', nettoRente(1913.40,2026,true) < nettoRente(1913.40,2026,false),'Pflegeversicherung');
+
+  // ---------- Historische Reihen ----------
+  const G5='Historische Reihen (reihen.js)';
+  chkTrue(G5,'Reihen geladen', typeof Reihen==='object' && !!Reihen.daten);
+  chk(G5,'US-Reihe reicht 1871 bis 2025', REIHEN.usa.basis+REIHEN.usa.aktien.length-1, 2025, 0,'Shiller, real');
+  chk(G5,'Deutsche Reihe reicht 1871 bis 2020', REIHEN.de.basis+REIHEN.de.aktien.length-1, 2020, 0,'Jordà-Schularick-Taylor R6');
+  chkTrue(G5,'Aktien und Anleihen gleich lang', REIHEN.usa.aktien.length===REIHEN.usa.anleihen.length && REIHEN.de.aktien.length===REIHEN.de.anleihen.length);
+  const geo=a=>(Math.pow(a.reduce((x,r)=>x*(1+r),1),1/a.length)-1)*100;
+  chk(G5,'US-Aktien real p.a. 1871–2025', geo(REIHEN.usa.aktien), 7.08, 0.02,'geometrisches Mittel');
+  chk(G5,'Deutsche Aktien real p.a. 1871–2020', geo(REIHEN.de.aktien), 4.17, 0.02);
+  chkTrue(G5,'Mischung liegt zwischen den Bausteinen', (function(){
+    const m=Reihen.serie('usa',0.6); return Math.abs(m[10]-(0.6*REIHEN.usa.aktien[10]+0.4*REIHEN.usa.anleihen[10]))<1e-12; })());
+  // Reine Ansparphase ohne Sparrate muss exakt dem aufgezinsten Startbetrag entsprechen
+  (function(){
+    const n=30;
+    const e=Reihen.lebenszyklus({land:'usa',aktienAnteil:1,start:1000,sparrateJahr:0,jahreAnspar:n,entnahmeJahr:0,jahreEntnahme:0});
+    const soll=1000*REIHEN.usa.aktien.slice(0,n).reduce((x,r)=>x*(1+r),1);
+    chk(G5,'Ansparphase entspricht dem aufgezinsten Startbetrag', e.laeufe[0].ende, soll, 0.01,'Startjahr 1871, 30 Jahre, keine Sparrate');
+    chk(G5,'Kapital bei Rentenbeginn = Kapital am Ende ohne Entnahmephase', e.laeufe[0].beiRente, e.laeufe[0].ende, 0.01);
+  })();
+  // Entnahme in Höhe des Barwerts muss das Kapital planmäßig auf null bringen
+  (function(){
+    const flach={basis:0,aktien:new Array(60).fill(0.04),anleihen:new Array(60).fill(0.04)};
+    const merk=REIHEN.test; REIHEN.test=flach;
+    const n=25, bw=kapitalbedarfBarwert(10000,n,0.04);
+    const e=Reihen.lebenszyklus({land:'test',aktienAnteil:1,start:bw,sparrateJahr:0,jahreAnspar:0,entnahmeJahr:10000,jahreEntnahme:n});
+    chk(G5,'Entnahme des Barwerts endet exakt bei null', e.laeufe[0].ende, 0, 0.01,'gleiche Konvention wie kapitalbedarfBarwert');
+    chkTrue(G5,'Dabei kein vorzeitiger Ausfall gemeldet', e.laeufe[0].pleiteNach===null);
+    if(merk===undefined) delete REIHEN.test; else REIHEN.test=merk;
+  })();
+  chkTrue(G5,'Zu langer Horizont wird abgefangen',
+    Reihen.lebenszyklus({land:'de',jahreAnspar:100,jahreEntnahme:100,start:1}).zuKurz===true,
+    'meldet zuKurz statt falscher Zahlen');
   chk(G1,'Kapitalbedarf: 24.000 € über 25 Jahre bei 3 %', kapitalbedarfBarwert(24000,25,0.03), 417915.54, 1,'Nachschüssiger Rentenbarwert');
   // Die Erbe-Simulation in Mein_Vermoegensbild.html muss zur Barwertformel passen:
   // startet man mit dem Kapitalbedarf, ist das Kapital am Ende genau aufgebraucht.
