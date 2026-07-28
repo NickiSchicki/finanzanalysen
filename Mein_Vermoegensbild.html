@@ -1,14 +1,14 @@
 <!DOCTYPE html><html lang=de><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1">
 <title>Mein Vermögensbild — alles auf einen Blick</title>
-<link rel=stylesheet href="assets/site.css?v=15">
-<script defer src="assets/site-map.js?v=15"></script>
-<script defer src="assets/datenstand.js?v=15"></script>
-<script defer src="assets/site.js?v=15"></script>
-<script defer src="assets/profil.js?v=15"></script>
-<script defer src="assets/de-rente.js?v=15"></script>
-<script defer src="assets/de-kapitalertrag.js?v=15"></script>
-<script defer src="assets/de-vermoegen.js?v=15"></script>
-<script defer src="assets/reihen.js?v=15"></script>
+<link rel=stylesheet href="assets/site.css?v=18">
+<script defer src="assets/site-map.js?v=18"></script>
+<script defer src="assets/datenstand.js?v=18"></script>
+<script defer src="assets/site.js?v=18"></script>
+<script defer src="assets/profil.js?v=18"></script>
+<script defer src="assets/de-rente.js?v=18"></script>
+<script defer src="assets/de-kapitalertrag.js?v=18"></script>
+<script defer src="assets/de-vermoegen.js?v=18"></script>
+<script defer src="assets/reihen.js?v=18"></script>
 <style>
 .two{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 @media(max-width:820px){.two{grid-template-columns:1fr}}
@@ -39,6 +39,8 @@
 .zrerg .s{font-size:11px;color:var(--ink-3);margin-top:5px;line-height:1.45}
 .zrleg{display:flex;gap:16px;flex-wrap:wrap;font-size:11.5px;color:var(--ink-2);margin-top:8px}
 .zrleg i{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:6px;vertical-align:middle}
+.zrleg .zrachs{color:var(--ink-3);font-size:11px}
+.zrleg .zrachs b{color:var(--ink-2)}
 .zrspanne{font-size:12.5px !important;color:var(--ink-3) !important;line-height:1.6 !important}
 .zrspanne b{color:var(--ink-2)}
 .zrfazit{font-size:15px;line-height:1.6;color:var(--ink-2);background:var(--card);border:1px solid var(--rule);
@@ -470,7 +472,7 @@ function zeitreihenTest(o){
           ? 'Kapital nach '+e.schlechtestes.pleiteNach+' Ruhestandsjahren aufgebraucht'
           : 'selbst dann am Ende noch '+eur(e.schlechtestes.ende))+'</div></div>'+
    '</div>'+
-   zrChart(e,o)+
+   zrChart(e,o,ohneEntnahme)+
    '<p class=zrn>'+deutung(e,o,quote,ohneEntnahme)+'</p>'+
    '<p>Die beiden Werkzeuge rechnen dasselbe ausführlicher — mit Portfolio-Mix, Glidepath, Leitplanken und der Heatmap aller Startjahre:</p>'+
    '<div class=wl>'+
@@ -527,9 +529,12 @@ function deutung(e,o,quote,ohneEntnahme){
   else s='<b style="color:var(--bad)">Ein erheblicher Teil der Startjahre hätte nicht gereicht.</b> Nicht wegen einer schlechten Durchschnittsrendite, sondern wegen ihrer Reihenfolge. ';
   if(abw && abw>1.25) s+='Auffällig ist der Abstand nach oben: historisch lag das Kapital bei Rentenbeginn im Median beim '+nf1(abw)+'-Fachen deiner Annahme — die Vorgabe oben ist also deutlich vorsichtiger als das, was die Geschichte lieferte. ';
   else if(abw && abw<0.8) s+='Deine Annahme oben liegt <b>über</b> dem historischen Median — sie unterstellt einen besseren Verlauf als die Mehrheit der Startjahre brachte. ';
-  s += e.p10>0
-    ? 'Zwischen dem schwachen und dem starken Zehntel liegt am Ende der Faktor '+nf1(e.p90/e.p10)+'. Diese Spannweite ist das eigentliche Risiko, nicht der Mittelwert.'
-    : 'Selbst das schwache Zehntel endet bei null — die Lücke ist zu groß für das Kapital, nicht bloß ungünstig getimt. Hier hilft keine andere Renditeannahme, sondern nur eine höhere Sparrate, ein späterer Renteneintritt oder ein kleinerer Wunsch.';
+  if(e.p10>0)
+    s+='Zwischen dem schwachen und dem starken Zehntel liegt am Ende der Faktor '+nf1(e.p90/e.p10)+'. Diese Spannweite ist das eigentliche Risiko, nicht der Mittelwert.';
+  else if(e.median>0)
+    s+='Das schwache Zehntel endet bei null, das mittlere Startjahr dagegen bei '+eur(e.median)+'. Genau das ist Sequenzrisiko: derselbe Plan, dasselbe Kapital — und trotzdem entscheidet das Startjahr über alles oder nichts.';
+  else
+    s+='Selbst das mittlere Startjahr endet bei null — die Lücke ist zu groß für das Kapital, nicht bloß ungünstig getimt. Hier hilft keine andere Renditeannahme, sondern nur eine höhere Sparrate, ein späterer Renteneintritt oder ein kleinerer Wunsch.';
   if(ZR.land==='de') s+=' Die deutsche Reihe enthält 1923 und 1948 als reale Totalverluste — Fenster, die eines der beiden Jahre umfassen, brechen zwangsläufig ein.';
   return s;
 }
@@ -539,33 +544,52 @@ const nf1=x=>Number(x).toLocaleString('de-DE',{minimumFractionDigits:1,maximumFr
    Punktschätzung oben ausgibt, damit die Vergleichslinie wirklich vergleichbar ist.
    Die Balken unter der Nulllinie markieren Startjahre, deren Kapital in der
    Entnahmephase trotzdem vorzeitig ausging.                                     */
-function zrChart(e,o){
-  const W=680,H=202,L=58,R=12,T=16,B=44;
+/* Zwei Felder übereinander statt zweier Achsen in einem: die Beträge bei
+   Renteneintritt und am Ende unterscheiden sich um ein Vielfaches, auf einer
+   gemeinsamen Skala wäre die untere Linie plattgedrückt. Gemeinsame Zeitachse,
+   getrennte Wertachsen, jede für sich beschriftet.                           */
+function zrChart(e,o,ohneEntnahme){
+  const W=680, L=58, R=12, PH=96, GAP=30, TOP=20, B=42;
+  const H=TOP+PH+GAP+PH+B;
   const j0=e.laeufe[0].jahr, j1=e.laeufe[e.laeufe.length-1].jahr;
-  const vmax=Math.max(...e.laeufe.map(l=>l.beiRente), o.projiziert)*1.04||1;
   const X=v=>L+(j1===j0?0:(v-j0)/(j1-j0))*(W-L-R);
-  const Y=v=>H-B-Math.min(v,vmax)/vmax*(H-T-B);
   const kurz=v=>v<1000?'0':(v>=1e6?nf1(v/1e6)+' Mio':Math.round(v/1000)+'k');
-  let s='<svg viewBox="0 0 '+W+' '+H+'" style="width:100%;height:auto;display:block;margin-top:12px" xmlns="http://www.w3.org/2000/svg">';
-  s+='<text x="0" y="10" font-size="10.5" fill="#57534c">Kapital zum Renteneintritt, je Startjahr</text>';
-  [0,0.5,1].forEach(f=>{const v=vmax*f;
-    s+='<line x1="'+L+'" y1="'+Y(v)+'" x2="'+(W-R)+'" y2="'+Y(v)+'" stroke="'+(f===0?'#8b857a':'#e8e2d7')+'" stroke-width="'+(f===0?1.2:1)+'"/>'+
-       '<text x="'+(L-8)+'" y="'+(Y(v)+3.5)+'" font-size="9.5" fill="#8b857a" text-anchor="end">'+kurz(v)+'</text>';});
-  s+='<polyline points="'+e.laeufe.map(l=>X(l.jahr)+','+Y(l.beiRente)).join(' ')+'" fill="none" stroke="#1d4ed8" stroke-width="2" stroke-linejoin="round"/>';
   const bw=(W-L-R)/Math.max(1,j1-j0);
-  e.laeufe.filter(l=>l.pleiteNach!==null).forEach(l=>{
-    s+='<rect x="'+(X(l.jahr)-Math.max(1,bw)/2)+'" y="'+(Y(0)+3)+'" width="'+Math.max(1.5,bw)+'" height="6" fill="#b91c1c" fill-opacity="0.85"/>';});
-  if(o.projiziert>0){
-    const y=Y(Math.min(o.projiziert,vmax));
-    s+='<line x1="'+L+'" y1="'+y+'" x2="'+(W-R)+'" y2="'+y+'" stroke="#c2410c" stroke-width="1.4"/>'+
-       '<text x="'+(L+4)+'" y="'+(y-5)+'" font-size="10" fill="#c2410c" font-weight="700">deine Annahme: '+eur(o.projiziert)+'</text>';}
-  else s+='<text x="'+(L+4)+'" y="'+(Y(0)-5)+'" font-size="10" fill="#c2410c" font-weight="700">deine Annahme: '+eur(o.projiziert)+'</text>';
+  let s='<svg viewBox="0 0 '+W+' '+H+'" style="width:100%;height:auto;display:block;margin-top:12px" xmlns="http://www.w3.org/2000/svg">';
+
+  function feld(y0, werte, farbe, titel, extra){
+    const vmax=Math.max(...werte, extra&&extra.linie||0)*1.06||1;
+    const Y=v=>y0+PH-Math.min(v,vmax)/vmax*PH;
+    let t='<text x="0" y="'+(y0-7)+'" font-size="10.5" fill="#57534c">'+titel+'</text>';
+    [0,0.5,1].forEach(f=>{const v=vmax*f;
+      t+='<line x1="'+L+'" y1="'+Y(v)+'" x2="'+(W-R)+'" y2="'+Y(v)+'" stroke="'+(f===0?'#8b857a':'#e8e2d7')+'" stroke-width="'+(f===0?1.2:1)+'"/>'+
+         '<text x="'+(L-8)+'" y="'+(Y(v)+3.5)+'" font-size="9.5" fill="#8b857a" text-anchor="end">'+kurz(v)+'</text>';});
+    if(extra&&extra.linie>0){
+      const y=Y(Math.min(extra.linie,vmax));
+      t+='<line x1="'+L+'" y1="'+y+'" x2="'+(W-R)+'" y2="'+y+'" stroke="#c2410c" stroke-width="1.4"/>'+
+         '<text x="'+(L+4)+'" y="'+(y-5)+'" font-size="10" fill="#c2410c" font-weight="700">'+extra.text+'</text>';}
+    t+='<polyline points="'+e.laeufe.map((l,i)=>X(l.jahr)+','+Y(werte[i])).join(' ')+'" fill="none" stroke="'+farbe+'" stroke-width="2" stroke-linejoin="round"/>';
+    if(extra&&extra.ausfaelle) e.laeufe.filter(l=>l.pleiteNach!==null).forEach(l=>{
+      t+='<rect x="'+(X(l.jahr)-Math.max(1,bw)/2)+'" y="'+(Y(0)+3)+'" width="'+Math.max(1.5,bw)+'" height="6" fill="#b91c1c" fill-opacity="0.85"/>';});
+    return t;
+  }
+
+  s+=feld(TOP, e.laeufe.map(l=>l.beiRente), '#1d4ed8',
+      '① Kapital bei Renteneintritt, nach '+o.jahreBisRente+' Jahren Ansparen',
+      {linie:o.projiziert, text:'deine Annahme: '+eur(o.projiziert)});
+  s+=feld(TOP+PH+GAP, e.laeufe.map(l=>l.ende), '#059669',
+      '② Kapital am Ende, nach weiteren '+o.jahreRuhestand+' Jahren '+(ohneEntnahme?'ohne Entnahme':'Entnahme'),
+      {ausfaelle:true});
+
   [j0,Math.round((j0+j1)/2),j1].forEach(v=>{
-    s+='<text x="'+X(v)+'" y="'+(H-20)+'" font-size="9.5" fill="#8b857a" text-anchor="middle">'+v+'</text>';});
-  s+='<text x="'+((L+W-R)/2)+'" y="'+(H-5)+'" font-size="10.5" fill="#57534c" text-anchor="middle">Startjahr des Plans</text>';
-  return s+'</svg><div class=zrleg><span><i style="background:#1d4ed8"></i>Kapital bei Renteneintritt ('+e.n+' Startjahre)</span>'+
+    s+='<text x="'+X(v)+'" y="'+(H-22)+'" font-size="9.5" fill="#8b857a" text-anchor="middle">'+v+'</text>';});
+  s+='<text x="'+((L+W-R)/2)+'" y="'+(H-6)+'" font-size="10.5" fill="#57534c" text-anchor="middle">Startjahr des Plans — beide Felder teilen sich diese Achse</text>';
+  return s+'</svg><div class=zrleg>'+
+    '<span><i style="background:#1d4ed8"></i>① bei Renteneintritt</span>'+
+    '<span><i style="background:#059669"></i>② am Ende</span>'+
     '<span><i style="background:#c2410c"></i>Punktschätzung dieser Seite</span>'+
-    (e.n-e.durchgehalten>0?'<span><i style="background:#b91c1c"></i>ging im Ruhestand vorzeitig aus</span>':'')+'</div>'+
+    (e.n-e.durchgehalten>0?'<span><i style="background:#b91c1c"></i>vorzeitig aufgebraucht</span>':'')+
+    '<span class=zrachs>Beachte: beide Felder haben eine <b>eigene</b> Wertachse</span></div>'+
     '<div class=zrherk><b>'+eur(o.projiziert)+'</b> — so kommt die rote Linie zustande: '+
       eur(o.liquide)+' liquides Vermögen'+(o.rate>0?' plus '+o.jahreBisRente+' × '+eur(o.rate)+' Sparrate im Jahr':' ohne weitere Sparrate')+
       ', über '+o.jahreBisRente+' Jahre mit <b>'+nf1(o.rReal*100)+' % realer Rendite</b> hochgerechnet'+
