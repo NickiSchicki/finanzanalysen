@@ -1,14 +1,14 @@
 <!DOCTYPE html><html lang=de><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1">
 <title>Mein Vermögensbild — alles auf einen Blick</title>
-<link rel=stylesheet href="assets/site.css?v=23">
-<script defer src="assets/site-map.js?v=23"></script>
-<script defer src="assets/datenstand.js?v=23"></script>
-<script defer src="assets/site.js?v=23"></script>
-<script defer src="assets/profil.js?v=23"></script>
-<script defer src="assets/de-rente.js?v=23"></script>
-<script defer src="assets/de-kapitalertrag.js?v=23"></script>
-<script defer src="assets/de-vermoegen.js?v=23"></script>
-<script defer src="assets/reihen.js?v=23"></script>
+<link rel=stylesheet href="assets/site.css?v=24">
+<script defer src="assets/site-map.js?v=24"></script>
+<script defer src="assets/datenstand.js?v=24"></script>
+<script defer src="assets/site.js?v=24"></script>
+<script defer src="assets/profil.js?v=24"></script>
+<script defer src="assets/de-rente.js?v=24"></script>
+<script defer src="assets/de-kapitalertrag.js?v=24"></script>
+<script defer src="assets/de-vermoegen.js?v=24"></script>
+<script defer src="assets/reihen.js?v=24"></script>
 <style>
 .two{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 @media(max-width:820px){.two{grid-template-columns:1fr}}
@@ -43,13 +43,21 @@
 .zrleg .zrachs b{color:var(--ink-2)}
 .zrspanne{font-size:12.5px !important;color:var(--ink-3) !important;line-height:1.6 !important}
 .zrspanne b{color:var(--ink-2)}
-.zrfazit{font-size:15px;line-height:1.6;color:var(--ink-2);background:var(--card);border:1px solid var(--rule);
-  border-left:3px solid var(--accent);border-radius:0 11px 11px 0;padding:14px 16px;margin:4px 0 0}
-.zrfazit b{color:var(--ink)}
 .zrn{border-left:2px solid var(--accent);padding-left:12px;margin-top:14px !important}
-.zrherk{font-size:11.5px;line-height:1.6;color:var(--ink-3);margin-top:8px;padding-top:8px;
-  border-top:1px solid var(--rule-soft)}
-.zrherk b{color:var(--ink-2)}
+/* Stations-Überschriften der Ergebnisspalte: ① Stand · ② Ruhestand · ③ Belastungstest */
+.station{display:flex;align-items:baseline;gap:9px;font-size:10.5px;font-weight:700;text-transform:uppercase;
+  letter-spacing:.15em;color:var(--ink-3);margin:26px 0 12px;padding-top:18px;border-top:1px solid var(--rule)}
+.station:first-child{margin-top:0;padding-top:0;border-top:0}
+.station b{font-family:var(--serif);font-size:16px;color:var(--accent);letter-spacing:0}
+/* Aufklapper: trennt "will ich wissen" von "muss ich nicht sofort lesen" */
+details.aufk{margin-top:12px}
+details.aufk>summary{display:inline-block;cursor:pointer;list-style:none;font-size:11px;font-weight:700;
+  text-transform:uppercase;letter-spacing:.11em;color:var(--ink-3);border:1px solid var(--rule);
+  border-radius:7px;padding:6px 11px;user-select:none}
+details.aufk>summary::-webkit-details-marker{display:none}
+details.aufk>summary::after{content:" ▾";font-size:9px}
+details.aufk[open]>summary::after{content:" ▴"}
+details.aufk>summary:hover{color:var(--accent);border-color:var(--accent)}
 .aktion{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
 .btn{font-family:var(--sans);font-size:12.5px;font-weight:600;padding:8px 14px;border:1px solid var(--rule);
   background:var(--card);border-radius:9px;cursor:pointer;color:var(--ink-2)}
@@ -79,7 +87,7 @@
 <div class=card>
 <h2>Deine Eckdaten</h2>
 
-<div class=grp>Person</div>
+<div class=grp>Das bist du</div>
 <div class=two>
 <div class=ctrl><div class=clabel><span>Geburtsjahr</span></div><input type=number id=p_gj min=1930 max=2015 step=1 placeholder="1985"></div>
 <div class=ctrl><div class=clabel><span>Bruttojahresgehalt</span></div><input type=text inputmode=numeric class=eurin id=p_brutto placeholder="60.000"></div>
@@ -90,7 +98,7 @@
 </div>
 <div class=hint id=ep_hinweis></div>
 
-<div class=grp>Vermögen heute</div>
+<div class=grp>Das hast du</div>
 <div class=two>
 <div class=ctrl><div class=clabel><span>Depot / Wertpapiere</span></div><input type=text inputmode=numeric class=eurin id=p_depot placeholder="0"></div>
 <div class=ctrl><div class=clabel><span>Bank- und Sparguthaben</span></div><input type=text inputmode=numeric class=eurin id=p_bank placeholder="0"></div>
@@ -114,9 +122,29 @@
 <div class=ctrl><div class=clabel><span>Sonstige Schulden</span></div><input type=text inputmode=numeric class=eurin id=p_sonstschuld placeholder="0"></div>
 </div>
 
-<div class=grp>Gehaltsentwicklung</div>
-<div class=ctrl><div class=clabel><span>Dein Gehalt steigt p.a. <span class=sub>(nominal)</span></span><span class=cval id=p_gs_v>2,5 %</span></div><input type=range id=p_gs min=0 max=6 step=0.1 value=2.5></div>
+<div class=grp>Das planst du</div>
+<div class=two>
+<div class=ctrl><div class=clabel><span>Sparrate pro Monat <span class=sub>(real)</span></span></div><input type=text inputmode=numeric class=eurin id=p_rate placeholder="500"></div>
+<div class=ctrl><div class=clabel><span>Wunsch-Nettorente <span class=sub>(heutige Kaufkraft)</span></span></div><input type=text inputmode=numeric class=eurin id=p_bedarf placeholder="2.500"></div>
+</div>
+<div class=two>
+<div class=ctrl><div class=clabel><span>Geplanter Renteneintritt</span><span class=cval id=p_ra_v>67</span></div><input type=range id=p_ra min=63 max=70 step=1 value=67></div>
+<div class=ctrl><div class=clabel><span>Dauer des Ruhestands</span><span class=cval id=p_rd_v>25 J</span></div><input type=range id=p_rd min=10 max=40 step=1 value=25></div>
+</div>
+<div class=hint>Mit 67 beträgt die durchschnittliche fernere Lebenserwartung rund 18 Jahre (Männer) bzw. 21 Jahre (Frauen). Wer nicht auf den Durchschnitt, sondern auf ein hohes Alter plant, rechnet mit 25 bis 30 Jahren.</div>
+<div class=ctrl style="margin-top:15px"><div class=clabel><span>Sicherheitspuffer <span class=sub>(soll am Ende übrig bleiben)</span></span></div>
+<input type=text inputmode=numeric class=eurin id=p_puffer placeholder="0">
+<div class=hint id=puffer_h></div></div>
 
+<details class=aufk id=annahmenbox>
+<summary>Annahmen — Rendite, Inflation, Lohnentwicklung</summary>
+<div class=hint style="margin:10px 0 14px">Die Voreinstellungen sind bewusst vorsichtig gewählt und historisch eingeordnet — hier ändern muss nur, wer eigene Erwartungen mitbringt.</div>
+<div class=two>
+<div class=ctrl><div class=clabel><span>Erwartete Rendite p.a. <span class=sub>(nominal)</span></span><span class=cval id=p_rn_v>5,0 %</span></div><input type=range id=p_rn min=0 max=10 step=0.1 value=5></div>
+<div class=ctrl><div class=clabel><span>Erwartete Inflation p.a.</span><span class=cval id=p_inf_v>2,0 %</span></div><input type=range id=p_inf min=0 max=6 step=0.1 value=2></div>
+</div>
+<div class=hint id=rendite_h></div>
+<div class=ctrl style="margin-top:15px"><div class=clabel><span>Dein Gehalt steigt p.a. <span class=sub>(nominal)</span></span><span class=cval id=p_gs_v>2,5 %</span></div><input type=range id=p_gs min=0 max=6 step=0.1 value=2.5></div>
 <div class=ctrl vorgabe><div class=clabel><span>Allgemeine Löhne steigen p.a. <span class=tagv>Vorgabe</span></span></div>
 <select id=p_lw>
 <option value=2.5 selected>2,5 % — Voreinstellung, zwischen Langfristtrend und jüngstem Anstieg</option>
@@ -129,27 +157,7 @@
 <div class=hint><b>Dies ist keine persönliche Annahme</b>, sondern der Vergleichsmaßstab: das Durchschnittsentgelt der Rentenversicherung, durch das dein Gehalt geteilt wird. In der Regel unverändert lassen.<br>
 Die Lohndynamik hat über die Jahrzehnte klar nachgelassen — von 4,9 % seit 1950 auf 1,9 % in den 2000ern. Zuletzt zog sie wieder an. Quelle: Jordà-Schularick-Taylor Macrohistory und amtliche Durchschnittsentgelte.</div></div>
 <div class=hint id=gs_hinweis></div>
-
-<div class=grp>Sparen &amp; Ruhestand</div>
-<div class=two>
-<div class=ctrl><div class=clabel><span>Sparrate pro Monat <span class=sub>(real)</span></span></div><input type=text inputmode=numeric class=eurin id=p_rate placeholder="500"></div>
-<div class=ctrl><div class=clabel><span>Wunsch-Nettorente <span class=sub>(heutige Kaufkraft)</span></span></div><input type=text inputmode=numeric class=eurin id=p_bedarf placeholder="2.500"></div>
-</div>
-<div class=ctrl><div class=clabel><span>Geplanter Renteneintritt</span><span class=cval id=p_ra_v>67</span></div><input type=range id=p_ra min=63 max=70 step=1 value=67></div>
-
-<div class=grp>Annahmen</div>
-<div class=ctrl><div class=clabel><span>Dauer des Ruhestands</span><span class=cval id=p_rd_v>25 J</span></div><input type=range id=p_rd min=10 max=40 step=1 value=25>
-<div class=hint>Mit 67 beträgt die durchschnittliche fernere Lebenserwartung rund 18 Jahre (Männer) bzw. 21 Jahre (Frauen). Wer nicht auf den Durchschnitt, sondern auf ein hohes Alter plant, rechnet mit 25 bis 30 Jahren.</div></div>
-
-<div class=two>
-<div class=ctrl><div class=clabel><span>Erwartete Rendite p.a. <span class=sub>(nominal)</span></span><span class=cval id=p_rn_v>5,0 %</span></div><input type=range id=p_rn min=0 max=10 step=0.1 value=5></div>
-<div class=ctrl><div class=clabel><span>Erwartete Inflation p.a.</span><span class=cval id=p_inf_v>2,0 %</span></div><input type=range id=p_inf min=0 max=6 step=0.1 value=2></div>
-</div>
-<div class=hint id=rendite_h></div>
-
-<div class=ctrl><div class=clabel><span>Sicherheitspuffer <span class=sub>(soll am Ende übrig bleiben)</span></span></div>
-<input type=text inputmode=numeric class=eurin id=p_puffer placeholder="0">
-<div class=hint id=puffer_h></div></div>
+</details>
 
 <div class=aktion>
 <button class=btn id=bLeeren>Angaben löschen</button>
@@ -164,7 +172,7 @@ Die Lohndynamik hat über die Jahrzehnte klar nachgelassen — von 4,9 % seit 19
 </div>
 
 <div class=card id=weiterkarte style="display:none">
-<h2>Damit weiterrechnen</h2>
+<h2>④ · Damit weiterrechnen</h2>
 <p class=note id=weiterhint></p>
 <div class=wl id=weiter></div>
 </div>
@@ -326,6 +334,7 @@ function auswerten(){
   const erbe=Math.max(0,rest);
 
   $('bild').innerHTML=
+   '<div class=station><b>①</b> Dein Stand heute</div>'+
    '<div class=saeulen>'+
    '<div class="sae a"><div class=l>Gesetzliche Rente mit '+raAlter+'</div><div class=v>'+eur(rentenNetto)+'</div>'+
      '<div class=s>Zahlbetrag nach Kranken- und Pflegeversicherung · Zugangsfaktor '+zf.toLocaleString('de-DE',{minimumFractionDigits:3,maximumFractionDigits:3})+
@@ -336,6 +345,9 @@ function auswerten(){
      '<div class=s>'+(hatVermoegen?('davon liquide '+eur(liquide)+(immo>0?' · Immobilie netto '+eur(immo-immoS):'')):'Noch keine Vermögensangaben')+'</div></div>'+
    '<div class="sae c"><div class=l>Mehr als … der Haushalte</div><div class=v>'+(rang!==null?p1(rang/100):'—')+'</div>'+
      '<div class=s>'+(gruppe?(p1((100-rang)/100)+' haben mehr'+(rang>=50?' (oberes '+p1((100-rang)/100)+')':'')+' · Median der Altersgruppe '+gruppe.altersgruppe+': '+eur(gruppe.medianGruppe)+' · Erhebung '+VERMOEGEN_ERHEBUNGSJAHR):'Vermögen eintragen für die Einordnung')+'</div></div>'+
+   '</div>'+
+   '<div class=station><b>②</b> Dein Ruhestand — gerechnet mit glatten '+p1(rReal)+' real</div>'+
+   '<div class=saeulen>'+
    '<div class="sae d"><div class=l>Lücke zum Wunsch von '+eur(bedarf)+'</div><div class=v>'+(luecke>0?eur(luecke):'gedeckt')+'</div>'+
      '<div class=s>'+(kapitalbedarf>0
        ? (luecke>0?'pro Monat · ':'Die Rente deckt den Wunsch, aber ')+'nötiges Kapital rund <b>'+eur(kapitalbedarf)+'</b>'+
@@ -351,9 +363,12 @@ function auswerten(){
             : '<b style="color:var(--warn)">Unter dem angestrebten Puffer von '+eur(puffer)+'</b> — es fehlen '+eur(puffer-erbe)+'.')
          : 'Ohne Puffer geplant — was hier steht, ist allein das Kapital über dem Bedarf.'))+
      '</div>'+
-     (pleiteNach===null&&erbe>0?'<div class=s style="margin-top:6px">In heutiger Kaufkraft, vor Erbschaftsteuer.</div>':'')+'</div>'+
+     '<div class=s style="margin-top:6px">'+(pleiteNach===null&&erbe>0?'In heutiger Kaufkraft, vor Erbschaftsteuer · ':'')+'glatte Rendite — den Härtetest macht ③.</div></div>'+
    '</div>'+
-   (kapitalbedarf>0?deckungsBalken(projiziert,kapitalbedarf,deckung,jahreBisRente)+herleitung(luecke,jahreRuhestand,rr,kapitalbedarf,rAnspar,jahreBisRente,liquide,rate,verkaufserloes,bedarfRente,bedarfKredit,restJahreKredit,krate/12,bedarfPuffer,puffer):'')+
+   (kapitalbedarf>0?deckungsBalken(projiziert,kapitalbedarf,deckung,jahreBisRente)+
+     '<details class=aufk><summary>Wie sich Bedarf und Projektion errechnen</summary>'+
+     herleitung(luecke,jahreRuhestand,rr,kapitalbedarf,rAnspar,jahreBisRente,liquide,rate,verkaufserloes,bedarfRente,bedarfKredit,restJahreKredit,krate/12,bedarfPuffer,puffer)+
+     '</details>':'')+
    zeitreihenTest({liquide:liquide, rate:rate, jahreBisRente:jahreBisRente, verkaufserloes:verkaufserloes,
      entnahmeJahr:entnahmeJahr, jahreRuhestand:jahreRuhestand, restJahreKredit:restJahreKredit,
      krate:krate, infl:infl, projiziert:projiziert, rReal:rReal});
@@ -389,11 +404,24 @@ function auswerten(){
   $('take').innerHTML = luecke>0
     ? 'Mit '+alter+' Jahren und '+eur(brutto)+' Brutto stehen zum Renteneintritt mit '+raAlter+' rund <b>'+eur(rentenNetto)+'</b> gesetzliche Rente im Monat zu buche. Vom Wunsch über '+eur(bedarf)+' fehlen damit <b>'+eur(luecke)+' im Monat</b> — dafür braucht es etwa <b>'+eur(kapitalbedarf)+'</b> eigenes Kapital'+kredZusatz+'. Bei der aktuellen Sparrate wären zum Rentenbeginn voraussichtlich <b>'+eur(projiziert)+'</b> vorhanden — '+(projiziert>=kapitalbedarf ? 'das <b>'+(projiziert/kapitalbedarf).toLocaleString('de-DE',{maximumFractionDigits:1})+'-fache</b> des Nötigen.' : 'also <b>'+p1(projiziert/kapitalbedarf)+'</b> des Nötigen.')
     : 'Mit '+alter+' Jahren und '+eur(brutto)+' Brutto deckt die gesetzliche Rente von rund <b>'+eur(rentenNetto)+'</b> den Wunsch über '+eur(bedarf)+' bereits ab.'+(bedarfKredit>0 ? ' Allerdings läuft die Kreditrate noch '+restJahreKredit+' Jahre in den Ruhestand hinein — dafür werden rund <b>'+eur(bedarfKredit)+'</b> eigenes Kapital gebraucht.' : ' Alles darüber hinaus Angesparte ist Zusatz.');
+  // Der Härtetest aus ③ gehört mit ins Fazit — eine Box, ein Urteil
+  if(ZR.ergebnis){
+    const z=ZR.ergebnis;
+    $('take').innerHTML += z.art==='trag'
+      ? ' Durch die echte Geschichte gerechnet trüge das Kapital zusätzlich rund <b>'+eur(z.sicher)+' im Monat</b> — in jedem Startjahr seit 1871 (③).'
+      : (z.quote===100
+        ? ' Durch die echte Geschichte gerechnet hätte dieser Plan in <b>allen '+z.n+' Startjahren</b> seit 1871 gehalten (③).'
+        : (z.quote>=90
+          ? ' Durch die echte Geschichte gerechnet hätte er in <b>'+z.quote+' %</b> der Startjahre gehalten (③).'
+          : ' <b style="color:var(--bad)">Durch die echte Geschichte gerechnet hätte er nur in '+z.quote+' % der Startjahre gehalten</b> (③).'));
+  }
 
   // Weiterführende Rechner mit Bezug zur eigenen Lage
   $('weiterkarte').style.display='';
-  $('weiterhint').textContent='Die Rechner übernehmen deine Angaben automatisch.';
+  $('weiterhint').textContent='Die Rechner übernehmen deine Angaben automatisch. Die ersten beiden rechnen den Belastungstest aus ③ ausführlicher.';
   $('weiter').innerHTML=
+   karte('Lebenszyklus_Simulator.html','Ein ganzes Finanzleben, durchgerechnet','Der Test aus ③ in ausführlich: Portfolio-Mix, Glidepath, Leitplanken, Perzentil-Fächer.')+
+   karte('Geschichts_Stresstest.html','Der Geschichts-Stresstest','Erfolgsquote, Spaghetti-Chart und Heatmap: welche Jahrgänge es traf und welche nicht.')+
    karte('Rentenluecke_Rechner.html','Rente im Detail','Ab- und Zuschläge, Steuer auf die Rente und der Kapitalbedarf genauer gerechnet.')+
    karte('Depot_Steuern_Kosten.html','Was Steuern und Kosten nehmen','Wie viel von der Rendite unterwegs verloren geht.')+
    karte('Sparplan_Perzentile.html','An der Sparrate drehen','Was ein paar hundert Euro mehr im Monat über die Jahre ausmachen — als Bandbreite, nicht als Punkt.')+
@@ -412,6 +440,7 @@ const ZR={land:'usa',aktien:1};
    tatsächliche Renditefolge, die es seit 1871 gab. Ansparen und Entnehmen in
    einem Durchlauf, damit die Reihenfolge der Jahre wirklich durchschlägt.     */
 function zeitreihenTest(o){
+  ZR.ergebnis=null;
   if(typeof Reihen==='undefined') return '';
   const e=Reihen.lebenszyklus({
     land:ZR.land, aktienAnteil:ZR.aktien,
@@ -422,6 +451,7 @@ function zeitreihenTest(o){
     jahreEntnahme:o.jahreRuhestand
   });
 
+  const kopf='<div class=station><b>③</b> Der Belastungstest — durch die echte Geschichte</div>';
   const steuer=
    '<div id=zrsteuer class=zrsteuer>'+
      '<div><span class=zl>Datenreihe</span><div class="seg tone">'+
@@ -434,7 +464,7 @@ function zeitreihenTest(o){
    '</div>';
 
   if(!e || e.zuKurz || !e.n){
-    return '<div class=zr><div class=hl>Dein Plan durch die Geschichte</div>'+steuer+
+    return kopf+'<div class=zr>'+steuer+
       '<p>Ansparen und Entnehmen ergeben zusammen '+(e?e.horizont:0)+' Jahre — mehr, als die gewählte Reihe hergibt ('+(e?e.verfuegbar:0)+' Jahre). '+
       'Wähle die US-Reihe, sie ist die längste.</p></div>';
   }
@@ -444,41 +474,37 @@ function zeitreihenTest(o){
   // Ohne Entnahme ist eine Erfolgsquote ohne Aussage — dann wird der Test zum Wachstumsvergleich
   const ohneEntnahme = o.entnahmeJahr<1 && o.restJahreKredit===0;
   const trag = ohneEntnahme ? tragfaehig(o) : null;   // einmal suchen, zweimal verwenden
+  // Kurzform für das Fazit ganz oben auf der Seite — die eine Fazit-Box der Seite
+  ZR.ergebnis = ohneEntnahme
+    ? {art:'trag', sicher:trag.sicher, n:e.n}
+    : {art:'quote', quote:quote, n:e.n, durchgehalten:e.durchgehalten};
 
-  return '<div class=zr>'+
-   '<div class=hl>Dein Plan durch die Geschichte</div>'+
-   '<p>Bis hierher steht überall <b>eine</b> Zahl, weil <b>eine</b> gleichbleibende Rendite unterstellt wird. So verläuft kein Anlegerleben. '+
-   'Deshalb läuft derselbe Plan hier durch <b>jede tatsächliche Renditefolge</b>, die es gab: '+o.jahreBisRente+' Jahre ansparen und '+
-   o.jahreRuhestand+' Jahre '+(ohneEntnahme?'liegen lassen':'entnehmen')+', also '+e.horizont+' Jahre am Stück, real gerechnet.</p>'+
-   '<p class=zrspanne>Das ergibt <b>'+e.n+' mögliche Startjahre, '+e.erstesStartjahr+' bis '+e.letztesStartjahr+'</b>. '+
-   'Später beginnt keiner mehr, weil ein Plan über '+e.horizont+' Jahre erst abgelaufen sein muss, um bewertet werden zu können: '+
-   'der Jahrgang '+e.letztesStartjahr+' endete '+e.letztesKalenderjahr+' und damit am Ende der Datenreihe. '+
-   'Die Jahreszahlen auf der Achse unten sind deshalb <b>Startjahre</b>, kein Zeitraum.</p>'+
+  return kopf+'<div class=zr>'+
+   '<p>Alles oben rechnet mit <b>einer</b> gleichbleibenden Rendite — so verläuft kein Anlegerleben. '+
+   'Hier läuft derselbe Plan durch <b>jede tatsächliche Renditefolge seit '+e.erstesStartjahr+'</b>: '+
+   o.jahreBisRente+' Jahre ansparen, '+o.jahreRuhestand+' Jahre '+(ohneEntnahme?'liegen lassen':'entnehmen')+
+   ' — einmal je Startjahr, '+e.n+' Durchläufe, real gerechnet.</p>'+
    steuer+
-   '<div class=zrfazit>'+fazit(e,o,quote,ohneEntnahme,trag)+'</div>'+
    '<div class=zrerg>'+
      (ohneEntnahme
        ? '<div><div class=l>Trägt zusätzlich zur Rente</div><div class=v style="color:var(--good)">'+eur(trag.sicher)+'</div>'+
          '<div class=s>im Monat, '+o.jahreRuhestand+' Jahre lang, und zwar in <b>jedem</b> der '+e.n+' Startjahre · in 90 % waren '+eur(trag.neunzig)+' drin</div></div>'
        : '<div><div class=l>Hätte gehalten in</div><div class=v style="color:'+farbe+'">'+quote+' %</div>'+
            '<div class=s>'+e.durchgehalten+' von '+e.n+' Startjahren'+(gescheitert?' · in '+gescheitert+' ging das Geld vorher aus':'')+'</div></div>')+
-     '<div><div class=l>Kapital bei Rentenbeginn</div><div class=v>'+eur(e.medianBeiRente)+'</div>'+
-       '<div class=s>Median der Geschichte · deine Annahme oben: '+eur(o.projiziert)+'</div></div>'+
      '<div><div class=l>'+(ohneEntnahme?'Nach weiteren '+o.jahreRuhestand+' Jahren':'Am Ende übrig')+'</div><div class=v>'+eur(e.median)+'</div>'+
-       '<div class=s>Median · schwaches Zehntel '+eur(e.p10)+' · starkes '+eur(e.p90)+
+       '<div class=s>Median über alle Startjahre · schwaches Zehntel '+eur(e.p10)+' · starkes '+eur(e.p90)+
        (ohneEntnahme?' · wächst weiter, weil nichts entnommen wird':'')+'</div></div>'+
-     '<div><div class=l>Schlechtestes Startjahr</div><div class=v'+(e.schlechtestes.pleiteNach!==null?' style="color:var(--bad)"':'')+'>'+e.schlechtestes.jahr+'</div>'+
-       '<div class=s>'+(e.schlechtestes.pleiteNach!==null
-          ? 'Kapital nach '+e.schlechtestes.pleiteNach+' Ruhestandsjahren aufgebraucht'
-          : 'selbst dann am Ende noch '+eur(e.schlechtestes.ende))+'</div></div>'+
    '</div>'+
    zrChart(e,o,ohneEntnahme)+
-   '<p class=zrn>'+deutung(e,o,quote,ohneEntnahme)+'</p>'+
-   '<p>Die beiden Werkzeuge rechnen dasselbe ausführlicher — mit Portfolio-Mix, Glidepath, Leitplanken und der Heatmap aller Startjahre:</p>'+
-   '<div class=wl>'+
-   karte('Lebenszyklus_Simulator.html','Ein ganzes Finanzleben, durchgerechnet','Ansparen und Entnehmen gekoppelt durch echte Sequenzen — Perzentil-Fächer statt einer Zahl.')+
-   karte('Geschichts_Stresstest.html','Der Geschichts-Stresstest','Erfolgsquote, Spaghetti-Chart und Heatmap: welche Jahrgänge es traf und welche nicht.')+
-   '</div></div>';
+   '<details class=aufk><summary>Wie dieser Test funktioniert — und was er zeigt</summary>'+
+     '<p class=zrspanne style="margin-top:12px">Das ergibt <b>'+e.n+' mögliche Startjahre, '+e.erstesStartjahr+' bis '+e.letztesStartjahr+'</b>. '+
+     'Später beginnt keiner mehr, weil ein Plan über '+e.horizont+' Jahre erst abgelaufen sein muss, um bewertet werden zu können: '+
+     'der Jahrgang '+e.letztesStartjahr+' endete '+e.letztesKalenderjahr+' und damit am Ende der Datenreihe.</p>'+
+     '<p class=zrn>'+deutung(e,o,quote,ohneEntnahme)+'</p>'+
+     '<p class=zrspanne>Die rote Linie im oberen Feld ist die Projektion aus ② — wie sie sich errechnet, steht dort unter '+
+     '„Wie sich Bedarf und Projektion errechnen". Ohne Steuern und Gebühren; keine Anlageberatung.</p>'+
+   '</details>'+
+   '</div>';
 }
 
 /* Wenn keine Lücke besteht, ist die spannende Frage nicht „hält es?", sondern
@@ -494,46 +520,25 @@ function tragfaehig(o){
   return {sicher:suche(1), neunzig:suche(0.9)};
 }
 
-/* Die eine Zeile, die sagt, was hier herauskommt — vor allen Kennzahlen */
-function fazit(e,o,quote,ohneEntnahme,trag){
-  if(ohneEntnahme){
-    const t=trag||tragfaehig(o);
-    return '<b>Hier wird gar nichts entnommen</b> — deine gesetzliche Rente deckt den Wunschbetrag schon ab. Die Frage „hält das Kapital durch?" stellt sich damit nicht. '+
-      'Die nützlichere Frage lautet: <b>wie viel könnte es zusätzlich tragen?</b> Antwort aus '+e.n+' Startjahren: rund <b>'+eur(t.sicher)+' im Monat</b> über '+
-      o.jahreRuhestand+' Jahre, und zwar in jedem einzelnen davon — auch im schlechtesten. '+
-      'Das ist der Betrag, den dein Vermögen zur gesetzlichen Rente beisteuert. Alles darüber hinaus hängt an ihr allein.';
-  }
-  const g=e.n-e.durchgehalten;
-  if(quote===100)
-    return '<b>Dein Plan hätte jedes der '+e.n+' Startjahre überstanden</b> — auch den Jahrgang '+e.schlechtestes.jahr+
-      ', den es am härtesten traf; dort blieben am Ende noch '+eur(e.schlechtestes.ende)+'.';
-  if(quote>=90)
-    return '<b>Dein Plan hätte in '+e.durchgehalten+' von '+e.n+' Startjahren gehalten</b>, in '+g+' nicht. '+
-      'Diese Ausfälle sind keine Ausreißer, sondern die Jahrgänge, die schwache Jahre direkt nach dem Renteneintritt erwischten.';
-  if(g===e.n)
-    return '<b style="color:var(--bad)">In allen '+e.n+' Startjahren wäre das Geld vor dem Ende ausgegangen</b> — ausnahmslos, im besten wie im schlechtesten Jahrzehnt. '+
-      'Das ist kein Timing-Problem: die Lücke ist schlicht zu groß für das Kapital. Hilfreich sind hier nur eine höhere Sparrate, ein späterer Renteneintritt oder ein niedrigerer Wunschbetrag — nicht eine andere Renditeannahme.';
-  const jeder=Math.round(e.n/g);
-  return '<b style="color:var(--bad)">In '+g+' von '+e.n+' Startjahren wäre das Geld vor dem Ende ausgegangen</b>'+
-    (jeder>=2?' — also in etwa jedem '+jeder+'. Jahrgang':' — in der Mehrzahl aller Jahrgänge')+
-    '. Der Plan ist nicht knapp kalkuliert, er trägt nicht.';
-}
-
-/* Ein Satz, der sagt, was die Verteilung für diesen Plan bedeutet */
+/* Was die Verteilung für diesen Plan bedeutet — im Aufklapper unter dem Chart */
 function deutung(e,o,quote,ohneEntnahme){
   const abw=o.projiziert>0 ? e.medianBeiRente/o.projiziert : null;
   let s='';
-  if(ohneEntnahme) s='Weil nichts entnommen wird, misst dieser Abschnitt allein das Sparen. ';
+  if(ohneEntnahme) s='Weil deine gesetzliche Rente den Wunschbetrag schon deckt, wird hier nichts entnommen — der Test misst allein das Sparen, und die Kachel oben beantwortet die nützlichere Frage: wie viel das Kapital <b>zusätzlich</b> tragen könnte. Alles darüber hinaus hängt an der Rente allein. ';
   else if(quote===100) s='In keinem einzigen Startjahr ging das Geld aus. Das ist eine Aussage über die Vergangenheit, keine Garantie — die Zukunft muss diese Renditen erst noch liefern. ';
-  else if(quote>=90) s='In den allermeisten Startjahren hielt der Plan, aber nicht in allen. Die Ausfälle sind keine Ausreißer, sondern die Jahrgänge mit schwachem Beginn. ';
+  else if(quote>=90) s='In den allermeisten Startjahren hielt der Plan, aber nicht in allen. Die Ausfälle sind keine Ausreißer, sondern die Jahrgänge, die schwache Jahre direkt nach dem Renteneintritt erwischten. ';
+  else if(e.durchgehalten===0) s='<b style="color:var(--bad)">In allen '+e.n+' Startjahren wäre das Geld vor dem Ende ausgegangen</b> — ausnahmslos, im besten wie im schlechtesten Jahrzehnt. Das ist kein Timing-Problem: die Lücke ist zu groß für das Kapital. Hilfreich sind nur eine höhere Sparrate, ein späterer Renteneintritt oder ein niedrigerer Wunschbetrag — nicht eine andere Renditeannahme. ';
   else s='<b style="color:var(--bad)">Ein erheblicher Teil der Startjahre hätte nicht gereicht.</b> Nicht wegen einer schlechten Durchschnittsrendite, sondern wegen ihrer Reihenfolge. ';
-  if(abw && abw>1.25) s+='Auffällig ist der Abstand nach oben: historisch lag das Kapital bei Rentenbeginn im Median beim '+nf1(abw)+'-Fachen deiner Annahme — die Vorgabe oben ist also deutlich vorsichtiger als das, was die Geschichte lieferte. ';
-  else if(abw && abw<0.8) s+='Deine Annahme oben liegt <b>über</b> dem historischen Median — sie unterstellt einen besseren Verlauf als die Mehrheit der Startjahre brachte. ';
+  s+='Das härteste Startjahr war <b>'+e.schlechtestes.jahr+'</b> — '+(e.schlechtestes.pleiteNach!==null
+    ? 'dort war das Kapital schon nach '+e.schlechtestes.pleiteNach+' Ruhestandsjahren aufgebraucht. '
+    : 'selbst dort standen am Ende noch '+eur(e.schlechtestes.ende)+'. ');
+  if(abw && abw>1.25) s+='Auffällig ist der Abstand nach oben: historisch lag das Kapital bei Rentenbeginn im Median bei '+eur(e.medianBeiRente)+' — dem '+nf1(abw)+'-Fachen der Projektion aus ②, die also deutlich vorsichtiger ist als das, was die Geschichte lieferte. ';
+  else if(abw && abw<0.8) s+='Die Projektion aus ② liegt <b>über</b> dem historischen Median von '+eur(e.medianBeiRente)+' — sie unterstellt einen besseren Verlauf als die Mehrheit der Startjahre brachte. ';
   if(e.p10>0)
     s+='Zwischen dem schwachen und dem starken Zehntel liegt am Ende der Faktor '+nf1(e.p90/e.p10)+'. Diese Spannweite ist das eigentliche Risiko, nicht der Mittelwert.';
   else if(e.median>0)
     s+='Das schwache Zehntel endet bei null, das mittlere Startjahr dagegen bei '+eur(e.median)+'. Genau das ist Sequenzrisiko: derselbe Plan, dasselbe Kapital — und trotzdem entscheidet das Startjahr über alles oder nichts.';
-  else
+  else if(e.durchgehalten>0)
     s+='Selbst das mittlere Startjahr endet bei null — die Lücke ist zu groß für das Kapital, nicht bloß ungünstig getimt. Hier hilft keine andere Renditeannahme, sondern nur eine höhere Sparrate, ein späterer Renteneintritt oder ein kleinerer Wunsch.';
   if(ZR.land==='de') s+=' Die deutsche Reihe enthält 1923 und 1948 als reale Totalverluste — Fenster, die eines der beiden Jahre umfassen, brechen zwangsläufig ein.';
   return s;
@@ -580,10 +585,10 @@ function zrChart(e,o,ohneEntnahme){
   }
 
   s+=feld(TOP, e.laeufe.map(l=>l.beiRente), '#1d4ed8',
-      '① Kapital bei Renteneintritt, nach '+o.jahreBisRente+' Jahren Ansparen',
-      {linie:o.projiziert, text:'so rechnet diese Seite: '+eur(o.projiziert)});
+      'Kapital bei Renteneintritt, nach '+o.jahreBisRente+' Jahren Ansparen',
+      {linie:o.projiziert, text:'Projektion aus ②: '+eur(o.projiziert)});
   s+=feld(TOP+PH+GAP, e.laeufe.map(l=>l.ende), '#059669',
-      '② Kapital am Ende, nach weiteren '+o.jahreRuhestand+' Jahren '+(ohneEntnahme?'ohne Entnahme':'Entnahme'),
+      'Kapital am Ende, nach weiteren '+o.jahreRuhestand+' Jahren '+(ohneEntnahme?'ohne Entnahme':'Entnahme'),
       {ausfaelle:true});
 
   [j0,Math.round((j0+j1)/2),j1].forEach(v=>{
@@ -591,17 +596,11 @@ function zrChart(e,o,ohneEntnahme){
   s+='<text x="'+((L+W-R)/2)+'" y="'+(H-6)+'" font-size="10.5" fill="#57534c" text-anchor="middle">'+
      'Startjahr des Plans · später als '+j1+' geht nicht: '+e.horizont+' Jahre wären '+e.reiheEndet+' noch nicht abgelaufen</text>';
   return s+'</svg><div class=zrleg>'+
-    '<span><i style="background:#1d4ed8"></i>① bei Renteneintritt</span>'+
-    '<span><i style="background:#059669"></i>② am Ende</span>'+
-    '<span><i style="background:#c2410c"></i>was die Rechnung oben ergibt — '+nf1(o.rReal*100)+' % real in <b>jedem</b> Jahr</span>'+
+    '<span><i style="background:#1d4ed8"></i>bei Renteneintritt</span>'+
+    '<span><i style="background:#059669"></i>am Ende</span>'+
+    '<span><i style="background:#c2410c"></i>Projektion aus ② — '+nf1(o.rReal*100)+' % real in <b>jedem</b> Jahr</span>'+
     (e.n-e.durchgehalten>0?'<span><i style="background:#b91c1c"></i>vorzeitig aufgebraucht</span>':'')+
-    '<span class=zrachs>Beachte: beide Felder haben eine <b>eigene</b> Wertachse</span></div>'+
-    '<div class=zrherk><b>'+eur(o.projiziert)+'</b> — so kommt die rote Linie zustande: '+
-      eur(o.liquide)+' liquides Vermögen'+(o.rate>0?' plus '+o.jahreBisRente+' × '+eur(o.rate)+' Sparrate im Jahr':' ohne weitere Sparrate')+
-      ', über '+o.jahreBisRente+' Jahre mit <b>'+nf1(o.rReal*100)+' % realer Rendite</b> hochgerechnet'+
-      (o.verkaufserloes>0?', dazu '+eur(o.verkaufserloes)+' Verkaufserlös der Immobilie':'')+'. '+
-      'Immobilie und Kredit stecken nicht darin, solange nicht verkauft wird. '+
-      'Die reale Rendite folgt aus deinen Reglern <i>nominale Rendite</i> und <i>Inflation</i> weiter oben — sie ist der Hebel, der die rote Linie verschiebt.</div>';
+    '<span class=zrachs>Beachte: beide Felder haben eine <b>eigene</b> Wertachse</span></div>';
 }
 
 /* Woher der Kapitalbedarf kommt — offengelegt statt behauptet */
@@ -610,7 +609,6 @@ function herleitung(luecke,jahre,rz,bedarf,rAnspar,jahreBis,liquide,rate,verk,bR
   const ohneRendite=jl*jahre;
   const rzT=(rz*100).toLocaleString('de-DE',{minimumFractionDigits:1,maximumFractionDigits:1});
   return '<div class=herl>'+
-   '<div class=hl>Woher der Kapitalbedarf kommt</div>'+
    '<table class=hltab><tbody>'+
    (luecke>0?
      '<tr><td>Monatliche Lücke</td><td class=r>'+eur(luecke)+'</td></tr>'+
