@@ -90,6 +90,16 @@ function run(){
     chkTrue(G5,'Dabei kein vorzeitiger Ausfall gemeldet', e.laeufe[0].pleiteNach===null);
     if(merk===undefined) delete REIHEN.test; else REIHEN.test=merk;
   })();
+  // Die Suche nach der tragfähigen Entnahme in Mein_Vermoegensbild.html halbiert
+  // Intervalle — das setzt voraus, dass die Erfolgsquote mit der Entnahme fällt.
+  (function(){
+    const q=m=>Reihen.lebenszyklus({land:'usa',aktienAnteil:1,start:10000,sparrateJahr:0,
+      jahreAnspar:26,entnahmeJahr:m*12,jahreEntnahme:25}).quote;
+    const stufen=[0,100,200,300,400,600,1000].map(q);
+    let fallend=true; for(let i=1;i<stufen.length;i++) if(stufen[i]>stufen[i-1]+1e-9) fallend=false;
+    chkTrue(G5,'Erfolgsquote fällt monoton mit der Entnahme', fallend,'Voraussetzung der Intervallhalbierung');
+    chk(G5,'Ohne Entnahme hält jedes Startjahr', stufen[0], 1, 0.0001);
+  })();
   chkTrue(G5,'Zu langer Horizont wird abgefangen',
     Reihen.lebenszyklus({land:'de',jahreAnspar:100,jahreEntnahme:100,start:1}).zuKurz===true,
     'meldet zuKurz statt falscher Zahlen');

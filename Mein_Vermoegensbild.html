@@ -1,14 +1,14 @@
 <!DOCTYPE html><html lang=de><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1">
 <title>Mein Vermögensbild — alles auf einen Blick</title>
-<link rel=stylesheet href="assets/site.css?v=14">
-<script defer src="assets/site-map.js?v=14"></script>
-<script defer src="assets/datenstand.js?v=14"></script>
-<script defer src="assets/site.js?v=14"></script>
-<script defer src="assets/profil.js?v=14"></script>
-<script defer src="assets/de-rente.js?v=14"></script>
-<script defer src="assets/de-kapitalertrag.js?v=14"></script>
-<script defer src="assets/de-vermoegen.js?v=14"></script>
-<script defer src="assets/reihen.js?v=14"></script>
+<link rel=stylesheet href="assets/site.css?v=15">
+<script defer src="assets/site-map.js?v=15"></script>
+<script defer src="assets/datenstand.js?v=15"></script>
+<script defer src="assets/site.js?v=15"></script>
+<script defer src="assets/profil.js?v=15"></script>
+<script defer src="assets/de-rente.js?v=15"></script>
+<script defer src="assets/de-kapitalertrag.js?v=15"></script>
+<script defer src="assets/de-vermoegen.js?v=15"></script>
+<script defer src="assets/reihen.js?v=15"></script>
 <style>
 .two{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 @media(max-width:820px){.two{grid-template-columns:1fr}}
@@ -441,6 +441,7 @@ function zeitreihenTest(o){
   const farbe = quote===100?'var(--good)':(quote>=90?'var(--warn)':'var(--bad)');
   // Ohne Entnahme ist eine Erfolgsquote ohne Aussage — dann wird der Test zum Wachstumsvergleich
   const ohneEntnahme = o.entnahmeJahr<1 && o.restJahreKredit===0;
+  const trag = ohneEntnahme ? tragfaehig(o) : null;   // einmal suchen, zweimal verwenden
 
   return '<div class=zr>'+
    '<div class=hl>Dein Plan durch die Geschichte</div>'+
@@ -452,11 +453,11 @@ function zeitreihenTest(o){
    'der Jahrgang '+e.letztesStartjahr+' endete '+e.letztesKalenderjahr+' und damit am Ende der Datenreihe. '+
    'Die Jahreszahlen auf der Achse unten sind deshalb <b>Startjahre</b>, kein Zeitraum.</p>'+
    steuer+
-   '<div class=zrfazit>'+fazit(e,o,quote,ohneEntnahme)+'</div>'+
+   '<div class=zrfazit>'+fazit(e,o,quote,ohneEntnahme,trag)+'</div>'+
    '<div class=zrerg>'+
      (ohneEntnahme
-       ? '<div><div class=l>Entnahme nötig</div><div class=v style="color:var(--good)">keine</div>'+
-           '<div class=s>Die gesetzliche Rente deckt deinen Wunsch bereits — das Kapital bleibt unangetastet</div></div>'
+       ? '<div><div class=l>Trägt zusätzlich zur Rente</div><div class=v style="color:var(--good)">'+eur(trag.sicher)+'</div>'+
+         '<div class=s>im Monat, '+o.jahreRuhestand+' Jahre lang, und zwar in <b>jedem</b> der '+e.n+' Startjahre · in 90 % waren '+eur(trag.neunzig)+' drin</div></div>'
        : '<div><div class=l>Hätte gehalten in</div><div class=v style="color:'+farbe+'">'+quote+' %</div>'+
            '<div class=s>'+e.durchgehalten+' von '+e.n+' Startjahren'+(gescheitert?' · in '+gescheitert+' ging das Geld vorher aus':'')+'</div></div>')+
      '<div><div class=l>Kapital bei Rentenbeginn</div><div class=v>'+eur(e.medianBeiRente)+'</div>'+
@@ -478,13 +479,28 @@ function zeitreihenTest(o){
    '</div></div>';
 }
 
+/* Wenn keine Lücke besteht, ist die spannende Frage nicht „hält es?", sondern
+   „wie viel trüge es zusätzlich?". Größte Monatsentnahme, die jedes bzw. neun
+   von zehn Startjahren überstanden hätte — per Intervallhalbierung gesucht.  */
+function tragfaehig(o){
+  const lauf=m=>Reihen.lebenszyklus({land:ZR.land,aktienAnteil:ZR.aktien,
+    start:o.liquide, sparrateJahr:o.rate, jahreAnspar:o.jahreBisRente,
+    einmalBeiRente:o.verkaufserloes, entnahmeJahr:m*12, jahreEntnahme:o.jahreRuhestand});
+  const suche=ziel=>{let lo=0,hi=20000;
+    for(let i=0;i<20;i++){const m=(lo+hi)/2; const q=lauf(m); if(q&&q.quote>=ziel) lo=m; else hi=m;}
+    return lo;};
+  return {sicher:suche(1), neunzig:suche(0.9)};
+}
+
 /* Die eine Zeile, die sagt, was hier herauskommt — vor allen Kennzahlen */
-function fazit(e,o,quote,ohneEntnahme){
-  if(ohneEntnahme)
-    return '<b>Hier wird gar nichts entnommen.</b> Deine gesetzliche Rente deckt den Wunschbetrag schon ab, also bleibt das Kapital liegen und wächst weiter. '+
-      'Die Frage „hält es durch?" stellt sich damit nicht — eine Erfolgsquote wäre hier eine leere Zahl. '+
-      'Was du unten siehst, ist etwas anderes: <b>wie verschieden dasselbe Sparen ausgegangen wäre</b>, je nach Startjahr — zwischen '+
-      eur(e.p10)+' und '+eur(e.p90)+'. Interessant wird der eigentliche Test erst, wenn du einen höheren Wunschbetrag einträgst oder früher in Rente gehst.';
+function fazit(e,o,quote,ohneEntnahme,trag){
+  if(ohneEntnahme){
+    const t=trag||tragfaehig(o);
+    return '<b>Hier wird gar nichts entnommen</b> — deine gesetzliche Rente deckt den Wunschbetrag schon ab. Die Frage „hält das Kapital durch?" stellt sich damit nicht. '+
+      'Die nützlichere Frage lautet: <b>wie viel könnte es zusätzlich tragen?</b> Antwort aus '+e.n+' Startjahren: rund <b>'+eur(t.sicher)+' im Monat</b> über '+
+      o.jahreRuhestand+' Jahre, und zwar in jedem einzelnen davon — auch im schlechtesten. '+
+      'Das ist der Betrag, den dein Vermögen zur gesetzlichen Rente beisteuert. Alles darüber hinaus hängt an ihr allein.';
+  }
   const g=e.n-e.durchgehalten;
   if(quote===100)
     return '<b>Dein Plan hätte jedes der '+e.n+' Startjahre überstanden</b> — auch den Jahrgang '+e.schlechtestes.jahr+
