@@ -64,9 +64,14 @@ window.Reihen = (function () {
     const durch = laeufe.filter(l => l.pleiteNach === null).length;
 
     return {
-      laeufe: laeufe, n: laeufe.length, land: land,
-      erstesJahr: laeufe.length ? laeufe[0].jahr : null,
-      letztesJahr: laeufe.length ? laeufe[laeufe.length - 1].jahr + bedarf - 1 : null,
+      laeufe: laeufe, n: laeufe.length, land: land, horizont: bedarf,
+      /* erstesStartjahr/letztesStartjahr = wann ein Plan BEGINNEN konnte;
+         letztesKalenderjahr = wann der späteste davon endete. Beides sauber
+         trennen — sonst liest man Startjahre als Zeitraum.                  */
+      erstesStartjahr: laeufe.length ? laeufe[0].jahr : null,
+      letztesStartjahr: laeufe.length ? laeufe[laeufe.length - 1].jahr : null,
+      letztesKalenderjahr: laeufe.length ? laeufe[laeufe.length - 1].jahr + bedarf - 1 : null,
+      reiheEndet: basis + r.length - 1,
       durchgehalten: durch,
       quote: laeufe.length ? durch / laeufe.length : null,
       median: med(laeufe.map(l => l.ende)),
