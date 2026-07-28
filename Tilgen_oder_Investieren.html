@@ -1,0 +1,367 @@
+<!DOCTYPE html><html lang=de><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1">
+<title>Tilgen oder investieren — Sondertilgung gegen Depot</title>
+<link rel=stylesheet href="assets/site.css?v=4">
+<script defer src="assets/site-map.js?v=4"></script>
+<script defer src="assets/datenstand.js?v=4"></script>
+<script defer src="assets/site.js?v=4"></script>
+<script src="assets/de-kapitalertrag.js?v=4"></script>
+<style>
+/* seitenspezifisch */
+.wbox .sub2{font-size:11.5px;color:var(--ink-3);margin-top:6px;line-height:1.45}
+.wbox.a{border-left:3px solid var(--s1)}
+.wbox.b{border-left:3px solid var(--s2)}
+.wbox.a .v{color:var(--s1)}
+.wbox.b .v{color:var(--s2)}
+.bigdiff{background:var(--card-2);border:1px solid var(--rule);border-radius:12px;padding:16px 18px;margin-top:14px;text-align:center}
+.bigdiff .l{font-size:12px;color:var(--ink-3)}
+.bigdiff .n{font-family:var(--serif);font-size:34px;font-weight:700;letter-spacing:-.025em;line-height:1.1;margin-top:3px;font-variant-numeric:tabular-nums}
+.bigdiff .s{font-size:12px;color:var(--ink-3);margin-top:5px}
+.warnbox{display:none;background:var(--card-2);border:1px solid var(--rule);border-left:3px solid var(--bad);
+  border-radius:0 10px 10px 0;color:var(--bad);padding:11px 15px;font-size:13.5px;margin:14px 0 0}
+.seg3 button{font-size:12px}
+.mcard .n{font-size:20px}
+.mcard.wide{grid-column:1/-1}
+h3{margin-top:26px}
+.txt{max-width:70ch}
+</style></head><body data-section="Werkzeug"><div class=wrap>
+
+<div class=hero>
+<div class=kicker>Werkzeug · Finanzierung</div>
+<h1>Tilgen oder <em>investieren</em></h1>
+<p class=lead>Der Kredit läuft, und am Monatsende bleibt Geld übrig. In die Sondertilgung damit — oder ins Depot? Die Tilgung wirkt bescheiden: sie bringt nur den Sollzins. Aber sie bringt ihn garantiert und steuerfrei, und genau das verschiebt die Schwelle nach oben.</p>
+</div>
+
+<div class=take id=take>—</div>
+
+<div class=grid2>
+<div class=card>
+<h2>Eingaben</h2>
+
+<div class=grp>Der Kredit</div>
+<div class=ctrl><div class=clabel><span>Restschuld</span></div>
+<input type=text inputmode=numeric class=eurin id=rest value="250.000"></div>
+<div class=ctrl><div class=clabel><span>Sollzins p.a.</span><span class=cval id=zins_v>3,60 %</span></div>
+<input type=range id=zins_r min=0.5 max=8 step=0.05 value=3.6></div>
+<div class=ctrl><div class=clabel><span>Monatsrate (Annuität)</span></div>
+<input type=text inputmode=numeric class=eurin id=rate value="1.250"><div class=hint id=rate_h></div></div>
+
+<div class=grp>Das freie Geld</div>
+<div class=ctrl><div class=clabel><span>Verfügbarer Zusatzbetrag pro Monat</span></div>
+<input type=text inputmode=numeric class=eurin id=zus value="500"><div class=hint id=zus_h></div></div>
+<div class=ctrl><div class=clabel><span>Betrachtungszeitraum</span><span class=cval id=jahre_v>20 Jahre</span></div>
+<input type=range id=jahre_r min=5 max=35 step=1 value=20></div>
+
+<div class=grp>Die Anlage</div>
+<div class=ctrl><div class=clabel><span>Erwartete Rendite p.a. (vor Kosten und Steuern)</span><span class=cval id=rend_v>7,0 %</span></div>
+<input type=range id=rend_r min=0 max=12 step=0.1 value=7></div>
+<div class=ctrl><div class=clabel><span>Laufende Kosten (TER)</span><span class=cval id=ter_v>0,20 %</span></div>
+<input type=range id=ter_r min=0 max=1.5 step=0.01 value=0.2></div>
+<div class=ctrl><div class=clabel><span>Anlageart (Teilfreistellung)</span></div>
+<div class="seg seg3" id=segArt>
+<button data-v=aktienfonds class=on>Aktien-ETF 30 %</button>
+<button data-v=mischfonds>Mischfonds 15 %</button>
+<button data-v=einzelaktien>Aktien 0 %</button></div></div>
+
+<div class=grp>Steuer</div>
+<div class=ctrl><div class=clabel><span>Kirchensteuer</span></div>
+<div class="seg seg3" id=segKist>
+<button data-v=keine class=on>keine</button>
+<button data-v=bw_by>8 % (BW, BY)</button>
+<button data-v=uebrige>9 % (übrige)</button></div></div>
+<div class=ctrl><div class=clabel><span>Sparer-Pauschbetrag</span></div>
+<div class="seg" id=segVer>
+<button data-v=ledig class=on>ledig · 1.000 €</button>
+<button data-v=zusammen>zusammen · 2.000 €</button></div>
+<div class=hint>Basiszins der Vorabpauschale: 3,20 % (2026). Effektiver Abgeltungsatz: <b id=satz_h>26,375 %</b>.</div></div>
+
+<div class=warnbox id=warn></div>
+</div>
+
+<div class=card>
+<h2>Ergebnis nach dem Betrachtungszeitraum</h2>
+<p class=sub style="margin:-6px 0 12px">Vermögen im Depot nach allen Steuern, abzüglich der verbliebenen Restschuld.</p>
+<div class=win>
+<div class="wbox a" id=boxA><div class=t>A · Sondertilgung</div><div class=v id=netA>—</div><div class=sub2 id=subA></div></div>
+<div class="wbox b" id=boxB><div class=t>B · Anlegen</div><div class=v id=netB>—</div><div class=sub2 id=subB></div></div>
+</div>
+<div class=bigdiff><div class=l>Vorsprung</div><div class=n id=diff>—</div><div class=s id=diffS></div></div>
+
+<div class=mrow style="margin-top:18px">
+<div class=mcard><div class=l>Break-even-Rendite</div><div class="n hot" id=be>—</div><div class=s>darüber gewinnt die Anlage, darunter die Tilgung</div></div>
+<div class=mcard><div class=l>Garantiert durch Tilgung</div><div class=n id=garant>—</div><div class=s>steuerfrei, risikolos — der Sollzins</div></div>
+<div class=mcard><div class=l>Zinsersparnis durch A</div><div class=n id=zinsE>—</div><div class=s id=zinsE_s>über die gesamte Kreditlaufzeit</div></div>
+<div class=mcard><div class=l>Nach-Steuer-Rendite der Anlage</div><div class=n id=nsr>—</div><div class=s id=nsr_s></div></div>
+<div class=mcard><div class=l>Schuldenfrei nach</div><div class=n id=frei>—</div><div class=s id=frei_s></div></div>
+<div class=mcard><div class=l>Steuer auf die Anlage (B)</div><div class=n id=stB>—</div><div class=s>Vorabpauschale plus Verkaufssteuer</div></div>
+</div>
+</div>
+</div>
+
+<div class=chartbox>
+<h2>Nettovermögen über die Zeit — Depot nach Steuern minus Restschuld</h2>
+<div id=chart1></div>
+<div class=figcap id=cap1></div>
+</div>
+
+<div class=chartbox>
+<h2>Wo das Ergebnis kippt — Endvorsprung der Anlage je nach Rendite</h2>
+<div id=chart2></div>
+<div class=figcap id=cap2></div>
+</div>
+
+<div class=card>
+<h2>Einordnung</h2>
+<div class=txt>
+<h3>Warum die Schwelle über dem Sollzins liegt</h3>
+<p>Jeder Euro Sondertilgung erspart künftige Zinsen in Höhe des Sollzinses. Diese Ersparnis ist eine Rendite — nur eben eine, die niemand besteuert, weil sie kein Kapitalertrag ist, sondern eine vermiedene Ausgabe. Die Anlage muss dagegen erst durch die Abgeltungsteuer: 25 % zuzüglich Solidaritätszuschlag und gegebenenfalls Kirchensteuer, gemildert um die Teilfreistellung des Fonds und den Sparer-Pauschbetrag, vorgezogen durch die jährliche Vorabpauschale. Deshalb genügt es nicht, wenn die erwartete Rendite den Sollzins erreicht — sie muss ihn um den Steuerkeil übertreffen.</p>
+<p>Die zweite Kurve zeigt genau das: die Nulllinie liegt nicht beim Sollzins, sondern spürbar darüber. Wo sie liegt, hängt zusätzlich vom Zeitverlauf ab — Variante A legt zwar später an, dafür mit der vollen Rate, sobald der Kredit weg ist.</p>
+
+<h3>Was der Vergleich nicht abbildet</h3>
+<p>Die Sondertilgung liefert ihre Rendite <b>garantiert</b>. Die Anlage tut das nicht: Die eingestellte Rendite ist ein Erwartungswert, kein Versprechen — die tatsächliche Bandbreite über zwanzig Jahre ist weit, und der Zeitpunkt der schlechten Jahre entscheidet mit. Ein Vorsprung der Anlage von wenigen Prozent ist deshalb kein Argument, sondern eine Risikoprämie, die man auch verlieren kann. Erst ein deutlicher Abstand zur Break-even-Rendite trägt die Entscheidung.</p>
+<p>Dazu kommt die Vertragswirklichkeit: Sondertilgungsrechte sind fast immer begrenzt, üblich sind 5 % der ursprünglichen Darlehenssumme pro Jahr, häufig nur einmal jährlich. Getilgtes Geld ist zudem gebunden — es steht bei Arbeitslosigkeit oder einer kaputten Heizung nicht mehr zur Verfügung, ein Depot dagegen schon. Und die Rechnung unterstellt einen konstanten Sollzins über den gesamten Zeitraum; endet die Zinsbindung früher, verschiebt die Anschlussfinanzierung die Schwelle — bei steigenden Zinsen zugunsten der Tilgung.</p>
+
+<h3>Der Sonderfall vermietete Immobilie</h3>
+<p>Bei einer selbstgenutzten Immobilie gilt die Rechnung dieser Seite. Bei einer <b>vermieteten</b> Wohnung dreht sich ein Vorzeichen: Dort sind die Schuldzinsen Werbungskosten und mindern die Einkommensteuer. Der Kredit kostet dann netto nur noch den Sollzins abzüglich der Steuerersparnis zum persönlichen Grenzsteuersatz — die Sondertilgung wird entsprechend unattraktiver, die Break-even-Rendite sinkt. Diesen Fall mit Kaufnebenkosten, AfA und Cashflow rechnet der <a href="Immobilien_Investitionsrechner.html">Immobilien-Investitionsrechner</a> vollständig durch.</p>
+</div>
+</div>
+
+<div class=foot id=foot></div>
+</div>
+
+<script>
+const $=id=>document.getElementById(id);
+const eur=x=>Math.round(x).toLocaleString('de-DE')+' €';
+const pct=(x,d)=>(x*100).toLocaleString('de-DE',{minimumFractionDigits:d===undefined?2:d,maximumFractionDigits:d===undefined?2:d})+' %';
+const num=(x,d)=>x.toLocaleString('de-DE',{minimumFractionDigits:d,maximumFractionDigits:d});
+const BZ=KAP.basiszins[2026];
+
+/* --- Eingabefelder mit Tausender-Trennzeichen --- */
+function numVal(id){return parseInt(($(id).value||'0').replace(/\D/g,''),10)||0;}
+function fmtInput(el){const raw=el.value.replace(/\D/g,'');const cfe=el.value.length-(el.selectionStart||el.value.length);
+  el.value=raw===''?'':parseInt(raw,10).toLocaleString('de-DE');const pos=Math.max(0,el.value.length-cfe);
+  try{el.setSelectionRange(pos,pos);}catch(e){}}
+
+/* --- Annuitätendarlehen, monatlich. Was über die Tilgung hinausgeht, fliesst ins Depot. --- */
+function kreditPfad(R0,p,zahlung,depotBasis,monate){
+  const i=p/12; let R=R0, zins=0, payoff=null;
+  const rest=[R0], flow=[];
+  for(let m=1;m<=monate;m++){
+    let c=depotBasis;
+    if(R>1e-6){
+      const z=R*i; zins+=z;
+      if(zahlung>=R+z){ c+=zahlung-(R+z); R=0; if(payoff===null) payoff=m; }
+      else { R=R+z-zahlung; }
+    } else { c+=zahlung; }
+    flow.push(c); rest.push(Math.max(R,0));
+  }
+  return {rest:rest, flow:flow, zins:zins, payoff:payoff};
+}
+
+/* --- Depot: Sparplan-Aufzinsung selbst, gesamte Steuerlogik aus der Bibliothek --- */
+function depot(flow,jahre,r,ter,tf,kiSt,pausch){
+  const g=1+r-ter, gm=Math.pow(Math.max(g,1e-6),1/12);
+  let W=0,sumVAP=0,einz=0,stVAP=0,freiRest=pausch;
+  const pfad=[0];
+  for(let j=1;j<=jahre;j++){
+    const wA=W, bestand=W*g;
+    let cSum=0,cEnd=0;
+    for(let m=1;m<=12;m++){const c=flow[(j-1)*12+m-1]||0; cSum+=c; cEnd+=c*Math.pow(gm,12-m);}
+    const v1=vorabpauschale(wA,bestand,0,BZ,tf,1);
+    const v2=cSum>0?vorabpauschale(cSum,cEnd,0,BZ,tf,7):{vorabpauschale:0};
+    const vap=v1.vorabpauschale+v2.vorabpauschale;
+    const st=kapESt(vap,kiSt,tf,pausch,0);
+    freiRest=st.freibetragRestNeu;
+    W=bestand+cEnd-st.steuerGesamt;
+    sumVAP+=vap; stVAP+=st.steuerGesamt; einz+=cSum;
+    const stL=kapESt(veraeusserungsgewinn(W,einz,sumVAP),kiSt,tf,freiRest,0);
+    pfad.push(W-stL.steuerGesamt);
+  }
+  const stV=kapESt(veraeusserungsgewinn(W,einz,sumVAP),kiSt,tf,freiRest,0);
+  return {brutto:W,netto:W-stV.steuerGesamt,einz:einz,sumVAP:sumVAP,stVAP:stVAP,stVerkauf:stV.steuerGesamt,pfad:pfad};
+}
+
+/* --- Achsenteilung --- */
+function ticks(min,max,n){
+  const span=(max-min)||1, roh=span/n, mag=Math.pow(10,Math.floor(Math.log10(roh))), norm=roh/mag;
+  const step=(norm<=1?1:norm<=2?2:norm<=5?5:10)*mag;
+  const lo=Math.floor(min/step)*step, hi=Math.ceil(max/step)*step, t=[];
+  for(let v=lo;v<=hi+step*1e-6;v+=step) t.push(Math.abs(v)<step*1e-6?0:v);
+  return {t:t,lo:lo,hi:hi};
+}
+function kLab(v){
+  const a=Math.abs(v);
+  if(a>=1e6) return (v/1e6).toLocaleString('de-DE',{maximumFractionDigits:2})+' Mio';
+  if(a>=1000) return Math.round(v/1000).toLocaleString('de-DE')+' k';
+  return Math.round(v).toLocaleString('de-DE');
+}
+
+/* --- Diagramm 1: beide Vermögenspfade --- */
+function chartPfade(nA,nB,T,payA,payB){
+  const W=720,H=300,X0=64,X1=612,Y0=18,Y1=248;
+  const alle=nA.concat(nB), mn=Math.min.apply(null,alle), mx=Math.max.apply(null,alle);
+  const ax=ticks(Math.min(mn,0),Math.max(mx,0),5);
+  const x=j=>X0+j/Math.max(T,1)*(X1-X0), y=v=>Y1-(v-ax.lo)/((ax.hi-ax.lo)||1)*(Y1-Y0);
+  let s='<svg viewBox="0 0 '+W+' '+H+'" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;font-family:inherit">';
+  ax.t.forEach(function(v){s+='<line x1="'+X0+'" y1="'+y(v).toFixed(1)+'" x2="'+X1+'" y2="'+y(v).toFixed(1)+'" stroke="'+(v===0?'#c9c2b6':'#ece7dd')+'"/>'+
+    '<text x="'+(X0-7)+'" y="'+(y(v)+3.5).toFixed(1)+'" font-size="10" fill="#8b857a" text-anchor="end">'+kLab(v)+'</text>';});
+  const stepJ=T<=12?2:(T<=24?4:5);
+  for(let j=0;j<=T;j+=stepJ) s+='<text x="'+x(j).toFixed(1)+'" y="'+(Y1+16)+'" font-size="10.5" fill="#8b857a" text-anchor="middle">'+j+'</text>';
+  s+='<text x="'+X0+'" y="'+(Y1+31)+'" font-size="10" fill="#8b857a">Jahre</text>';
+  function poly(a,col,w){return '<polyline points="'+a.map(function(v,j){return x(j).toFixed(1)+','+y(v).toFixed(1);}).join(' ')+'" fill="none" stroke="'+col+'" stroke-width="'+w+'"/>';}
+  s+=poly(nA,'#c2410c',2);
+  s+=poly(nB,'#1d4ed8',2);
+  if(payA!==null&&payA/12<=T){const jx=payA/12, yy=y(nA[Math.round(jx)]||0);
+    s+='<circle cx="'+x(jx).toFixed(1)+'" cy="'+yy.toFixed(1)+'" r="3.4" fill="#c2410c"/>'+
+    '<text x="'+(x(jx)+8).toFixed(1)+'" y="'+(yy+16).toFixed(1)+'" font-size="9.5" fill="#c2410c">A schuldenfrei</text>';}
+  if(payB!==null&&payB/12<=T){const jx=payB/12;s+='<circle cx="'+x(jx).toFixed(1)+'" cy="'+y(nB[Math.round(jx)]||0).toFixed(1)+'" r="3.4" fill="#1d4ed8"/>';}
+  s+='<text x="'+(X1+8)+'" y="'+(y(nA[T])+3.5).toFixed(1)+'" font-size="11" font-weight="700" fill="#c2410c">A · Tilgung</text>';
+  s+='<text x="'+(X1+8)+'" y="'+(y(nB[T])+3.5).toFixed(1)+'" font-size="11" font-weight="700" fill="#1d4ed8">B · Anlage</text>';
+  return s+'</svg>';
+}
+
+/* --- Diagramm 2: Endvorsprung je nach Anlagerendite --- */
+function chartKurve(pts,be,rNow,dNow,rMax){
+  const W=720,H=300,X0=64,X1=690,Y0=18,Y1=248;
+  const ys=pts.map(function(p){return p[1];});
+  const ax=ticks(Math.min(Math.min.apply(null,ys),0),Math.max(Math.max.apply(null,ys),0),5);
+  const x=r=>X0+r/rMax*(X1-X0), y=v=>Y1-(v-ax.lo)/((ax.hi-ax.lo)||1)*(Y1-Y0);
+  let s='<svg viewBox="0 0 '+W+' '+H+'" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;font-family:inherit">';
+  const xb=be===null?X1:x(Math.min(be,rMax));
+  s+='<rect x="'+X0+'" y="'+Y0+'" width="'+Math.max(xb-X0,0).toFixed(1)+'" height="'+(Y1-Y0)+'" fill="#c2410c" fill-opacity="0.05"/>';
+  s+='<rect x="'+xb.toFixed(1)+'" y="'+Y0+'" width="'+Math.max(X1-xb,0).toFixed(1)+'" height="'+(Y1-Y0)+'" fill="#1d4ed8" fill-opacity="0.05"/>';
+  ax.t.forEach(function(v){s+='<line x1="'+X0+'" y1="'+y(v).toFixed(1)+'" x2="'+X1+'" y2="'+y(v).toFixed(1)+'" stroke="'+(v===0?'#c9c2b6':'#ece7dd')+'"/>'+
+    '<text x="'+(X0-7)+'" y="'+(y(v)+3.5).toFixed(1)+'" font-size="10" fill="#8b857a" text-anchor="end">'+kLab(v)+'</text>';});
+  for(let r=0;r<=rMax+1e-9;r+=0.02) s+='<text x="'+x(r).toFixed(1)+'" y="'+(Y1+16)+'" font-size="10.5" fill="#8b857a" text-anchor="middle">'+Math.round(r*100)+' %</text>';
+  s+='<text x="'+X0+'" y="'+(Y1+31)+'" font-size="10" fill="#8b857a">Anlagerendite p.a. vor Steuern</text>';
+  s+='<polyline points="'+pts.map(function(p){return x(p[0]).toFixed(1)+','+y(p[1]).toFixed(1);}).join(' ')+'" fill="none" stroke="#6d28d9" stroke-width="2"/>';
+  if(be!==null&&be<=rMax){
+    s+='<line x1="'+xb.toFixed(1)+'" y1="'+Y0+'" x2="'+xb.toFixed(1)+'" y2="'+Y1+'" stroke="#c2410c" stroke-width="1.3" stroke-dasharray="4 3"/>';
+    s+='<circle cx="'+xb.toFixed(1)+'" cy="'+y(0).toFixed(1)+'" r="4" fill="#c2410c"/>';
+    const anc=xb>X1-140?'end':'start', dx=xb>X1-140?-8:8;
+    s+='<text x="'+(xb+dx).toFixed(1)+'" y="'+(Y0+14)+'" font-size="10.5" font-weight="700" fill="#c2410c" text-anchor="'+anc+'">Break-even '+pct(be,2)+'</text>';
+  }
+  if(rNow<=rMax){
+    s+='<circle cx="'+x(rNow).toFixed(1)+'" cy="'+y(dNow).toFixed(1)+'" r="4.2" fill="#6d28d9"/>';
+    const anc2=x(rNow)>X1-150?'end':'start', dx2=x(rNow)>X1-150?-9:9;
+    s+='<text x="'+(x(rNow)+dx2).toFixed(1)+'" y="'+(y(dNow)+17).toFixed(1)+'" font-size="10.5" font-weight="700" fill="#6d28d9" text-anchor="'+anc2+'">Einstellung: '+eur(dNow)+'</text>';
+  }
+  s+='<text x="'+(X0+8)+'" y="'+(Y0+31)+'" font-size="9.5" fill="#57534c">Sondertilgung vorn</text>';
+  s+='<text x="'+(X1-8)+'" y="'+(Y1-9)+'" font-size="9.5" fill="#57534c" text-anchor="end">Anlage vorn</text>';
+  return s+'</svg>';
+}
+
+/* --- Zustand --- */
+let art='aktienfonds', kistKey='keine', verKey='ledig';
+function seg(id,setter){$(id).addEventListener('click',function(e){
+  const b=e.target.closest('button'); if(!b) return;
+  [].forEach.call(this.querySelectorAll('button'),function(x){x.classList.remove('on');});
+  b.classList.add('on'); setter(b.dataset.v); render();});}
+seg('segArt',function(v){art=v;});
+seg('segKist',function(v){kistKey=v;});
+seg('segVer',function(v){verKey=v;});
+
+function render(){
+  const R0=numVal('rest'), ann=numVal('rate'), zus=numVal('zus');
+  const p=+$('zins_r').value/100, T=+$('jahre_r').value, r=+$('rend_r').value/100, ter=+$('ter_r').value/100;
+  const tf=KAP.teilfreistellung[art], kiSt=KAP.kiSt[kistKey], pausch=KAP.sparerPauschbetrag[verKey];
+  $('zins_v').textContent=pct(p,2); $('jahre_v').textContent=T+' Jahre';
+  $('rend_v').textContent=pct(r,1); $('ter_v').textContent=pct(ter,2);
+  $('satz_h').textContent=pct(gesamtsatz(kiSt),3);
+
+  const zinsMonat=R0*p/12;
+  $('rate_h').innerHTML='Zinsanteil im ersten Monat: <b>'+eur(zinsMonat)+'</b>, Tilgungsanteil '+eur(Math.max(ann-zinsMonat,0))+'.';
+  $('zus_h').innerHTML=eur(zus*12)+' im Jahr — das sind <b>'+pct(R0>0?zus*12/R0:0,1)+'</b> der Restschuld. Sondertilgungsrechte sind meist auf 5 % der ursprünglichen Darlehenssumme pro Jahr begrenzt.';
+
+  if(R0<=0||ann<=0){$('warn').style.display='block';$('warn').textContent='Restschuld und Monatsrate müssen größer als null sein.';return;}
+  if(ann<=zinsMonat){$('warn').style.display='block';$('warn').innerHTML='Die Monatsrate von '+eur(ann)+' deckt nicht einmal die Zinsen von '+eur(zinsMonat)+' — die Schuld würde wachsen. Bitte Rate erhöhen.';return;}
+  $('warn').style.display='none';
+
+  const M=T*12;
+  const A=kreditPfad(R0,p,ann+zus,0,M);          // Variante A: alles in die Tilgung
+  const B=kreditPfad(R0,p,ann,zus,M);            // Variante B: Kredit normal, Zusatz ins Depot
+  const Afull=kreditPfad(R0,p,ann+zus,0,1200);
+  const Bfull=kreditPfad(R0,p,ann,0,1200);
+  const restA=A.rest[M], restB=B.rest[M];
+
+  function netz(flow,restEnd,rr){return depot(flow,T,rr,ter,tf,kiSt,pausch).netto-restEnd;}
+  const dA=depot(A.flow,T,r,ter,tf,kiSt,pausch), dB=depot(B.flow,T,r,ter,tf,kiSt,pausch);
+  const netA=dA.netto-restA, netB=dB.netto-restB, diff=netB-netA;
+
+  /* Break-even per Binärsuche */
+  const f=function(rr){return netz(B.flow,restB,rr)-netz(A.flow,restA,rr);};
+  let be=null;
+  if(f(0)>0) be=0; else if(f(0.40)>0){let lo=0,hi=0.40;
+    for(let k=0;k<44;k++){const mid=(lo+hi)/2; if(f(mid)<0) lo=mid; else hi=mid;} be=(lo+hi)/2;}
+
+  const sim=etfSimulation({start:100000,jahre:T,renditePA:r,ter:ter,teilfreistellung:tf,
+                           kiStSatz:kiSt,sparerPauschbetragPA:0,basiszinsPA:BZ});
+
+  $('netA').textContent=eur(netA);
+  $('netB').textContent=eur(netB);
+  $('subA').innerHTML='Depot '+eur(dA.netto)+' · Restschuld '+eur(restA);
+  $('subB').innerHTML='Depot '+eur(dB.netto)+' · Restschuld '+eur(restB);
+  $('boxA').classList.toggle('on',netA>=netB); $('boxB').classList.toggle('on',netB>netA);
+  $('diff').textContent=(diff>=0?'+':'−')+eur(Math.abs(diff)).replace('-','');
+  $('diff').className='n '+(diff>=0?'pos':'neg');
+  $('diffS').textContent=diff>=0?'für die Anlage (Variante B) nach '+T+' Jahren':'für die Sondertilgung (Variante A) nach '+T+' Jahren';
+
+  $('be').textContent=be===null?'> 40 %':(be<=0?'jede Rendite':pct(be,2));
+  $('garant').textContent=pct(p,2);
+  const zinsErsp=Bfull.zins-Afull.zins;
+  $('zinsE').textContent=eur(zinsErsp);
+  $('zinsE_s').textContent='gesamte Laufzeit; im Zeitfenster '+eur(B.zins-A.zins);
+  $('nsr').textContent=pct(sim.renditePANachSteuer,2);
+  $('nsr_s').textContent='Einmalanlage über '+T+' Jahre, ohne Pauschbetrag';
+  const fa=A.payoff?num(A.payoff/12,1)+' J.':'—', fb=Bfull.payoff?num(Bfull.payoff/12,1)+' J.':'nie';
+  $('frei').textContent=(A.payoff?num(A.payoff/12,1):'>'+T)+' Jahre';
+  $('frei_s').textContent='Variante A '+fa+' statt '+fb+' ohne Sondertilgung';
+  $('stB').textContent=eur(dB.stVAP+dB.stVerkauf);
+
+  /* Take */
+  const beTxt=be===null?'erst jenseits von 40 % p.a.':(be<=0?'bei jeder positiven Rendite':'bei <b>'+pct(be,2)+'</b>');
+  $('take').innerHTML='Bei '+pct(r,1)+' erwarteter Rendite liegt nach '+T+' Jahren <b>'+(diff>=0?'die Anlage':'die Sondertilgung')+'</b> um <b>'+
+    eur(Math.abs(diff))+'</b> vorn. Das Ergebnis kippt '+beTxt+' Anlagerendite — deutlich über dem Sollzins von '+pct(p,2)+
+    ', weil die Zinsersparnis steuerfrei ist, der Anlageertrag aber nicht. Der entscheidende Unterschied bleibt allerdings ungerechnet: die '+
+    pct(p,2)+' der Tilgung sind sicher, die '+pct(r,1)+' der Anlage sind es nicht.';
+
+  /* Diagramm 1 */
+  const nA=[],nB=[];
+  for(let j=0;j<=T;j++){nA.push(dA.pfad[j]-A.rest[j*12]); nB.push(dB.pfad[j]-B.rest[j*12]);}
+  $('chart1').innerHTML=chartPfade(nA,nB,T,A.payoff,B.payoff);
+  $('cap1').innerHTML='Beide Pfade starten bei −'+eur(R0)+' (der Restschuld) und enthalten die latente Steuer auf den Depotgewinn. '+
+    'Variante A ist nach '+(A.payoff?num(A.payoff/12,1)+' Jahren':'mehr als '+T+' Jahren')+' schuldenfrei und legt ab dann '+eur(ann+zus)+' im Monat an; '+
+    'Variante B legt von Beginn an '+eur(zus)+' im Monat an'+(B.payoff?' und ab Jahr '+num(B.payoff/12,1)+' zusätzlich die frei gewordene Rate':'')+'.';
+
+  /* Diagramm 2 */
+  const rMax=0.12, pts=[];
+  for(let k=0;k<=48;k++){const rr=rMax*k/48; pts.push([rr,netz(B.flow,restB,rr)-netz(A.flow,restA,rr)]);}
+  $('chart2').innerHTML=chartKurve(pts,be,r,diff,rMax);
+  $('cap2').innerHTML='Differenz Endvermögen B minus A, alle übrigen Eingaben unverändert. Links der Marke gewinnt die Sondertilgung, rechts davon die Anlage. '+
+    'Die Nulllinie liegt nicht beim Sollzins '+pct(p,2)+', sondern bei '+(be===null?'über 40 %':pct(be,2))+' — der Abstand ist der Steuerkeil.';
+
+  $('foot').innerHTML=FOOT(tf,pausch,kiSt);
+}
+
+function FOOT(tf,pausch,kiSt){
+  return '<b>Quellen und Rechtsstand der Steuerlogik</b> (assets/de-kapitalertrag.js, Stand 25.07.2026): '+
+  '§ 32d Abs. 1 EStG — Abgeltungsteuer 25 %, bei Kirchensteuerpflicht nach Satz 4 als KapESt = (e − 4q)/(4 + k); '+
+  'SolzG — Solidaritätszuschlag 5,5 % auf die Kapitalertragsteuer; § 20 Abs. 9 EStG — Sparer-Pauschbetrag 1.000 € (ledig) bzw. 2.000 € (zusammenveranlagt), hier '+pausch.toLocaleString('de-DE')+' €; '+
+  '§ 20 InvStG — Teilfreistellung (Aktienfonds 30 %, Mischfonds 15 %, Einzelaktien 0 %), hier '+pct(tf,0)+'; '+
+  '§ 18 InvStG — Vorabpauschale: Basisertrag = 70 % des Basiszinses auf den Jahresanfangswert, gedeckelt auf die Wertsteigerung, Zwölftelung im Erwerbsjahr; Basiszins 2026 = 3,20 % (BMF); '+
+  '§ 19 Abs. 1 Satz 3 InvStG — Anrechnung bereits angesetzter Vorabpauschalen beim Verkauf. Effektiver Gesamtsatz hier '+pct(gesamtsatz(kiSt),3)+'.<br><br>'+
+  '<b>Modellannahmen und Vereinfachungen.</b> Annuitätendarlehen mit monatlicher Verzinsung und konstantem Sollzins über den gesamten Zeitraum — eine auslaufende Zinsbindung und die Anschlussfinanzierung sind nicht abgebildet. '+
+  'Die Sondertilgung wird monatlich gerechnet; reale Verträge erlauben sie meist nur einmal jährlich und begrenzen sie auf etwa 5 % der ursprünglichen Darlehenssumme. '+
+  'Am Ende des Betrachtungszeitraums wird das Depot in beiden Varianten vollständig verkauft, die latente Steuer also realisiert. '+
+  'Die Vorabpauschale wird je Jahr auf zwei Tranchen gerechnet — den Bestand zum Jahresanfang (volles Jahr) und die Zuflüsse des Jahres (pauschal ab Monat 7, Zwölftelung 6/12) — statt tranchenscharf je Kauf. '+
+  'Ohne Inflation, ohne Transaktionskosten und Ausgabeaufschlag, ohne Verlustverrechnungstöpfe, ohne Günstigerprüfung, ohne ausländische Quellensteuer. '+
+  'Die Rendite der Anlage ist ein konstanter Erwartungswert ohne Schwankung — das reale Sequenzrisiko fehlt vollständig und arbeitet gegen die Anlagevariante. '+
+  'Bei vermieteten Objekten sind Schuldzinsen abziehbar; dieser Rechner unterstellt eine selbstgenutzte oder private Finanzierung.<br><br>'+
+  '<b>Dies ist keine Steuer-, Rechts- oder Anlageberatung</b>, sondern ein Rechenwerkzeug mit offengelegten Annahmen. Für die konkrete Entscheidung Steuerberater und Kreditvertrag heranziehen.';
+}
+
+[].forEach.call(document.querySelectorAll('input.eurin'),function(el){
+  el.addEventListener('input',function(){fmtInput(el);render();});});
+['zins_r','jahre_r','rend_r','ter_r'].forEach(function(id){$(id).addEventListener('input',render);});
+render();
+</script>
+</body></html>

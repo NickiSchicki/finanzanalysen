@@ -1,0 +1,59 @@
+<!DOCTYPE html><html lang=de><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1">
+<title>S&P-500-Studie — kuratierter Überblick</title>
+<link rel=stylesheet href="assets/site.css?v=4">
+<script defer src="assets/site-map.js?v=4"></script>
+<script defer src="assets/datenstand.js?v=4"></script>
+<script defer src="assets/site.js?v=4"></script>
+<style>
+/* seitenspezifisch */
+.arc{font-size:13.5px;color:var(--ink-2);margin:0 0 26px;padding-left:16px;border-left:2px solid var(--accent)}
+.exec ul{margin:0;padding-left:20px}
+.exec li{margin:9px 0;font-size:14.5px;color:var(--ink-2)}
+.exec li::marker{color:var(--ink-3)}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:6px}
+@media(max-width:820px){.grid{grid-template-columns:1fr}}
+.grid .card{display:block;margin:0;padding:19px 21px;text-decoration:none;color:inherit;
+  transition:border-color .14s,transform .14s}
+.grid .card:hover{border-color:var(--accent);transform:translateY(-2px)}
+.tt{font-family:var(--serif);font-size:19px;font-weight:700;letter-spacing:-.015em;
+  line-height:1.22;margin-bottom:6px;color:var(--ink)}
+.fd{font-size:13.5px;color:var(--ink-2);line-height:1.5;margin-bottom:10px}
+.open{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.13em;color:var(--accent)}
+</style>
+</head><body data-section="Überblick"><div class=wrap>
+<div class=kicker>11 Analysen · 76 Jahre Daten · 1950–2026</div>
+<h1>Wie sicher ist der Aktienmarkt <em>wirklich</em>?</h1>
+<p class=lead>Eine empirische Studie zum S&amp;P 500 — <a href="Altersvorsorge_Rechner.html">von der Altersvorsorge</a> über Fat Tails bis zur Frage, ob sich Anomalien ausbeuten lassen.</p>
+<p class=arc>Roter Faden: &bdquo;<a href="Lebenszyklus_Simulator.html">Reichen 300k für die Rente?</a>&ldquo; → wie riskant ist der Markt wirklich → was sagt die Statistik sauber → was ist neu → kann man es zu Geld machen.</p>
+
+<div class=take><b>Die Summe aus elf Analysen:</b> Der Markt zahlt langfristig großzügig, doch der Weg dorthin ist unbequem — und keine der untersuchten Anomalien lässt sich verlässlich in Rendite verwandeln. Was bleibt, ist unspektakulär: investiert bleiben, Kosten niedrig halten, <a href="Geschichts_Stresstest.html">den großen Drawdown von vornherein einkalkulieren</a>.</div>
+
+<div class="card exec">
+<h3>Kernbotschaft in sechs Punkten</h3>
+<ul>
+<li><b>Langfristig großzügig, kurzfristig wild.</b> ~8 %/Jahr Kurs (≈ 11 % mit Dividenden) über 76 Jahre — aber die Rendite steckt in extrem wenigen Tagen.</li>
+<li><b>Fat Tails sind real.</b> Tail-Index α ≈ 3: Crashs wie 1987 (20,7σ) sind unter der Glockenkurve &bdquo;unmöglich&ldquo; — passieren aber regelmäßig. Gauß'sches Risiko-Management unterschätzt genau das.</li>
+<li><b>Über 10 Jahre glättet sich viel</b> (Median 11 % nominal) — aber die Tail-Wahrscheinlichkeiten sind statistisch kaum bestimmbar (nur ~8 unabhängige Dekaden). <b>Real</b> ist ein Verlust-Jahrzehnt mit ~18 % gar nicht selten.</li>
+<li><b>Der Weg ist brutal.</b> 92 % der Zeit unter Wasser, jedes Jahrzehnt mit ≥ −19 %. Ein großer Drawdown ist die Eintrittskarte, nicht die Ausnahme.</li>
+<li><b>Die neueste Anomalie:</b> ein Regimewechsel von Momentum zu Mean-Reversion (robust, ~15 SE) — am stärksten in US-Aktien, mit blitzschnellen V-Crashs (2020).</li>
+<li><b>Ausbeuten? Kein freies Mittagessen.</b> Eine hochsignifikante Anomalie ist trotzdem keine profitable Strategie — Regime, Kosten und Tail-Risiko fressen den Edge. Am robustesten bleibt: investiert bleiben, Kosten niedrig halten.</li>
+</ul>
+</div>
+
+<div class=sechead><span class=num>1</span><h2>Der Ausgangspunkt: Altersvorsorge</h2><span class=line></span></div>
+<div class=grid><a class=card href='Altersvorsorge_Modell.xlsx'><div class=ct><div class=tt>Altersvorsorge-Modell (Excel)</div><div class=fd>Interaktiv: Einmalanlage → reale Monatsrente, &bdquo;ewige Rente&ldquo;, variabler Renteneintritt. Faustregel: ~22 € reale Netto-Rente/Monat je 1.000 € heute (bei 7 %, Rente mit 65).</div><div class=open>Öffnen →</div></div></a></div>
+
+<div class=sechead><span class=num>2</span><h2>Risiko &amp; Fat Tails</h2><span class=line></span></div>
+<div class=grid><a class=card href='SP500_Taleb_Analyse.html'><div class=ct><div class=tt>Die Diktatur der seltenen Tage</div><div class=fd>Exzess-Kurtosis 20; Black Monday = 20,7σ → unter Gauß einmal in 10⁹² Jahren. Die 10 besten Tage = 14 % der Gesamtrendite; beste &amp; schlimmste Tage clustern.</div><div class=open>Öffnen →</div></div></a><a class=card href='SP500_Drawdown_Pfadrisiko.html'><div class=ct><div class=tt>Drawdown &amp; Pfadrisiko</div><div class=fd>92 % der Zeit unter Wasser, tiefster Sturz −57 %. Jedes 10-Jahres-Fenster erlitt ≥ −19 %. Der große Drawdown ist nicht das Risiko — er ist die Eintrittskarte.</div><div class=open>Öffnen →</div></div></a></div>
+
+<div class=sechead><span class=num>3</span><h2>Verteilung &amp; saubere Statistik</h2><span class=line></span></div>
+<div class=grid><a class=card href='SP500_10Jahres_Renditeverteilung.html'><div class=ct><div class=tt>Verteilung der 10-Jahres-Renditen</div><div class=fd>CDF nominal &amp; real: P(&lt; 7 %) 23 % nominal / 46 % real; P(&lt; 0 %) 1,4 % / 18 %; Median 11 % / 7,6 %. Inflationsbereinigt ist ein Verlust-Jahrzehnt gar nicht selten.</div><div class=open>Öffnen →</div></div></a><a class=card href='SP500_Statistik_Appendix.html'><div class=ct><div class=tt>Statistik-Appendix (Gold-Standard)</div><div class=fd>Hill-Tail-Index α ≈ 3 (Kurtosis divergiert). Effektiv nur ~8 unabhängige Dekaden → riesige CIs. Real (CPI): Verlust-Jahrzehnt-Chance 1 % → 18 %.</div><div class=open>Öffnen →</div></div></a></div>
+
+<div class=sechead><span class=num>4</span><h2>Anomalien &amp; Regimewechsel</h2><span class=line></span></div>
+<div class=grid><a class=card href='SP500_Anomalien_aktuell.html'><div class=ct><div class=tt>Was an den letzten Jahren neu ist</div><div class=fd>Autokorrelation flippte: Momentum → Mean-Reversion. 2020 = schnellster −34 %-Crash je (23 Handelstage) mit schnellster Erholung.</div><div class=open>Öffnen →</div></div></a><a class=card href='SP500_Momentum_MeanReversion.html'><div class=ct><div class=tt>Vom Momentum zur Mean-Reversion</div><div class=fd>Zwei unabhängige Maße (Autokorr. + Varianz-Ratio) kippen gemeinsam (~15 SE). Übergang 1985–2000, Extrem 2020–22, seit 2023 normalisiert.</div><div class=open>Öffnen →</div></div></a><a class=card href='Regimewechsel_Anlageklassen.html'><div class=ct><div class=tt>Marktweit oder S&amp;P-spezifisch?</div><div class=fd>Nicht S&amp;P-spezifisch: US-Aktien am stärksten (Nasdaq 2,08 → 0,80), international milder, Gold erst spät. Kein universelles Gesetz.</div><div class=open>Öffnen →</div></div></a></div>
+
+<div class=sechead><span class=num>5</span><h2>Lässt es sich ausbeuten?</h2><span class=line></span></div>
+<div class=grid><a class=card href='SP500_MeanReversion_Strategie.html'><div class=ct><div class=tt>Contrarian-Strategie (Aktien)</div><div class=fd>Scheitert: regimeabhängig (−26 %/J in der Momentum-Ära), von Kosten gefressen, seit 2023 verschwunden. Anomalie ≠ profitable Strategie.</div><div class=open>Öffnen →</div></div></a><a class=card href='SP500_Call_im_Dip.html'><div class=ct><div class=tt>Call im Dip, verkaufen am Hoch</div><div class=fd>Optionskonvexität monetarisiert die V-Form (Apr 24: +86 %), aber Theta tötet im Schleichbär 2022. Ohne echte Spreads gerechnet.</div><div class=open>Öffnen →</div></div></a><a class=card href='SP500_Call_Strategie_verbessern.html'><div class=ct><div class=tt>Wie man sie verbessert</div><div class=fd>ITM &amp; Puts-verkaufen helfen (short Vola), aber Index-im-Dip schlägt alle (+44,5 %). Saubere Version: Put-Credit-Spread (definiertes Risiko).</div><div class=open>Öffnen →</div></div></a></div>
+
+<div class=foot>Eigene Berechnungen auf täglichen Schlusskursen (Yahoo Finance: ^GSPC u.a.) und CPI (FRED). Alle Analysen sind interaktiv. Kein Anlageratschlag.</div>
+</div></body></html>

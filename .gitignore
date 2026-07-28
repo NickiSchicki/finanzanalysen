@@ -1,0 +1,13 @@
+# Rohdaten der Auswertungen — die Ergebnisse stecken als Zahlen-Arrays in den Seiten,
+# die Kursdateien selbst werden zur Laufzeit nirgends geladen (1,7 GB)
+Stockdata_stooq/
+
+# Originale vor dem Redesign, nur lokal von Interesse
+_backup_vor_redesign/
+
+# Arbeitsdateien und Notizen
+_*.html
+_spec/
+.~lock.*#
+.DS_Store
+*.swp

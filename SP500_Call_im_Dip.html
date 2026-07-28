@@ -1,0 +1,78 @@
+<!DOCTYPE html><html lang=de><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1">
+<title>Call im Dip, verkaufen am ATH</title>
+<script src="assets/chart.umd.min.js?v=4"></script>
+<link rel=stylesheet href="assets/site.css?v=4">
+<script defer src="assets/site-map.js?v=4"></script>
+<script defer src="assets/datenstand.js?v=4"></script>
+<script defer src="assets/site.js?v=4"></script>
+<style>
+/* seitenspezifisch */
+.chartbox{position:relative;height:340px}
+.kpi.g .n{color:var(--good)}
+.kpi.r .n{color:var(--bad)}
+.tbl{margin:6px 0 4px}
+.tbl th:nth-child(2),.tbl td:nth-child(2){text-align:left}
+.callout.g{border-left:3px solid var(--good)}
+.callout.r{border-left:3px solid var(--bad)}
+ul.take{padding:16px 22px 16px 42px}
+ul.take li{margin:9px 0}
+ul.take li:last-child{margin-bottom:0}
+</style></head><body data-section="Strategien"><div class=wrap>
+<div class=kicker>Strategien &middot; Optionen</div>
+<h1>Call im <em>Dip</em> kaufen, am neuen Hoch verkaufen</h1>
+<p class=lead>Ein Call auf den R&uuml;cksetzer ist keine Wette auf die Richtung, sondern auf das Tempo der Erholung. F&uuml;nf Jahre S&amp;P&nbsp;500 zeigen, wie schmal der Grat zwischen Konvexit&auml;t und Zeitwertverfall verl&auml;uft.</p>
+<div class=sub>Black-Scholes-N&auml;herung mit VIX als IV &middot; ATM-Calls, 3-Monats-Laufzeit, gerollt &middot; letzte 5 Jahre (S&amp;P 500)</div>
+
+<div class=kpis>
+<div class="kpi g"><div class=n>5 / 7</div><div class=l>Gewinner-Dips (&minus;5%)</div></div>
+<div class="kpi g"><div class=n>+86 %</div><div class=l>bester Trade (Apr 24)</div></div>
+<div class="kpi r"><div class=n>7&times;</div><div class=l>Rolls im 2022er-B&auml;r</div></div>
+<div class="kpi r"><div class=n>&minus;32 %</div><div class=l>2022 (&minus;10%-Schwelle)</div></div>
+</div>
+
+<div class=card>
+<h2>Mechanik</h2>
+<h3>Konvexit&auml;t gegen Theta</h3>
+<p>Anders als <a href="SP500_MeanReversion_Strategie.html">die reine Aktienstrategie</a> tr&auml;gt ein Call <b>Konvexit&auml;t</b>: Bei einer schnellen V-Erholung vervielfacht sich der Gewinn, w&auml;hrend der Verlust auf die Pr&auml;mie begrenzt bleibt. Dagegen steht <b>Theta</b>, der Zeitwertverfall &mdash; und der Umstand, dass Calls im Dip genau dann gekauft werden, wenn die Volatilit&auml;t und damit der Preis hoch ist. Der Test: pro Dip (&ge;&minus;5&nbsp;%) ein ATM-Call, bei Verfall gerollt, verkauft am neuen Allzeithoch.</p>
+<div class=chartbox><canvas id=ep></canvas></div>
+<div class=take>Das Muster ist eindeutig: <b>Tempo entscheidet.</b> Schnelle V-Erholungen (Apr&nbsp;24 +86&nbsp;%, Aug&nbsp;24 +50&nbsp;%, M&auml;r&nbsp;26 +38&nbsp;%) zahlen massiv &mdash; die Konvexit&auml;t der Option monetarisiert genau die <b>V-Form</b>, die das moderne Marktmuster pr&auml;gt. Der lange 2022er-Schleichb&auml;r dagegen: <b>7 Rolls &uuml;ber 2 Jahre</b>, am Ende trotz Index +6,8&nbsp;% nur &minus;4&nbsp;% &mdash; Theta hat fast alles aufgezehrt.</div>
+</div>
+
+<div class=card>
+<h2>Schwelle &minus;5&nbsp;%</h2>
+<h3>Trade f&uuml;r Trade</h3>
+<table class=tbl><thead><tr><th>Einstieg (Dip)</th><th>Ausstieg (ATH)</th><th>Tage</th><th>Rolls</th><th>Option P&amp;L</th><th>Index</th></tr></thead><tbody><tr><td>2021-09-30</td><td>2021-10-21</td><td class=v>15</td><td class=v>&ndash;</td><td class='v pos'>+37&nbsp;%</td><td class=v>+5.6&nbsp;%</td></tr><tr><td>2022-01-19</td><td>2024-01-19</td><td class=v>502</td><td class=v>7&times;</td><td class='v neg'>-4&nbsp;%</td><td class=v>+6.8&nbsp;%</td></tr><tr><td>2024-04-19</td><td>2024-05-15</td><td class=v>18</td><td class=v>&ndash;</td><td class='v pos'>+86&nbsp;%</td><td class=v>+6.9&nbsp;%</td></tr><tr><td>2024-08-02</td><td>2024-09-19</td><td class=v>33</td><td class=v>&ndash;</td><td class='v pos'>+50&nbsp;%</td><td class=v>+6.9&nbsp;%</td></tr><tr><td>2025-03-04</td><td>2025-06-27</td><td class=v>80</td><td class=v>1&times;</td><td class='v neg'>-4&nbsp;%</td><td class=v>+6.8&nbsp;%</td></tr><tr><td>2025-11-20</td><td>2025-12-11</td><td class=v>14</td><td class=v>&ndash;</td><td class='v pos'>+20&nbsp;%</td><td class=v>+5.5&nbsp;%</td></tr><tr><td>2026-03-18</td><td>2026-04-15</td><td class=v>19</td><td class=v>&ndash;</td><td class='v pos'>+38&nbsp;%</td><td class=v>+6.0&nbsp;%</td></tr></tbody></table>
+<div class="callout g">Summe &uuml;ber alle 7 Dips: <b>+15&nbsp;% (premium-gewichtet), +32&nbsp;% (gleichgewichtet)</b> &mdash; in diesem Fenster hat die Strategie funktioniert, weil fast alle Dips flach und schnell waren. Die Konvexit&auml;t der wenigen V-Treffer tr&auml;gt das Ergebnis.</div>
+</div>
+
+<div class=card>
+<h2>Schwelle &minus;10&nbsp;%</h2>
+<h3>Tiefere Dips drehen ins Minus</h3>
+<table class=tbl><thead><tr><th>Einstieg</th><th>Ausstieg</th><th>Tage</th><th>Rolls</th><th>Option P&amp;L</th><th>Index</th></tr></thead><tbody><tr><td>2022-02-22</td><td>2024-01-19</td><td class=v>479</td><td class=v>7&times;</td><td class='v neg'>-32&nbsp;%</td><td class=v>+12.4&nbsp;%</td></tr><tr><td>2025-03-13</td><td>2025-06-27</td><td class=v>73</td><td class=v>1&times;</td><td class='v pos'>+51&nbsp;%</td><td class=v>+11.8&nbsp;%</td></tr></tbody></table>
+<div class="callout r">Bei &minus;10&nbsp;% gibt es nur zwei F&auml;lle &mdash; und der <b>2022er-B&auml;r dominiert mit &minus;32&nbsp;%</b> (Index +12,4&nbsp;%). Summe: <b>&minus;11&nbsp;% premium-gewichtet.</b> Je tiefer der Dip, desto l&auml;nger die Erholung und desto t&ouml;dlicher das Theta. Ein <a href="SP500_Drawdown_Pfadrisiko.html">echter, langer B&auml;renmarkt</a> (2000&ndash;02, 2008) w&uuml;rde die Strategie zerreiben.</div>
+</div>
+
+<div class=card>
+<h2>Fazit</h2>
+<h3>Was die Strategie wirklich ist</h3>
+<ul class=take>
+<li><b>Eine Wette auf das Erholungstempo, nicht auf die Richtung.</b> Die Strategie ist &bdquo;long Gamma / long V-Form&ldquo;. Sie verdient nur, weil die letzten 5 Jahre von <b>schnellen V-Erholungen</b> gepr&auml;gt waren &mdash; genau <a href="SP500_Anomalien_aktuell.html">die Anomalie aus der vorangegangenen Analyse</a>.</li>
+<li><b>Theta ist der stille Killer.</b> Jeder Tag im Dip kostet Zeitwert, jeder Roll erneut. Im 2022er-Schleichb&auml;r zehren 7 Rolls den Gewinn der Erholung auf.</li>
+<li><b>Der gr&ouml;&szlig;te Vorbehalt: Geld-Brief-Spannen und Kommissionen.</b> Echte Optionen kosten pro Round-Trip oft 2&ndash;10&nbsp;% &mdash; bei 7 Rolls vernichtend. Mit realistischen Kosten k&auml;me selbst die &minus;5&nbsp;%-Variante wahrscheinlich nahe null oder ins Minus.</li>
+<li><b><a href="SP500_Statistik_Appendix.html">Kleine Stichprobe</a>, Bullenfenster.</b> 7 bzw. 2 Episoden in einem ungew&ouml;hnlich erholungsfreudigen Markt. Keine Aussage &uuml;ber die Zukunft.</li>
+</ul>
+</div>
+
+<div class=note><b>Kein Anlageratschlag.</b> Stark vereinfachter Backtest: Black-Scholes-Preise mit VIX als IV (keine echten Optionsquotes), <b>ohne</b> Geld-Brief-Spannen, Kommissionen, Slippage, Steuern; ATM-Calls, 3-Monats-Laufzeit, r=3&nbsp;%. Dient der Veranschaulichung der Mechanik, nicht als handelbare Strategie.</div>
+<div class=foot>Eigene Berechnung, ^GSPC &amp; ^VIX Tagesdaten (Yahoo Finance), 2021-06 bis 2026-06. Dip = Drawdown vom Allzeithoch &le; Schwelle. Verkauf am n&auml;chsten neuen Allzeithoch.</div>
+</div>
+<script>
+const P={"labels": ["Sep 21", "Jan 22", "Apr 24", "Aug 24", "M\u00e4r 25", "Nov 25", "M\u00e4r 26"], "opt": [37, -4, 86, 50, -4, 20, 38], "idx": [5.6, 6.8, 6.9, 6.9, 6.8, 5.5, 6.0]};
+Chart.defaults.font.family="-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif";
+new Chart(document.getElementById('ep'),{type:'bar',data:{labels:P.labels,datasets:[
+ {label:'Option P&L (%)',data:P.opt,backgroundColor:P.opt.map(v=>v>=0?'#047857':'#b91c1c'),borderRadius:4},
+ {label:'Index über denselben Zeitraum (%)',data:P.idx,backgroundColor:'#8b857a',borderRadius:4}
+]},options:{maintainAspectRatio:false,scales:{
+ y:{title:{display:true,text:'Rendite (%)'},ticks:{callback:v=>v+'%'},grid:{color:c=>c.tick.value===0?'#d5cec1':'#ece7dd'}},
+ x:{grid:{display:false}}},plugins:{legend:{labels:{usePointStyle:true,boxWidth:8}},tooltip:{callbacks:{label:it=>it.dataset.label+': '+it.parsed.y+'%'}}}}});
+</script></body></html>

@@ -1,0 +1,326 @@
+<!DOCTYPE html><html lang=de><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1">
+<title>Lebenszyklus-Simulator — sparen & entnehmen durch die Geschichte</title>
+<link rel=stylesheet href="assets/site.css?v=4">
+<script defer src="assets/site-map.js?v=4"></script>
+<script defer src="assets/datenstand.js?v=4"></script>
+<script defer src="assets/site.js?v=4"></script>
+<style>
+/* seitenspezifisch */
+.sub{font-weight:400;color:var(--ink-3);font-size:.92em}
+.mrow{grid-template-columns:repeat(3,1fr)}
+.mcard .n{font-size:20px}
+.mcard .l{min-height:2.6em}
+@media(max-width:860px){.mrow{grid-template-columns:1fr}}
+#bond{accent-color:var(--s5)}
+#cf{accent-color:var(--bad)}
+.infl,.story,.homectx,.warnbox{background:var(--card-2);border:1px solid var(--rule-soft);
+  border-left:3px solid var(--rule);border-radius:0 10px 10px 0;padding:11px 15px;
+  font-size:13px;line-height:1.6;color:var(--ink-2)}
+.infl{border-left-color:var(--s4);margin-top:10px;font-size:12.5px}
+.infl b{color:var(--s4)}
+.story{border-left-color:var(--accent);margin-top:8px;font-size:13.5px}
+.homectx{border-left-color:var(--good);margin-top:4px}
+.warnbox{border-left-color:var(--bad);margin-bottom:14px;font-size:13.5px}
+.warnbox b{color:var(--bad)}
+.fanwrap{position:relative}
+.scrub{display:flex;align-items:center;gap:12px;margin:14px 0 6px;flex-wrap:wrap}
+.scrub .lbl{font-size:12.5px;font-weight:600}
+.scrub input[type=range]{flex:1;min-width:170px;accent-color:var(--accent)}
+.scrub .yr{font-family:var(--mono);font-size:17px;font-weight:700;color:var(--accent);
+  min-width:54px;text-align:right;font-variant-numeric:tabular-nums}
+.sbtn{padding:6px 11px;border:1px solid var(--rule);background:var(--card);border-radius:8px;
+  font-family:var(--sans);font-size:12px;font-weight:600;color:var(--ink-2);cursor:pointer}
+.sbtn:hover{border-color:var(--accent);color:var(--accent)}
+#fantip{position:absolute;pointer-events:none;background:var(--ink);color:var(--paper);
+  font-family:var(--mono);font-size:11px;padding:5px 8px;border-radius:6px;opacity:0;
+  transition:opacity .08s;white-space:nowrap;transform:translateX(-50%);z-index:5}
+#fanguide{position:absolute;top:0;width:1px;background:var(--accent);opacity:0;pointer-events:none}
+</style></head><body data-section="Werkzeug"><div class=wrap>
+<div class=hero>
+<div class=kicker>Werkzeug &middot; Ansparen und Entnehmen &middot; reale Renditen 1871&ndash;2025</div>
+<h1>Ein ganzes Finanzleben durch die <em>Geschichte</em> gerechnet</h1>
+<p class=lead>Ansparphase und Entnahmephase gekoppelt, gerechnet auf tatsächlichen realen Renditesequenzen. Datenbasis wahlweise USA (S&amp;P 500, mit CAPE-Startfilter) oder Deutschland mit der langen Historie einschließlich Hyperinflation 1923 und Währungsreform 1948, dort zusätzlich Sparbuch und Immobilien. Mit Portfolio-Mix, Glidepath, Leitplanken und Startjahr-Hervorhebung, durchgehend inflationsbereinigt.</p>
+</div>
+<div class=take><b>Über ein Anlegerleben entscheidet die Reihenfolge der Jahre, nicht der Mittelwert.</b> Dieselbe durchschnittliche Realrendite führt je nach Startjahr zu Endvermögen, die um ein Vielfaches auseinanderliegen &mdash; und im Ruhestand entscheidet dieselbe Sequenz darüber, ob das Kapital drei Jahrzehnte trägt oder vorzeitig erschöpft ist.</div>
+<div class=tip>Regler und Umschalter rechnen sofort neu. Der Zeiger über dem Diagramm zeigt Median, P10 und P90 des jeweiligen Lebensjahres; der Startjahr-Regler hebt einen einzelnen historischen Verlauf hervor.</div>
+
+<div class=grid2>
+<div class=card>
+<h2>Dein Plan</h2>
+<div class=grp>Datenbasis</div>
+<div class=ctrl><div class=seg><button id=cUSA class=on>USA (S&amp;P, CAPE)</button><button id=cDE>Deutschland</button></div></div>
+<div class=ctrl id=erabox style="display:none"><div class=clabel><span>Deutsche Ära</span></div><div class=seg><button id=eLong class=on>lange Historie 1871–2020</button><button id=ePost>Nachkriegs-BRD 1963–2020</button></div><div class=hint id=erahint></div></div>
+<div class=grp>Sparen</div>
+<div class=ctrl><div class=clabel><span>Heutiges Alter</span><span class=cval id=age_v>30</span></div><input type=range id=age min=0 max=70 step=1 value=30><div class=hint id=agehint></div></div>
+<div class=ctrl><div class=clabel><span>Sparrate pro Monat</span></div><input type=number id=rate value=500 step=50 min=0><input type=range id=rate_r min=50 max=3000 step=50 value=500 style="margin-top:6px"></div>
+<div class=ctrl><div class=clabel><span>Startkapital heute <span class=sub>(€, frei eintippbar)</span></span></div><input type=number id=lump value=0 step=10000 min=0><input type=range id=lump_r min=0 max=10000000 step=50000 value=0 style="margin-top:6px"></div>
+<div class=ctrl><div class=clabel><span>Sparjahre</span><span class=cval id=ns_v>30</span></div><input type=range id=ns min=1 max=45 step=1 value=30></div>
+<div class=grp>Ruhestand</div>
+<div class=ctrl><div class=clabel><span>Entnahmejahre</span><span class=cval id=nd_v>30</span></div><input type=range id=nd min=1 max=40 step=1 value=30></div>
+<div class=ctrl><div class=clabel><span>Strategie</span></div><div class="seg tone"><button id=sFixed class=on>feste reale Rente</button><button id=sPerp>ewige Rente (% vom Depot)</button></div></div>
+<div class=ctrl><div class=clabel><span>Entnahmerate p.a. <span class=sub id=wrhint>(vom Kapital bei Rente)</span></span><span class=cval id=wr_v>4,0 %</span></div><input type=range id=wr min=2 max=8 step=0.1 value=4></div>
+<label class=chk id=guardchk><input type=checkbox id=guard><span>Leitplanken: in schlechten Jahren weniger entnehmen (variabel)</span></label>
+<div class=grp>Portfolio & Szenario</div>
+<div class=ctrl><div class=clabel><span>Anleihen-Anteil <span class=sub>(Rest Aktien)</span></span><span class=cval id=bond_v style="color:var(--s5)">0 %</span></div><input type=range id=bond min=0 max=100 step=5 value=0></div>
+<div class=ctrl id=billbox style="display:none"><div class=clabel><span>Sparbuch/Geldmarkt-Anteil</span><span class=cval id=bill_v style="color:var(--ink-3)">0 %</span></div><input type=range id=bill min=0 max=100 step=5 value=0></div>
+<div class=ctrl id=housebox style="display:none"><div class=clabel><span>Immobilien-Anteil <span class=sub>(im Anlage-Depot)</span></span><span class=cval id=house_v style="color:var(--good)">0 %</span></div><input type=range id=house min=0 max=100 step=5 value=0></div>
+<label class=chk id=glidechk style="display:none;margin-bottom:12px"><input type=checkbox id=glide><span>Glidepath: im Alter defensiver (Aktien/Immobilien → Sparbuch)</span></label>
+<div class=hint id=mixhint style="margin:-4px 0 12px"></div>
+<div class=ctrl id=homebox style="display:none"><div class=clabel><span>Eigene Immobilie <span class=sub>(zusätzlich, Wert heute in €)</span></span></div>
+<input type=number id=home value=0 step=25000 min=0>
+<div class="seg tone" style="margin-top:6px"><button id=bMit class=on>mit Vermietung</button><button id=bOhne>ohne Vermietung</button></div>
+<div class=hint id=homehint></div></div>
+<div class=ctrl id=capebox><div class=clabel><span>CAPE-Startfilter <span class=sub>(nur teure/billige Einstiege)</span></span><span class=cval id=cf_v style="color:var(--bad)">aus</span></div><input type=range id=cf min=0 max=38 step=1 value=0><div class=hint id=cfhint></div></div>
+<div class=ctrl><div class=clabel><span>10-Jahres-Blöcke</span></div><div class=seg><button id=mContig class=on>zusammenhängend</button><button id=mBoot>gemischt (Bootstrap)</button></div></div>
+<div class=grp>Anzeige</div>
+<div class=ctrl><div class=clabel><span>Beträge zeigen als</span></div><div class=seg><button id=dReal class=on>real (heutige Kaufkraft)</button><button id=dNom>nominal (künftige Euro)</button></div></div>
+<div class=ctrl id=inflbox style="display:none"><div class=clabel><span>Angenommene Inflation p.a.</span><span class=cval id=infl_v>2,0 %</span></div><input type=range id=infl min=0 max=5 step=0.1 value=2><div class=hint>Nur für die Umrechnung in künftige Euro. Die Simulation selbst rechnet unverändert real — die Kaufkraft ändert sich dadurch nicht.</div></div>
+<div class=infl id=inflnote><b>Inflation ist drin.</b> Reale historische Renditen (tatsächliche Inflation jedes Jahres abgezogen); die Entnahme ist real konstant, steigt also mit der Inflation.</div>
+</div>
+<div class=card>
+<h2 id=reslab>Ergebnis (real, heutige Kaufkraft)</h2>
+<div class=summary id=summary>30 J sparen (500 €/Mon = 180.000 € real) → Median <b>551.974 €</b> bei Rente. Dann 30 J feste reale Rente von <b>1.840 €/Monat</b>: <b>99 %</b> hielten durch, Median-Erbe <b>1.635.760 €</b>.</div>
+<div class=rentebox><div class=l>Reale Monatsrente <span id=rentelab>(fest, real konstant)</span></div><div class=n id=monthly>1.840 €<span style="font-size:15px;font-weight:600;color:#8b857a">/Monat</span></div><div class=s id=monthsub>real konstant, steigt mit der Inflation · P10 1.106 € – P90 3.398 €/Mon</div></div>
+<div class=mrow>
+<div class=mcard><div class=l id=c1lab>Median-Kapital bei Rente</div><div class=n id=kapmed>551.974 €</div><div class=s id=kaprange>real ×3,1 Einzahlung · P10 331.676 – P90 1.019.295 €</div></div>
+<div class="mcard succ"><div class=l id=c2lab>Geld reicht durch den Ruhestand</div><div class=n id=succ>99 %</div><div class=s id=c2sub>der Startjahre/Pfade</div></div>
+<div class=mcard><div class=l id=c3lab>Median-Endvermögen (Erbe)</div><div class=n id=erbmed>1.635.760 €</div><div class=s id=erbrange>real ×9,1 Einzahlung · P10 544.237 – P90 2.976.911 €</div></div>
+</div>
+<div class=homectx id=homectx style="display:none"></div>
+</div>
+</div>
+
+<div class=card>
+<h2>Ein ganzes Finanzleben — Fächer aller Startjahre</h2>
+<div class=warnbox id=fanwarn style="display:none"></div>
+<div class=fanwrap id=fanwrap><div id=fan><svg viewBox="0 0 720 320" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;font-family:inherit"><rect x="58.0" y="26" width="285.0" height="244" fill="#1d4ed8" fill-opacity="0.05"/><rect x="343.0" y="26" width="285.0" height="244" fill="#059669" fill-opacity="0.05"/><line x1="58" y1="270.0" x2="628" y2="270.0" stroke="#ece7dd"/><text x="52" y="273.0" font-size="10" fill="#8b857a" text-anchor="end">0</text><line x1="58" y1="231.3" x2="628" y2="231.3" stroke="#ece7dd"/><text x="52" y="234.3" font-size="10" fill="#8b857a" text-anchor="end">500 k</text><line x1="58" y1="192.7" x2="628" y2="192.7" stroke="#ece7dd"/><text x="52" y="195.7" font-size="10" fill="#8b857a" text-anchor="end">1,0 Mio</text><line x1="58" y1="154.0" x2="628" y2="154.0" stroke="#ece7dd"/><text x="52" y="157.0" font-size="10" fill="#8b857a" text-anchor="end">1,5 Mio</text><line x1="58" y1="115.4" x2="628" y2="115.4" stroke="#ece7dd"/><text x="52" y="118.4" font-size="10" fill="#8b857a" text-anchor="end">2,0 Mio</text><line x1="58" y1="76.7" x2="628" y2="76.7" stroke="#ece7dd"/><text x="52" y="79.7" font-size="10" fill="#8b857a" text-anchor="end">2,5 Mio</text><line x1="58" y1="38.0" x2="628" y2="38.0" stroke="#ece7dd"/><text x="52" y="41.0" font-size="10" fill="#8b857a" text-anchor="end">3,0 Mio</text><text x="58.0" y="286" font-size="10" fill="#8b857a" text-anchor="middle">0</text><text x="153.0" y="286" font-size="10" fill="#8b857a" text-anchor="middle">10</text><text x="248.0" y="286" font-size="10" fill="#8b857a" text-anchor="middle">20</text><text x="343.0" y="286" font-size="10" fill="#8b857a" text-anchor="middle">30</text><text x="438.0" y="286" font-size="10" fill="#8b857a" text-anchor="middle">40</text><text x="533.0" y="286" font-size="10" fill="#8b857a" text-anchor="middle">50</text><text x="628.0" y="286" font-size="10" fill="#8b857a" text-anchor="middle">60</text><polygon points="58.0,270.0 67.5,269.4 77.0,268.7 86.5,268.0 96.0,267.1 105.5,266.1 115.0,265.1 124.5,263.9 134.0,263.0 143.5,261.7 153.0,260.1 162.5,258.4 172.0,256.2 181.5,254.2 191.0,252.7 200.5,249.8 210.0,246.4 219.5,243.4 229.0,240.4 238.5,238.0 248.0,235.3 257.5,231.9 267.0,229.1 276.5,225.8 286.0,220.6 295.5,216.8 305.0,212.5 314.5,208.4 324.0,202.2 333.5,196.6 343.0,191.2 352.5,190.4 362.0,188.6 371.5,185.6 381.0,180.0 390.5,175.9 400.0,170.4 409.5,165.6 419.0,162.5 428.5,156.3 438.0,154.2 447.5,151.2 457.0,146.0 466.5,138.9 476.0,129.7 485.5,122.2 495.0,112.1 504.5,107.9 514.0,100.0 523.5,86.1 533.0,81.9 542.5,70.9 552.0,66.6 561.5,71.7 571.0,72.2 580.5,62.9 590.0,53.7 599.5,44.0 609.0,46.4 618.5,41.0 628.0,39.8 628.0,227.9 618.5,228.1 609.0,227.6 599.5,228.3 590.0,231.5 580.5,230.1 571.0,231.7 561.5,231.7 552.0,234.3 542.5,235.6 533.0,239.3 523.5,238.0 514.0,238.5 504.5,238.1 495.0,239.9 485.5,239.1 476.0,239.2 466.5,241.2 457.0,239.5 447.5,239.0 438.0,238.1 428.5,238.1 419.0,237.5 409.5,237.9 400.0,238.2 390.5,238.9 381.0,241.3 371.5,242.3 362.0,243.2 352.5,244.0 343.0,244.4 333.5,247.0 324.0,249.1 314.5,250.7 305.0,252.5 295.5,254.1 286.0,255.4 276.5,256.5 267.0,257.7 257.5,258.7 248.0,259.6 238.5,260.5 229.0,261.1 219.5,261.8 210.0,262.4 200.5,262.9 191.0,263.5 181.5,263.8 172.0,264.2 162.5,264.5 153.0,264.9 143.5,265.7 134.0,266.3 124.5,266.7 115.0,267.3 105.5,267.8 96.0,268.3 86.5,268.7 77.0,269.2 67.5,269.6 58.0,270.0" fill="#dde6fb"/><polygon points="58.0,270.0 67.5,269.4 77.0,268.8 86.5,268.2 96.0,267.5 105.5,266.7 115.0,265.9 124.5,264.9 134.0,263.9 143.5,262.8 153.0,261.6 162.5,260.5 172.0,259.1 181.5,257.8 191.0,256.5 200.5,254.8 210.0,253.0 219.5,250.9 229.0,249.2 238.5,247.5 248.0,245.7 257.5,243.2 267.0,241.0 276.5,238.7 286.0,234.9 295.5,230.8 305.0,227.1 314.5,222.5 324.0,219.0 333.5,216.1 343.0,211.1 352.5,210.3 362.0,208.8 371.5,207.1 381.0,201.7 390.5,199.8 400.0,198.5 409.5,195.3 419.0,196.9 428.5,194.7 438.0,193.9 447.5,190.9 457.0,188.9 466.5,186.9 476.0,183.4 485.5,181.6 495.0,177.8 504.5,171.7 514.0,170.5 523.5,171.6 533.0,168.0 542.5,162.8 552.0,143.0 561.5,139.3 571.0,140.6 580.5,130.3 590.0,125.8 599.5,122.9 609.0,119.2 618.5,103.4 628.0,95.4 628.0,196.2 618.5,196.4 609.0,196.4 599.5,199.1 590.0,205.6 580.5,209.8 571.0,216.4 561.5,214.3 552.0,219.6 542.5,221.9 533.0,222.6 523.5,224.3 514.0,226.4 504.5,227.0 495.0,227.3 485.5,228.4 476.0,228.7 466.5,229.9 457.0,229.7 447.5,228.3 438.0,229.4 428.5,230.1 419.0,230.2 409.5,232.2 400.0,233.1 390.5,234.3 381.0,235.2 371.5,234.8 362.0,235.7 352.5,236.5 343.0,236.9 333.5,238.9 324.0,241.0 314.5,243.0 305.0,245.4 295.5,247.5 286.0,249.1 276.5,250.3 267.0,251.6 257.5,253.5 248.0,254.9 238.5,256.4 229.0,257.1 219.5,258.2 210.0,259.0 200.5,259.9 191.0,260.9 181.5,261.9 172.0,262.6 162.5,263.4 153.0,264.2 143.5,264.9 134.0,265.6 124.5,266.2 115.0,266.8 105.5,267.4 96.0,268.0 86.5,268.6 77.0,269.1 67.5,269.6 58.0,270.0" fill="#c3d3f7"/><polyline points="58.0,270.0 67.5,269.5 77.0,269.0 86.5,268.4 96.0,267.8 105.5,267.1 115.0,266.4 124.5,265.7 134.0,264.9 143.5,264.0 153.0,263.2 162.5,262.3 172.0,261.4 181.5,260.2 191.0,258.9 200.5,257.7 210.0,256.4 219.5,255.1 229.0,253.4 238.5,251.8 248.0,250.0 257.5,248.2 267.0,246.4 276.5,244.3 286.0,242.3 295.5,239.9 305.0,237.4 314.5,235.0 324.0,232.4 333.5,230.1 343.0,227.3 352.5,226.7 362.0,225.7 371.5,224.8 381.0,224.6 390.5,222.8 400.0,222.6 409.5,222.5 419.0,220.6 428.5,220.5 438.0,217.2 447.5,215.8 457.0,211.3 466.5,210.7 476.0,208.6 485.5,207.7 495.0,206.8 504.5,205.1 514.0,204.2 523.5,200.5 533.0,196.6 542.5,196.2 552.0,192.2 561.5,191.2 571.0,187.1 580.5,180.0 590.0,172.4 599.5,169.7 609.0,155.8 618.5,146.4 628.0,143.5" fill="none" stroke="#1d4ed8" stroke-width="2.6"/><polyline points="58.0,270.0 67.5,269.5 77.0,269.1 86.5,268.6 96.0,268.1 105.5,267.7 115.0,267.2 124.5,266.8 134.0,266.3 143.5,265.8 153.0,265.4 162.5,264.9 172.0,264.4 181.5,264.0 191.0,263.5 200.5,263.0 210.0,262.6 219.5,262.1 229.0,261.6 238.5,261.2 248.0,260.7 257.5,260.3 267.0,259.8 276.5,259.3 286.0,258.9 295.5,258.4 305.0,257.9 314.5,257.5 324.0,257.0 333.5,256.5 343.0,256.1 352.5,256.1 362.0,256.1 371.5,256.1 381.0,256.1 390.5,256.1 400.0,256.1 409.5,256.1 419.0,256.1 428.5,256.1 438.0,256.1 447.5,256.1 457.0,256.1 466.5,256.1 476.0,256.1 485.5,256.1 495.0,256.1 504.5,256.1 514.0,256.1 523.5,256.1 533.0,256.1 542.5,256.1 552.0,256.1 561.5,256.1 571.0,256.1 580.5,256.1 590.0,256.1 599.5,256.1 609.0,256.1 618.5,256.1 628.0,256.1" fill="none" stroke="#8b857a" stroke-width="1.5" stroke-dasharray="4 3"/><line x1="343.0" y1="26" x2="343.0" y2="270" stroke="#a16207" stroke-width="1.6" stroke-dasharray="5 3"/><text x="343.0" y="22" font-size="10" font-weight="700" fill="#a16207" text-anchor="middle">Rente (J30)</text><text x="200.5" y="39" font-size="10.5" fill="#1d4ed8" text-anchor="middle">Ansparen</text><text x="485.5" y="39" font-size="10.5" fill="#059669" text-anchor="middle">Entnehmen</text><text x="632" y="42.8" font-size="9.5" font-weight="700" fill="#8b857a">P90</text><text x="632" y="146.5" font-size="9.5" font-weight="700" fill="#1d4ed8">Median</text><text x="632" y="230.9" font-size="9.5" font-weight="700" fill="#8b857a">P10</text><text x="343.0" y="316" font-size="11.5" fill="#57534c" text-anchor="middle">Reales Vermögen (heutiges Geld) über das ganze Leben · Band = alle Startjahre</text></svg></div><div id=fanguide></div><div id=fantip></div></div>
+<div id=scrubrow><div class=scrub><span class=lbl>Startjahr hervorheben:</span><input type=range id=hy min=1871 max=1966 step=1 value=1966><span class=yr id=hy_v>1966</span><button class=sbtn id=bWorst>schlechtestes</button><button class=sbtn id=bBest>bestes</button></div>
+<div class=story id=story></div></div>
+</div>
+
+<div class=card>
+<h2>Kapital bei Renteneintritt — nach Perzentil</h2>
+<div class=pcards>
+<div class=pc><div class=l>P10</div><div class=n id=p10>331.676 €</div></div>
+<div class=pc><div class=l>P25</div><div class=n id=p25>428.412 €</div></div>
+<div class="pc med"><div class=l>Median</div><div class=n id=p50>551.974 €</div></div>
+<div class=pc><div class=l>P75</div><div class=n id=p75>761.637 €</div></div>
+<div class=pc><div class=l>P90</div><div class=n id=p90>1.019.295 €</div></div>
+</div>
+</div>
+
+<div class=callout id=cptnote><b>CAPE-Startfilter, Anleihen, Leitplanken.</b> Ein hoher <b>CAPE-Filter</b> beschränkt die Auswertung auf teure Einstiege (wie heute ~40) — die Erfolgsquote fällt. <b>Anleihen</b> glätten das Sequenzrisiko (2008 stützten sie, 2022 nicht). <b>Leitplanken</b> heben die Erfolgsquote, kosten aber Einkommens-Stabilität. Die Effekte sind kombinierbar.</div>
+<div class=foot id=src>Realer S&amp;P-Total-Return & reale 10-J-Staatsanleihen (Shiller, mit tatsächlicher Inflation) 1871–2025. Anleihe = Duration-Näherung. Zusammenhängend = reale Fenster; gemischt = 2.000 Bootstrap-Pfade. Ohne Steuern/Gebühren. Keine Anlageberatung.</div>
+</div>
+
+<script>
+const RS=[0.1330,0.0871,0.0287,0.1197,0.1107,-0.1268,0.1436,0.2802,0.2237,0.3291,-0.0618,0.0549,0.0268,-0.0162,0.3171,0.1121,-0.0442,0.0785,0.1194,-0.0745,0.2521,-0.0117,-0.0552,0.0745,0.0351,0.0600,0.1613,0.2628,-0.1066,0.2312,0.1612,-0.0086,-0.1209,0.2713,0.2054,-0.0323,-0.2008,0.3255,0.0474,0.0383,0.0462,0.0012,-0.0583,-0.0581,0.2567,-0.0311,-0.2689,-0.0040,0.0210,-0.1071,0.2172,0.2845,0.0254,0.2523,0.2038,0.1346,0.3674,0.4714,-0.0814,-0.1452,-0.3253,0.0202,0.4969,-0.0987,0.5004,0.2933,-0.2889,0.1612,0.0412,-0.0908,-0.1587,0.1117,0.1938,0.1617,0.3445,-0.2386,-0.0596,0.0840,0.1912,0.2369,0.1534,0.1323,0.0200,0.4528,0.2716,0.0367,-0.0821,0.3667,0.0637,0.0462,0.1770,-0.0364,0.1867,0.1455,0.0929,-0.0900,0.1164,0.0568,-0.1314,0.0181,0.1010,0.1326,-0.2222,-0.2710,0.2924,0.0572,-0.1364,0.0638,0.0288,0.1186,-0.1327,0.2355,0.1499,0.0419,0.2060,0.2854,-0.0532,0.1238,0.1640,-0.0570,0.2773,0.0414,0.0870,-0.0143,0.3079,0.2302,0.2539,0.2886,0.1229,-0.0846,-0.1423,-0.2163,0.2564,0.0293,0.0585,0.1087,-0.0529,-0.3401,0.2850,0.1415,0.0065,0.1424,0.2313,0.1331,-0.0457,0.1772,0.2197,-0.0588,0.2451,0.1571,0.1346,-0.1691,0.1917,0.2207,0.1433], RB=[0.0344,0.0137,0.1131,0.1660,0.1538,0.0482,0.2483,0.1738,-0.1229,0.1306,-0.0343,0.0551,0.1226,0.1643,0.0857,0.0212,-0.0237,0.1050,0.0888,-0.0073,0.1044,-0.0503,0.2013,0.1018,0.0091,0.0835,0.0086,0.0388,-0.1214,0.0612,-0.0004,-0.0680,0.0716,0.0043,0.0390,-0.0293,0.0426,0.0149,-0.0741,0.1084,0.0487,-0.0643,0.0462,0.0249,0.0271,-0.0881,-0.1517,-0.1080,-0.1384,0.0569,0.2498,0.0444,0.0366,0.0568,0.0180,0.0892,0.0462,0.0225,0.0617,0.1063,0.1173,0.1832,0.0252,0.0280,0.0249,0.0021,0.0299,0.0580,0.0443,0.0304,-0.1257,-0.0490,-0.0056,0.0112,0.0167,-0.1395,-0.0877,0.0229,0.0440,-0.0738,-0.0261,0.0100,0.0466,0.0210,-0.0029,-0.0474,0.0282,-0.0612,-0.0266,0.0974,0.0120,0.0470,-0.0059,0.0301,-0.0109,0.0134,-0.0632,-0.0259,-0.1224,0.1235,0.0492,-0.0141,-0.0617,-0.0751,-0.0081,0.0582,-0.0453,-0.0822,-0.1376,-0.1032,-0.0643,0.3079,-0.0098,0.0946,0.1943,0.2085,-0.0778,0.0121,0.0904,0.0318,0.1225,0.0657,0.0991,-0.1184,0.1897,-0.0423,0.1226,0.0987,-0.1285,0.1314,0.0488,0.0982,0.0129,0.0060,-0.0132,-0.0035,0.0810,0.1373,-0.1041,0.0481,0.1199,0.0090,-0.0811,0.1138,-0.0137,-0.0337,-0.0094,-0.0010,0.0824,0.0646,-0.1192,-0.1950,-0.0384,-0.0345,0.0542], CAPE=[null,11.9,12.2,11.3,11.4,11.8,9.5,10.6,12.9,14.9,18.5,15.7,15.3,14.4,13.1,16.7,17.5,15.4,15.8,17.2,15.4,19.0,17.6,15.7,16.5,16.6,17.0,19.2,22.9,18.7,21.0,22.3,20.3,15.9,18.5,20.1,17.2,11.9,14.8,14.5,14.1,13.8,13.2,11.6,10.4,12.5,11.0,6.6,6.1,6.0,5.1,6.3,8.2,8.1,9.7,11.3,13.2,18.8,27.1,22.3,16.7,9.3,8.7,13.0,11.5,17.1,21.6,13.5,15.6,16.4,13.9,10.1,10.2,11.1,12.0,15.6,11.5,10.4,10.2,10.8,11.9,12.5,13.0,12.0,16.0,18.3,16.7,13.8,18.0,18.3,18.5,21.2,19.3,21.6,23.3,24.1,20.4,21.5,21.2,17.1,16.5,17.3,18.7,13.5,8.9,11.2,11.4,9.2,9.3,8.8,9.3,7.4,8.8,9.9,10.0,11.7,14.9,13.9,15.1,17.1,15.6,19.8,20.3,21.4,20.2,24.8,28.3,32.9,40.6,43.8,37.0,30.3,22.9,27.7,26.6,26.5,27.2,24.0,15.2,20.5,23.0,21.2,21.9,24.9,26.5,24.2,28.1,33.3,28.4,31.0,34.5,36.9,28.3,32.0,37.1,40.0];
+const DE_EQ=[0.3141,0.069,-0.146,-0.0432,-0.0297,0.0671,0.0237,0.1304,0.3675,0.0815,0.1949,-0.012,0.121,0.0748,0.0371,0.106,0.0062,0.1554,0.1323,-0.0675,-0.0582,0.0657,0.11,0.1908,0.1118,0.0794,0.0591,0.0897,0.0111,-0.0902,0.0386,0.078,0.101,0.1247,0.054,0.0033,0.0328,0.0206,0.107,0.0401,0.0525,0.0447,0.0337,-0.1103,-0.125,-0.1231,-0.1775,-0.4034,0.1972,-0.3135,0.7075,0.9306,1.4965,-0.8744,-0.4037,1.3607,-0.1177,0.0824,-0.2323,-0.2424,-0.2838,0.2781,0.1733,0.1118,0.1414,0.2884,0.0096,-0.035,0.1337,0.2965,0.0505,0.1092,0.0352,0.0098,-0.1582,-0.1713,0.0147,-0.8996,1.2125,-0.0223,1.0227,0.1925,0.2756,0.8882,0.0924,-0.0726,0.0557,0.5782,0.802,0.359,-0.0904,-0.2373,0.088,0.07,-0.1465,-0.1665,0.3573,0.1413,0.1696,-0.2413,0.019,0.1037,-0.2067,-0.0425,0.238,-0.0625,0.0845,0.0899,-0.1295,-0.0194,-0.0332,0.0907,0.3491,0.0838,0.6309,0.1518,-0.3367,0.2629,0.2793,-0.0942,0.089,-0.068,0.4045,-0.0954,0.0506,0.2035,0.3872,0.1486,0.3079,-0.1116,-0.1944,-0.4071,0.3609,0.066,0.2578,0.2191,0.1773,-0.4411,0.251,0.1715,-0.1688,0.2654,0.2475,0.0231,0.1058,0.0529,0.1442,-0.1843,0.2113,0.0719], DE_BOND=[0.0927,-0.01,0.0072,0.0539,0.1066,0.0319,0.0553,0.0854,0.0869,0.0212,0.0645,0.0337,0.0824,0.0601,0.0795,0.0632,0.0339,0.0477,-0.0054,-0.0243,0.0168,0.0549,0.1008,0.1043,0.0283,0.0153,0.0031,0.0089,-0.0398,0.0017,0.0622,0.0323,0.0331,0.0278,-0.005,-0.0356,0.0109,0.0576,0.0042,-0.0024,0.0246,-0.0121,0.0156,0.0174,-0.1511,-0.207,-0.3123,-0.1558,-0.1964,-0.5437,0.0922,-0.9068,-1,-0.8712,-0.0242,0.0408,-0.0024,0.0254,0.0331,0.1117,-0.0469,0.3982,0.2404,0.0195,0.0294,0.0625,0.0868,0.0582,0.0457,0.0445,0.0449,0.0301,0.0568,-0.0217,-0.0284,-0.0897,-0.0696,-0.9,-0.0054,0.1058,-0.0377,0.0407,0.0341,0.0688,0.0845,-0.0802,-0.0229,0.104,0.0812,0.0056,0.0754,0.0258,0.0242,0.0448,-0.0296,-0.034,0.1406,0.0718,-0.0092,0.0197,0.0314,-0.0135,-0.0346,0.0119,0.0713,0.0657,0.0952,0.0103,-0.0346,-0.022,-0.0118,0.1264,0.0158,0.1053,0.079,0.0876,0.0656,0.0363,-0.0114,-0.0126,0.0727,0.0795,0.0977,-0.0511,0.1458,0.0597,0.0497,0.1059,-0.0261,0.0538,0.0365,0.0761,0.0296,0.0487,0.0211,-0.0149,0.0022,0.072,0.0467,0.0286,0.0567,0.0244,-0.0205,0.0628,-0.0017,0.0368,-0.0056,0.0059,0.0444,0.0283], DE_BILL=[-0.0036,-0.018,-0.0101,0.0271,0.1066,0.0292,0.0569,0.0801,0.0618,-0.009,0.0588,0.0301,0.0707,0.0378,0.056,0.0308,0.023,0.012,-0.0091,0.0116,0.0132,0.0265,0.0956,0.0357,0.002,0.0214,0.0131,0.0355,0.0182,0.0184,0.0306,0.0136,0.0301,0.0314,-0.0039,-0.0139,0.0591,0.0352,-0.0014,-0.0011,0.0354,0.0277,0.0426,0.0085,-0.1722,-0.2047,-0.3025,-0.1496,-0.2122,-0.5779,-0.2105,-0.9057,-0.97,-0.866,-0.0107,0.0528,0.0219,0.0463,0.0686,0.0994,0.1802,0.1806,0.0772,0.0196,0.0179,0.0248,0.0234,0.0219,0.025,-0.0093,-0.0012,-0.0085,0.0139,-0.0217,-0.0284,-0.0897,-0.0696,-0.9,-0.0704,0.1123,-0.0152,0.0292,0.0554,0.0265,0.0146,0.0209,0.0181,0.0097,0.0171,0.0303,0.0064,-0.0021,0.0001,0.0092,0.0085,0.0166,0.0171,0.0095,0.0288,0.0504,0.0088,-0.0113,0.0298,0.0178,-0.0145,-0.0039,0.0043,0.0066,0.0169,0.0345,0.0464,0.0323,0.0202,0.0306,0.0295,0.047,0.0347,0.027,0.0371,0.0509,0.0502,0.0415,0.029,0.0254,0.0261,0.0176,0.0164,0.0281,0.0204,0.0267,0.0243,0.0195,0.0121,0.0029,0.0016,0.0103,0.0153,0.0104,0.0038,-0.0073,-0.0163,-0.0186,-0.0149,-0.0067,-0.0078,-0.0064,-0.0201,-0.0221,-0.0169,-0.0079], DE_HOUSE=[0.1768,0.0821,0.2006,0.1114,0.1127,0.1089,0.0555,0.0821,0.0504,0.0434,0.0335,0.0351,-0.0066,0.0105,0.0507,0.0738,0.0991,0.0468,0.0326,-0.008,0.0003,-0.0139,0.0141,0.0382,0.0225,0.0382,0.0478,0.0823,0.0495,0.0573,0.0495,0.0542,0.0324,0.0181,0.0101,0.0204,0.0579,0.0315,0.027,0.0063,0.0283,0.0131,0.0124,0.0346,0.0405,0.0317,0.0566,0.0681,0.0809,0.1243,0.0939,0.0895,0.0894,0.1144,0.0835,0.0845,0.0803,0.1091];
+const DE_HOUSE_CG=[0.129,0.0383,0.1574,0.0725,0.0747,0.0715,0.0191,0.0461,0.0156,0.009,-0.0003,0.002,-0.0398,-0.0242,0.0152,0.0386,0.0656,0.0155,0.0024,-0.0382,-0.0317,-0.0474,-0.0214,0.0013,-0.0149,-0.0001,0.0094,0.044,0.0126,0.0191,0.0099,0.014,-0.0082,-0.0235,-0.0328,-0.0243,0.012,-0.0138,-0.0186,-0.0403,-0.0203,-0.0361,-0.0382,-0.0176,-0.0121,-0.0207,0.0027,0.0143,0.0285,0.0723,0.0456,0.0431,0.0446,0.0713,0.0433,0.0462,0.0436,0.0735];
+const $=id=>document.getElementById(id);
+const fmt=x=>Math.round(x).toLocaleString('de-DE');
+function kf(v){if(v>=1e6)return (v/1e6).toLocaleString('de-DE',{minimumFractionDigits:1,maximumFractionDigits:1})+' Mio';if(v>=1000)return Math.round(v/1000)+' k';return '0';}
+function niceStep(x){if(!(x>0))return 500000;const p=Math.pow(10,Math.floor(Math.log10(x)));const f=x/p;const n=f<1.5?1:f<3?2:f<7?5:10;return n*p;}
+const X0=58,X1=628,Y0=26,Y1=270;
+let mode='contig',strat='fixed',guard=false,gGeo=null,lastD=null,country='usa',era='long',glide=false,homeRent=true,HOMEON=false,AGE0=30,disp='real',INFL=0.02;
+// Umrechnung real -> nominal: Kaufkraft von heute in Euro des Jahres k. Die Simulation bleibt real.
+const nf=k=>Math.pow(1+INFL,k);                       // Aufzinsungsfaktor fuer Jahr k
+const nv=(v,k)=>disp==='nom'?v*nf(k):v;               // Wert im aktuell gewaehlten Massstab
+const alt=(v,k)=>disp==='nom'?v:v*nf(k);              // derselbe Wert im jeweils anderen Massstab
+const altLab=()=>disp==='nom'?'real':'nominal';
+function homeReturns(){if(country==='de'&&era==='postwar'&&(+$('home').value)>0)return homeRent?DE_HOUSE:DE_HOUSE_CG;return null;}
+function pct(v,p){v=v.slice().sort((a,b)=>a-b);const k=(v.length-1)*p/100,f=Math.floor(k),c=Math.min(f+1,v.length-1);return v[f]+(v[c]-v[f])*(k-f);}
+function mulberry32(a){return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;};}
+function activeData(){
+  if(country==='usa')return{base:1871,N:RS.length,A:{eq:RS,bond:RB},cape:CAPE,hasBill:false,hasHouse:false};
+  if(era==='postwar'){const o=92;return{base:1963,N:58,A:{eq:DE_EQ.slice(o),bond:DE_BOND.slice(o),bill:DE_BILL.slice(o),house:DE_HOUSE},cape:null,hasBill:true,hasHouse:true};}
+  return{base:1871,N:150,A:{eq:DE_EQ,bond:DE_BOND,bill:DE_BILL},cape:null,hasBill:true,hasHouse:false};
+}
+function weightsAt(k,H){
+  const D=activeData();
+  const wBond=+$('bond').value/100, wBill=D.hasBill?+$('bill').value/100:0, wHouse=D.hasHouse?+$('house').value/100:0;
+  let w={eq:Math.max(0,1-wBond-wBill-wHouse),bond:wBond,bill:wBill,house:wHouse};
+  let sum=w.eq+w.bond+w.bill+w.house; if(sum<=0){w={eq:1,bond:0,bill:0,house:0};sum=1;}
+  for(const a in w)w[a]/=sum;
+  if(glide){const g=H>1?k/(H-1):0,cut=g*0.6,risky=w.eq+w.house,move=risky*cut,scale=risky>0?(risky-move)/risky:1,safe=D.hasBill?'bill':'bond';w.eq*=scale;w.house*=scale;w[safe]+=move;}
+  return w;
+}
+function blendAt(ci,k,H){const D=activeData(),w=weightsAt(k,H);let r=0;for(const a in D.A)r+=w[a]*D.A[a][ci];return r;}
+function drawOne(s,L,C,ns,nd,wr){
+  const H=ns+nd;let V=L;const p=[L];for(let k=0;k<ns;k++){V+=C;V*=(1+blendAt(s+k,k,H));p.push(V);}
+  const K=V;let fail=null;
+  if(strat==='fixed'){let W=wr*K;for(let k=0;k<nd;k++){if(guard){const cr=V>0?W/V:99;if(cr>wr*1.2)W*=0.9;else if(cr<wr*0.8)W*=1.1;}if(V<W&&fail===null)fail=k;V=Math.max(V-W,0)*(1+blendAt(s+ns+k,ns+k,H));p.push(V);}}
+  else{for(let k=0;k<nd;k++){const w=wr*V;V=(V-w)*(1+blendAt(s+ns+k,ns+k,H));p.push(V);}}
+  const hr=homeReturns();let tK=K,tEnd=V;
+  if(hr){let Hv=+$('home').value;const hp=[Hv];for(let k=0;k<H;k++){Hv*=(1+hr[s+k]);hp.push(Hv);}for(let k=0;k<=H;k++)p[k]+=hp[k];tK=K+hp[ns];tEnd=V+hp[H];}
+  return {p,K:tK,end:tEnd,fail};
+}
+function simLife(L,C,ns,nd,wr,bf,capeMin){
+  const H=ns+nd,D=activeData(),N=D.N,base=D.base;let seqStarts=[];
+  if(mode==='contig'){for(let s=0;s<=N-H;s++){if(D.cape&&capeMin>0){const cy=D.cape[s];if(cy===null||cy<capeMin)continue;}seqStarts.push(s);}}
+  const paths=[],Ks=[],ends=[],incs=[],starts=[],pKs=[],pends=[];let m2=0;
+  const hr=homeReturns(),home0=hr?+$('home').value:0;
+  const runSeq=(seq,hseq)=>{
+    let V=L;const p=[L];for(let k=0;k<ns;k++){V+=C;V*=(1+seq[k]);p.push(V);}
+    const K=V;let fail=false,inc0=0;
+    if(strat==='fixed'){let W=wr*K;inc0=W;for(let k=0;k<nd;k++){if(guard){const cr=V>0?W/V:99;if(cr>wr*1.2)W*=0.9;else if(cr<wr*0.8)W*=1.1;}if(V<W)fail=true;V=Math.max(V-W,0)*(1+seq[ns+k]);p.push(V);}if(!fail)m2++;}
+    else{inc0=wr*K;for(let k=0;k<nd;k++){const w=wr*V;V=(V-w)*(1+seq[ns+k]);p.push(V);}if(V>=K)m2++;}
+    let pk=0,pe=0;
+    if(hseq){let Hv=home0;const hp=[Hv];for(let k=0;k<H;k++){Hv*=(1+hseq[k]);hp.push(Hv);}for(let k=0;k<=H;k++)p[k]+=hp[k];pk=hp[ns];pe=hp[H];}
+    paths.push(p);Ks.push(K);ends.push(V);incs.push(inc0);pKs.push(pk);pends.push(pe);
+  };
+  if(mode==='contig'){seqStarts.forEach(s=>{const seq=[],hseq=hr?[]:null;for(let k=0;k<H;k++){seq.push(blendAt(s+k,k,H));if(hseq)hseq.push(hr[s+k]);}starts.push(base+s);runSeq(seq,hseq);});}
+  else{const rnd=mulberry32(999);const nb=9,maxb=N-10;let pool=[];/* konstante Blockzahl (deckt max. Horizont 90 J) → Ansparphase unabhängig von den Entnahmejahren */for(let b=0;b<=maxb;b++){if(!(D.cape&&capeMin>0)||(D.cape[b]!==null&&D.cape[b]>=capeMin))pool.push(b);}if(!pool.length)pool=[0];
+    for(let i=0;i<2000;i++){let idx=[pool[Math.floor(rnd()*pool.length)]];for(let b=1;b<nb;b++)idx.push(Math.floor(rnd()*(maxb+1)));let seq=[],hseq=hr?[]:null,ly=0;idx.forEach(st=>{for(let k=0;k<10;k++){seq.push(blendAt(st+k,ly,H));if(hseq)hseq.push(hr[st+k]);ly++;}});seq=seq.slice(0,H);if(hseq)hseq=hseq.slice(0,H);starts.push(null);runSeq(seq,hseq);}}
+  const ptab={};[10,25,50,75,90].forEach(q=>ptab[q]=[]);
+  for(let k=0;k<=H;k++){const col=paths.map(p=>p[k]);[10,25,50,75,90].forEach(q=>ptab[q].push(pct(col,q)));}
+  return {H,ns,paths,Ks,ends,incs,starts,pKs,pends,m2:paths.length?m2/paths.length:0,ptab,n:paths.length};
+}
+function fan(d0,L,C,ns,hl0){
+  // Im nominalen Modus jeden Jahreswert mit seinem eigenen Aufzinsungsfaktor skalieren
+  let d=d0,hl=hl0;
+  if(disp==='nom'){
+    const pt={};[10,25,50,75,90].forEach(q=>pt[q]=d0.ptab[q].map((v,k)=>v*nf(k)));
+    d={...d0,ptab:pt};
+    if(hl0)hl={...hl0,p:hl0.p.map((v,k)=>v*nf(k))};
+  }
+  const H=d.H,ymax=Math.max(Math.max(...d.ptab[90]),hl?Math.max(...hl.p):0)*1.06||1,xm=k=>X0+k/H*(X1-X0),ym=v=>Y1-Math.min(v,ymax)/ymax*(Y1-Y0);
+  gGeo={H,ymax,ptab:d.ptab,age0:AGE0};
+  let s=`<svg viewBox="0 0 720 320" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;font-family:inherit">`;
+  s+=`<rect x="${xm(0)}" y="${Y0}" width="${xm(ns)-xm(0)}" height="${Y1-Y0}" fill="#1d4ed8" fill-opacity="0.05"/><rect x="${xm(ns)}" y="${Y0}" width="${xm(H)-xm(ns)}" height="${Y1-Y0}" fill="#059669" fill-opacity="0.05"/>`;
+  const step=niceStep(ymax/6);
+  for(let gv=0;gv<=ymax;gv+=step){const y=ym(gv);s+=`<line x1="${X0}" y1="${y}" x2="${X1}" y2="${y}" stroke="#ece7dd"/><text x="${X0-6}" y="${y+3}" font-size="10" fill="#8b857a" text-anchor="end">${kf(gv)}</text>`;}
+  const xs=H>=20?10:(H>=8?5:1);for(let k=0;k<=H;k+=xs)s+=`<text x="${xm(k)}" y="${Y1+16}" font-size="10" fill="#8b857a" text-anchor="middle">${AGE0>0?AGE0+k:k}</text>`;
+  const poly=(hi,lo,fill)=>{let p='';for(let k=0;k<=H;k++)p+=xm(k).toFixed(1)+','+ym(d.ptab[hi][k]).toFixed(1)+' ';for(let k=H;k>=0;k--)p+=xm(k).toFixed(1)+','+ym(d.ptab[lo][k]).toFixed(1)+' ';s+=`<polygon points="${p}" fill="${fill}"/>`;};
+  poly(90,10,'#dde6fb');poly(75,25,'#c3d3f7');
+  s+=`<polyline points="${d.ptab[50].map((v,k)=>xm(k).toFixed(1)+','+ym(v).toFixed(1)).join(' ')}" fill="none" stroke="#1d4ed8" stroke-width="2.6"/>`;
+  // Einzahlungslinie: real konstante Sparrate waechst nominal mit der Inflation mit
+  let cp='',ein=L*(disp==='nom'?1:1);
+  for(let k=0;k<=H;k++){
+    let v;
+    if(disp==='nom'){v=L*nf(k);for(let j=1;j<=Math.min(k,ns);j++)v+=C*nf(j);}
+    else v=L+C*Math.min(k,ns);
+    cp+=xm(k).toFixed(1)+','+ym(v).toFixed(1)+' ';
+  }
+  s+=`<polyline points="${cp}" fill="none" stroke="#8b857a" stroke-width="1.5" stroke-dasharray="4 3"/>`;
+  if(hl){s+=`<polyline points="${hl.p.map((v,k)=>xm(k).toFixed(1)+','+ym(v).toFixed(1)).join(' ')}" fill="none" stroke="#c2410c" stroke-width="2.6"/>`;}
+  s+=`<line x1="${xm(ns)}" y1="${Y0}" x2="${xm(ns)}" y2="${Y1}" stroke="#a16207" stroke-width="1.6" stroke-dasharray="5 3"/><text x="${xm(ns)}" y="${Y0-4}" font-size="10" font-weight="700" fill="#a16207" text-anchor="middle">${AGE0>0?'Rente (Alter '+(AGE0+ns)+')':'Rente (J'+ns+')'}</text>`;
+  s+=`<text x="${(xm(0)+xm(ns))/2}" y="${Y0+13}" font-size="10.5" fill="#1d4ed8" text-anchor="middle">Ansparen</text><text x="${(xm(ns)+xm(H))/2}" y="${Y0+13}" font-size="10.5" fill="#059669" text-anchor="middle">Entnehmen</text>`;
+  [[90,'P90'],[50,'Median'],[10,'P10']].forEach(q=>{s+=`<text x="${X1+4}" y="${ym(d.ptab[q[0]][H])+3}" font-size="9.5" font-weight="700" fill="${q[0]==50?'#1d4ed8':'#8b857a'}">${q[1]}</text>`;});
+  s+=`<text x="${(X0+X1)/2}" y="316" font-size="11.5" fill="#57534c" text-anchor="middle">${HOMEON?('Gesamtvermögen (Depot + Immobilie), '+(disp==='nom'?'nominal':'real')):(disp==='nom'?'Vermögen in Euro des jeweiligen Jahres':'Reales Vermögen (heutiges Geld)')} über das ganze Leben · ${AGE0>0?'Achse = Alter':'Achse = Jahre ab heute'} · Band = alle Startjahre</text>`;
+  return s+'</svg>';
+}
+function syncUI(){
+  INFL=(+$('infl').value)/100;
+  $('dReal').classList.toggle('on',disp==='real');$('dNom').classList.toggle('on',disp==='nom');
+  $('inflbox').style.display=disp==='nom'?'':'none';
+  $('infl_v').textContent=(INFL*100).toLocaleString('de-DE',{minimumFractionDigits:1,maximumFractionDigits:1})+' %';
+  const de=country==='de';
+  $('cUSA').classList.toggle('on',!de);$('cDE').classList.toggle('on',de);
+  $('erabox').style.display=de?'':'none';$('capebox').style.display=de?'none':'';
+  $('billbox').style.display=de?'':'none';$('housebox').style.display=(de&&era==='postwar')?'':'none';$('glidechk').style.display=de?'':'none';
+  const homeAv=de&&era==='postwar';$('homebox').style.display=homeAv?'':'none';
+  if(homeAv){$('bMit').classList.toggle('on',homeRent);$('bOhne').classList.toggle('on',!homeRent);$('homehint').textContent=homeRent?'Gesamtrendite (Wertzuwachs + Miete, reinvestiert) — real 1963–2020 ≈ 5,6 %/J':'Nur Wertsteigerung (Eigenheim, kein Mietertrag) — real 1963–2020 ≈ 1,5 %/J';}
+  if(de){$('eLong').classList.toggle('on',era==='long');$('ePost').classList.toggle('on',era==='postwar');
+    $('erahint').textContent=era==='long'?'Aktien · Anleihen · Sparbuch — inkl. Hyperinflation 1923 & Währungsreform 1948':'Aktien · Anleihen · Sparbuch · Immobilien — lückenlose Nachkriegsdaten';}
+  $('cptnote').innerHTML=de
+    ?'<b>Die deutsche Lehre.</b> 1 € real angelegt 1871 wurde bis 2020 zu <b>~456 € in Aktien</b> — aber zu <b>fast null in Anleihen & Sparbuch</b> (1923 real −100 %). Ein höherer <b>Anleihen- oder Sparbuch-Anteil</b> lässt jeden Verlauf über 1923 und 1948 einbrechen: nominale Sicherheit schützt kurzfristig, real kostet Inflation langfristig alles.'
+    :'<b>CAPE-Startfilter, Anleihen, Leitplanken.</b> Ein hoher <b>CAPE-Filter</b> beschränkt die Auswertung auf teure Einstiege (wie heute ~40) — die Erfolgsquote fällt. <b>Anleihen</b> glätten das Sequenzrisiko (2008 stützten sie, 2022 nicht). <b>Leitplanken</b> heben die Erfolgsquote, kosten aber Einkommens-Stabilität.';
+  $('src').textContent=de
+    ?'Reale Renditen Deutschland: Jordà-Schularick-Taylor Macrohistory Database (JST R6), 1871–2020 · Aktien/Anleihen/Geldmarkt/Immobilien (Total Return, mit tatsächlicher Inflation). Kriegs-/Reformlücken 1944–49 dokumentiert modelliert (1948 ≈ −90 %). Immobilien erst ab 1963. Ohne Steuern/Gebühren. Keine Anlageberatung.'
+    :'Realer S&P-Total-Return & reale 10-J-Staatsanleihen (Shiller, mit tatsächlicher Inflation) 1871–2025. Anleihe = Duration-Näherung. Zusammenhängend = reale Fenster; gemischt = 2.000 Bootstrap-Pfade. Ohne Steuern/Gebühren. Keine Anlageberatung.';
+}
+function render(){
+  syncUI();
+  const D=activeData();
+  const C=(+$('rate').value)*12,L=+$('lump').value,ns=+$('ns').value,nd=+$('nd').value,wr=+$('wr').value/100,bf=+$('bond').value/100,cm=+$('cf').value;
+  $('ns_v').textContent=ns;$('nd_v').textContent=nd;const wrs=(+$('wr').value).toLocaleString('de-DE',{minimumFractionDigits:1,maximumFractionDigits:1})+' %';$('wr_v').textContent=wrs;
+  AGE0=+$('age').value;$('age_v').textContent=AGE0>0?AGE0:'aus';$('agehint').textContent=AGE0>0?('Renteneintritt mit '+(AGE0+ns)+' · Simulation bis Alter '+(AGE0+ns+nd)):'Achse zeigt Jahre ab heute (Alter: 0 = aus)';
+  $('bond_v').textContent=$('bond').value+' %';$('cf_v').textContent=cm>0?('≥ '+cm):'aus';
+  if(D.hasBill)$('bill_v').textContent=$('bill').value+' %';if(D.hasHouse)$('house_v').textContent=$('house').value+' %';
+  const w0=weightsAt(0,ns+nd);$('mixhint').textContent=country==='de'?('Aktien-Anteil: '+Math.round(w0.eq*100)+' %'+(glide?' (Start; Glidepath senkt ihn übers Leben)':'')):'';
+  $('wrhint').textContent=strat==='fixed'?'(vom Kapital bei Rente)':'(vom aktuellen Depot)';
+  $('guardchk').classList.toggle('off',strat!=='fixed');
+  const d=simLife(L,C,ns,nd,wr,bf,cm),contrib=L+C*ns,H=ns+nd;lastD=d;
+  $('cfhint').textContent=cm>0?(d.n+(mode==='contig'?' passende Startjahre':' Pfade')+(d.n<8&&mode==='contig'?' — sehr wenige, Ergebnis unsicher':'')):'';
+  if(d.n<8&&mode==='contig'){$('fanwarn').style.display='';const why=country==='de'?('Der Horizont ('+H+' J) ist für diese Ära (nur '+D.N+' Datenjahre) zu lang für zusammenhängende Fenster'):('Nur '+d.n+' Startjahr'+(d.n===1?'':'e')+' erfüllen den CAPE-Filter');$('fanwarn').innerHTML=why+' — der Fächer kollabiert (nur '+d.n+' Verläufe). Belastbar wird das Ergebnis erst im Modus <b>gemischt (Bootstrap)</b>'+(country==='de'?' oder mit kürzeren Spar- und Entnahmejahren.':' oder mit niedrigerem CAPE-Filter.');}else{$('fanwarn').style.display='none';}
+  if(d.n===0){['kapmed','succ','erbmed','p10','p25','p50','p75','p90','monthly'].forEach(id=>$(id).textContent='—');$('kaprange').textContent='';$('erbrange').textContent='';$('monthsub').textContent='';$('succ').style.color='#8b857a';$('summary').innerHTML='Kein zusammenhängendes Fenster: Horizont '+H+' J > '+D.N+' Datenjahre dieser Ära. Auswertbar nur im Modus <b>gemischt (Bootstrap)</b> oder mit kürzeren Spar- und Entnahmejahren.';$('fan').innerHTML='';$('scrubrow').style.display='none';$('homectx').style.display='none';return;}
+  const kp=q=>pct(d.Ks,q),ep=q=>pct(d.ends,q);
+  const cbase=Math.max(contrib,1);
+  // Anzeige-Maßstab: real (heutige Kaufkraft) oder nominal (Euro des jeweiligen Jahres)
+  const NOM=disp==='nom';
+  $('reslab').textContent=NOM?('Ergebnis (nominal, Euro der Zukunft bei '+(INFL*100).toLocaleString('de-DE',{minimumFractionDigits:1,maximumFractionDigits:1})+' % Inflation)'):'Ergebnis (real, heutige Kaufkraft)';
+  const K=v=>nv(v,ns), E=v=>nv(v,H);   // Kapital bei Rente liegt in Jahr ns, Endvermögen in Jahr H
+  $('kapmed').textContent=fmt(K(kp(50)))+' €';
+  $('kaprange').textContent='real ×'+(kp(50)/cbase).toFixed(1).replace('.',',')+' Einzahlung · P10 '+fmt(K(kp(10)))+' – P90 '+fmt(K(kp(90)))+' €  ·  '+altLab()+' '+fmt(alt(kp(50),ns))+' €';
+  const m2=Math.round(d.m2*100);$('succ').textContent=m2+' %';$('succ').style.color=m2>=90?'#047857':m2>=70?'#a16207':'#b91c1c';
+  $('erbmed').textContent=fmt(E(ep(50)))+' €';
+  $('erbrange').textContent='real ×'+(ep(50)/cbase).toFixed(1).replace('.',',')+' Einzahlung · P10 '+fmt(E(ep(10)))+' – P90 '+fmt(E(ep(90)))+' €  ·  '+altLab()+' '+fmt(alt(ep(50),H))+' €';
+  ['p10','p25','p50','p75','p90'].forEach((id,i)=>$(id).textContent=fmt(K(kp([10,25,50,75,90][i])))+' €');
+  const monMed=wr*kp(50)/12,monLo=wr*kp(10)/12,monHi=wr*kp(90)/12;
+  const M=v=>nv(v,ns);   // Monatsrente zum Rentenbeginn
+  $('monthly').innerHTML=fmt(M(monMed))+' €<span style="font-size:15px;font-weight:600;color:#8b857a">/Monat</span>';
+  const gtxt=guard&&strat==='fixed'?' · mit Leitplanken variabel':'';
+  if(strat==='fixed'){
+    $('rentelab').textContent=NOM?'(bei Rentenbeginn, danach mit der Inflation steigend)':'(fest, real'+(guard?', mit Leitplanken':' konstant')+')';
+    $('monthsub').textContent=NOM
+      ? 'zu Rentenbeginn · steigt bis zum Ende auf ~'+fmt(nv(monMed,H))+' €/Mon (gleiche Kaufkraft) · real konstant '+fmt(monMed)+' € · P10 '+fmt(M(monLo))+' – P90 '+fmt(M(monHi))+' €'
+      : 'real konstant, steigt mit der Inflation'+gtxt+' · P10 '+fmt(monLo)+' € – P90 '+fmt(monHi)+' €/Mon · nominal bei Rentenbeginn '+fmt(monMed*nf(ns))+' €';
+    $('c2lab').textContent='Geld reicht durch den Ruhestand';$('c2sub').textContent='der Startjahre/Pfade';$('c3lab').textContent='Median-Endvermögen (Erbe)';
+    $('summary').innerHTML=ns+' J sparen ('+$('rate').value+' €/Mon) → Median <b>'+fmt(K(kp(50)))+' €</b> bei Rente. Dann '+nd+' J feste Rente ~<b>'+fmt(M(monMed))+' €/Monat</b>: <b>'+m2+' %</b> hielten durch, Median-Erbe <b>'+fmt(E(ep(50)))+' €</b>. '+(NOM?'<span style="color:var(--ink-3)">Nominal bei '+(INFL*100).toLocaleString('de-DE',{minimumFractionDigits:1,maximumFractionDigits:1})+' % Inflation; die Kaufkraft entspricht '+fmt(kp(50))+' € bzw. '+fmt(monMed)+' €/Mon von heute.</span>':(bf>0?'('+$('bond').value+' % Anleihen)':''));
+  }else{
+    $('rentelab').textContent=NOM?'(ewig, % vom Depot · bei Rentenbeginn)':'(ewig, % vom Depot · Start)';
+    $('monthsub').textContent='Start; wächst/schwankt mit dem Depot, Median-Ende ~'+fmt(nv(wr*ep(50)/12,H))+' €/Mon · P10 '+fmt(M(monLo))+' – P90 '+fmt(M(monHi))+(NOM?' · real '+fmt(monMed)+' €':'');
+    $('c2lab').textContent='Kapital real erhalten';$('c2sub').textContent='Endkapital ≥ Kapital bei Rente';$('c3lab').textContent=NOM?'Median-Endkapital':'Median reales Endkapital';
+    $('summary').innerHTML=ns+' J sparen → Median <b>'+fmt(K(kp(50)))+' €</b> bei Rente. Ewige Rente ('+wrs+'): Start ~<b>'+fmt(M(monMed))+' €/Monat</b>, wächst im Median auf ~<b>'+fmt(nv(wr*ep(50)/12,H))+' €/Mon</b>, Kapital in <b>'+m2+' %</b> real erhalten.'+(NOM?' <span style="color:var(--ink-3)">Nominal bei '+(INFL*100).toLocaleString('de-DE',{minimumFractionDigits:1,maximumFractionDigits:1})+' % Inflation.</span>':'');
+  }
+  // Eigene Immobilie / Gesamtvermögen
+  HOMEON=homeReturns()!==null;
+  if(HOMEON){
+    const pk=q=>pct(d.pKs,q),pe=q=>pct(d.pends,q),tk=pct(d.paths.map(p=>p[ns]),50),te=pct(d.paths.map(p=>p[H]),50),home0=+$('home').value;
+    $('c1lab').textContent='Depot-Kapital bei Rente';$('c3lab').textContent='Depot-Endvermögen (Erbe)';
+    $('homectx').style.display='';
+    $('homectx').innerHTML='<b>Eigene Immobilie</b> ('+(homeRent?'mit Vermietung':'ohne Vermietung')+'): heute '+fmt(home0)+' € → Median <b>'+fmt(pk(50))+' €</b> bei Rente → <b>'+fmt(pe(50))+' €</b> am Ende (P10 '+fmt(pe(10))+' – P90 '+fmt(pe(90))+' €). &nbsp;<b>Gesamtvermögen</b> (Depot + Immobilie): Median <b>'+fmt(tk)+' €</b> bei Rente · <b>'+fmt(te)+' €</b> am Ende.';
+  }else{$('homectx').style.display='none';$('c1lab').textContent='Median-Kapital bei Rente';}
+  // highlight / scrubber
+  const scrubrow=$('scrubrow');
+  if(mode==='contig'&&D.N-H>=0){scrubrow.style.display='';const hy=$('hy');hy.min=D.base;hy.max=D.base+(D.N-H);if(+hy.value>+hy.max)hy.value=hy.max;if(+hy.value<+hy.min)hy.value=hy.min;$('hy_v').textContent=hy.value;
+    const hl=drawOne(+hy.value-D.base,L,C,ns,nd,wr);$('fan').innerHTML=fan(d,L,C,ns,hl);
+    const cs=D.cape?D.cape[+hy.value-D.base]:null;
+    $('story').innerHTML=hl.fail!==null
+      ?'Start <b>'+hy.value+'</b>'+(cs?' (CAPE '+Math.round(cs)+')':'')+': Kapital <b>nach '+hl.fail+' Rentenjahren aufgebraucht</b> — trotz '+wrs+' Entnahme. Sequenzrisiko.'
+      :'Start <b>'+hy.value+'</b>'+(cs?' (CAPE '+Math.round(cs)+')':'')+': '+fmt(hl.K)+' € bei Rente, endete mit <b>'+fmt(hl.end)+' €</b> ('+(hl.end/Math.max(hl.K,1)).toFixed(1)+'× des Rentenkapitals).';
+  }else{scrubrow.style.display='none';$('fan').innerHTML=fan(d,L,C,ns,null);}
+}
+// hover
+const fw=$('fanwrap');
+fw.addEventListener('mousemove',e=>{if(!gGeo)return;const r=$('fan').getBoundingClientRect();const sx=(e.clientX-r.left)/r.width*720;const H=gGeo.H;let k=Math.round((sx-X0)/(X1-X0)*H);if(k<0||k>H){$('fantip').style.opacity=0;$('fanguide').style.opacity=0;return;}
+  const px=(X0+k/H*(X1-X0))/720*r.width;$('fanguide').style.left=px+'px';$('fanguide').style.height=r.height*0.86+'px';$('fanguide').style.opacity=.5;
+  const t=$('fantip');t.style.opacity=1;t.style.left=px+'px';t.style.top='0px';
+  t.innerHTML=(gGeo.age0>0?'Alter '+(gGeo.age0+k):'Jahr '+k)+' · Median '+kf(gGeo.ptab[50][k])+' · P10 '+kf(gGeo.ptab[10][k])+' · P90 '+kf(gGeo.ptab[90][k]);});
+fw.addEventListener('mouseleave',()=>{$('fantip').style.opacity=0;$('fanguide').style.opacity=0;});
+$('rate').addEventListener('input',()=>{$('rate_r').value=$('rate').value;render();});
+$('rate_r').addEventListener('input',()=>{$('rate').value=$('rate_r').value;render();});
+$('lump').addEventListener('input',()=>{$('lump_r').value=$('lump').value;render();});
+$('lump_r').addEventListener('input',()=>{$('lump').value=$('lump_r').value;render();});
+['age','ns','nd','wr','bond','bill','house','home','cf','hy'].forEach(id=>$(id).addEventListener('input',render));
+$('bMit').addEventListener('click',()=>{homeRent=true;render();});
+$('bOhne').addEventListener('click',()=>{homeRent=false;render();});
+$('guard').addEventListener('change',()=>{guard=$('guard').checked;render();});
+$('glide').addEventListener('change',()=>{glide=$('glide').checked;render();});
+$('dReal').addEventListener('click',()=>{disp='real';render();});
+$('dNom').addEventListener('click',()=>{disp='nom';render();});
+$('infl').addEventListener('input',render);
+$('cUSA').addEventListener('click',()=>{country='usa';render();});
+$('cDE').addEventListener('click',()=>{country='de';render();});
+$('eLong').addEventListener('click',()=>{era='long';render();});
+$('ePost').addEventListener('click',()=>{era='postwar';if((+$('ns').value + +$('nd').value)>58){mode='boot';$('mBoot').classList.add('on');$('mContig').classList.remove('on');}render();});
+$('mContig').addEventListener('click',()=>{mode='contig';$('mContig').classList.add('on');$('mBoot').classList.remove('on');render();});
+$('mBoot').addEventListener('click',()=>{mode='boot';$('mBoot').classList.add('on');$('mContig').classList.remove('on');render();});
+$('sFixed').addEventListener('click',()=>{strat='fixed';$('sFixed').classList.add('on');$('sPerp').classList.remove('on');render();});
+$('sPerp').addEventListener('click',()=>{strat='perp';$('sPerp').classList.add('on');$('sFixed').classList.remove('on');render();});
+$('bWorst').addEventListener('click',()=>{const d=lastD;if(!d||!d.starts.length)return;let wi=0;d.ends.forEach((e,i)=>{if(e<d.ends[wi])wi=i;});if(d.starts[wi]){$('hy').value=d.starts[wi];render();}});
+$('bBest').addEventListener('click',()=>{const d=lastD;if(!d||!d.starts.length)return;let bi=0;d.ends.forEach((e,i)=>{if(e>d.ends[bi])bi=i;});if(d.starts[bi]){$('hy').value=d.starts[bi];render();}});
+render();
+</script>
+</body></html>

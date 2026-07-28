@@ -1,0 +1,452 @@
+<!DOCTYPE html><html lang=de><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1">
+<title>Immobilien-Investitionsrechner — vermietete Wohnimmobilie, mit Steuer</title>
+<link rel=stylesheet href="assets/site.css?v=4">
+<script defer src="assets/site-map.js?v=4"></script>
+<script defer src="assets/datenstand.js?v=4"></script>
+<script defer src="assets/site.js?v=4"></script>
+<style>
+/* seitenspezifisch */
+.two{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media(max-width:820px){.two{grid-template-columns:1fr}}
+.big{grid-column:1/-1;text-align:center;background:var(--card-2)}
+.big .n{font-size:38px}
+.mcard.g .n{color:var(--good)}.mcard.r .n{color:var(--bad)}.mcard.o .n{color:var(--accent)}
+.bar{height:9px;border-radius:5px;background:var(--accent);display:inline-block;vertical-align:middle}
+.sub{font-weight:400;color:var(--ink-3);font-size:.9em}
+</style></head><body data-section="Immobilien"><div class=wrap>
+<div class=hero>
+<div class=kicker>Vermögensinfo · Immobilien · Rechtsstand 2025/2026</div>
+<h1>Die vermietete Wohnung, <em>vollständig</em> durchgerechnet</h1>
+<p class=lead>Kaufnebenkosten, Finanzierung, Abschreibung und laufender Cashflow einer vermieteten Wohnimmobilie — samt dem <b>Steuereffekt am persönlichen Grenzsteuersatz</b> nach dem exakten §32a-Tarif. Kernstück ist der Steuervorteil bei verschiedenen Einkommen. Dazu Verkauf innerhalb und außerhalb der Spekulationsfrist sowie der Vergleich mit derselben Summe im Aktiendepot. Keine Steuer- oder Anlageberatung.</p>
+</div>
+<div class=tip>Alle Regler rechnen sofort neu. Grün bedeutet, die Immobilie trägt sich; Rot bedeutet monatliche Zuzahlung. Der Steuervorteil steigt tendenziell mit dem Einkommen.</div>
+
+<div class=grid2>
+<div class=card>
+<h2>Deine Angaben</h2>
+
+<div class=grp>Objekt</div>
+<div class=two>
+<div class=ctrl><div class=clabel><span>Kaufpreis</span></div><input type=text inputmode=numeric class=eurin id=kaufpreis value="400.000"></div>
+<div class=ctrl><div class=clabel><span>Wohnfläche (m²)</span></div><input type=number id=flaeche value=80 step=5 min=1></div>
+</div>
+<div class=ctrl><div class=clabel><span>Bundesland <span class=sub>(→ Grunderwerbsteuer)</span></span><span class=cval id=grest_v>6,5 %</span></div>
+<select id=bundesland></select></div>
+<div class=ctrl><div class=clabel><span>Baujahr / Fertigstellung</span><span class=cval id=baujahr_v>1995</span></div><input type=range id=baujahr min=1850 max=2027 step=1 value=1995><div class=hint id=baujahr_h></div></div>
+<div class=ctrl><div class=clabel><span>Grund/Boden-Wert <span class=sub>(nicht abschreibbar)</span></span></div><input type=text inputmode=numeric class=eurin id=boden value="100.000"><div class=hint id=geb_h></div></div>
+
+<div class=grp>Abschreibung (AfA)</div>
+<div class=ctrl><div class=clabel><span>AfA-Methode</span></div>
+<select id=afa>
+<option value=lin>Linear (Satz aus Baujahr)</option>
+<option value=deg>Degressiv 5 % (§7 Abs. 5a — nur Neubau 10/2023–9/2029)</option>
+<option value=denk>Denkmal/Sanierung §7h/§7i (9 % / 7 %)</option>
+</select><div class=hint id=afa_h></div></div>
+<div class=ctrl id=sanierbox style="display:none"><div class=clabel><span>Anteil begünstigte Sanierungskosten <span class=sub>(am Gebäudewert)</span></span><span class=cval id=sanier_v>60 %</span></div><input type=range id=sanier min=0 max=100 step=5 value=60></div>
+<label class=chk id=s7bchk><input type=checkbox id=s7b><span>Sonder-AfA §7b: +5 % p.a. in den ersten 4 Jahren (Neubau, KfW-40/QNG, ≤ 4.000 €/m²)</span></label>
+
+<div class=grp>Finanzierung</div>
+<div class=ctrl><div class=clabel><span>Darlehen</span></div><input type=text inputmode=numeric class=eurin id=darlehen value="340.000"><div class=hint id=ek_h></div></div>
+<div class=ctrl><div class=clabel><span>Rate festlegen über</span></div><div class=seg><button id=fmTilg class=on>Anf. Tilgung %</button><button id=fmRate>Monatsrate €</button></div></div>
+<div class=two>
+<div class=ctrl><div class=clabel><span>Sollzins p.a.</span><span class=cval id=zins_v>3,8 %</span></div><input type=range id=zins min=0 max=8 step=0.1 value=3.8></div>
+<div class=ctrl id=tilgbox><div class=clabel><span>Anf. Tilgung p.a.</span><span class=cval id=tilg_v>2,0 %</span></div><input type=range id=tilg min=0 max=6 step=0.1 value=2></div>
+<div class=ctrl id=ratebox style="display:none"><div class=clabel><span>Monatsrate (Annuität)</span></div><input type=text inputmode=numeric class=eurin id=rate value="1.643"><div class=hint id=rate_h></div></div>
+</div>
+<div class=two>
+<div class=ctrl><div class=clabel><span>Zinsbindung (J.)</span><span class=cval id=zb_v>10</span></div><input type=range id=zb min=5 max=30 step=1 value=10></div>
+<div class=ctrl><div class=clabel><span>Anschlusszins</span><span class=cval id=azins_v>4,5 %</span></div><input type=range id=azins min=0 max=9 step=0.1 value=4.5></div>
+</div>
+
+<div class=grp>Miete & Kosten</div>
+<div class=two>
+<div class=ctrl><div class=clabel><span>Kaltmiete / Monat</span></div><input type=text inputmode=numeric class=eurin id=miete value="1.500"></div>
+<div class=ctrl><div class=clabel><span>Nicht-uml. Kosten/Jahr</span></div><input type=text inputmode=numeric class=eurin id=bewirt value="1.800"></div>
+</div>
+<div class=two>
+<div class=ctrl><div class=clabel><span>Mietsteigerung p.a.</span><span class=cval id=msteig_v>1,5 %</span></div><input type=range id=msteig min=0 max=5 step=0.1 value=1.5></div>
+<div class=ctrl><div class=clabel><span>Leerstand/Ausfall</span><span class=cval id=leer_v>2,0 %</span></div><input type=range id=leer min=0 max=15 step=0.5 value=2></div>
+</div>
+<div class=ctrl><div class=clabel><span>Instandhaltungsrücklage <span class=sub>(€/m²/Jahr)</span></span><span class=cval id=instand_v>9,00 €</span></div><input type=range id=instand min=0 max=25 step=0.5 value=9></div>
+
+<div class=grp>Steuer</div>
+<div class=ctrl><div class=clabel><span>Zu versteuerndes Einkommen <span class=sub>(ohne Immobilie, p.a.)</span></span></div><input type=text inputmode=numeric class=eurin id=zve value="70.000"><div class=hint id=zve_h></div></div>
+<div class=two>
+<div class=ctrl><div class=clabel><span>Veranlagung</span></div><div class=seg><button id=vSingle class=on>ledig</button><button id=vSplit>verheiratet</button></div></div>
+<div class=ctrl><div class=clabel><span>Steuerjahr</span></div><div class=seg><button id=y2025>2025</button><button id=y2026 class=on>2026</button></div></div>
+</div>
+<div class=ctrl><div class=clabel><span>Kirchensteuer</span></div>
+<select id=kist><option value=0>keine</option><option value=0.09>9 % (übrige Länder)</option><option value=0.08>8 % (Bayern, BW)</option></select></div>
+
+<div class=grp>Verkauf & Vergleich</div>
+<div class=ctrl><div class=clabel><span>Wertsteigerung Immobilie</span></div><div class=seg><button id=wmFix class=on>Annahme (Regler)</button><button id=wmHist>historisch 1963–2020</button></div><div class=hint id=wert_hh></div></div>
+<div class=two>
+<div class=ctrl><div class=clabel><span>Haltedauer (Jahre)</span><span class=cval id=halt_v>12</span></div><input type=range id=halt min=1 max=40 step=1 value=12></div>
+<div class=ctrl id=wertbox><div class=clabel><span>Wertsteigerung p.a.</span><span class=cval id=wert_v>2,0 %</span></div><input type=range id=wert min=-2 max=6 step=0.1 value=2></div>
+</div>
+<div class=two>
+<div class=ctrl><div class=clabel><span>Verkaufskosten</span><span class=cval id=vmakler_v>3,6 %</span></div><input type=range id=vmakler min=0 max=8 step=0.1 value=3.6></div>
+<div class=ctrl><div class=clabel><span>Aktien-Alternative p.a.</span><span class=cval id=aktien_v>7,0 %</span></div><input type=range id=aktien min=0 max=12 step=0.1 value=7></div>
+</div>
+</div>
+
+<div class=card>
+<h2>Ergebnis (nominale €, nicht inflationsbereinigt)</h2>
+<div class=summary id=summary></div>
+<div class=mrow>
+<div class="mcard big"><div class=l>Cashflow nach Steuer · Jahr 1</div><div class=n id=cf1></div><div class=s id=cf1sub></div></div>
+<div class=mcard><div class=l>Bruttomietrendite</div><div class=n id=brutto></div><div class=s>Kaltmiete / Kaufpreis</div></div>
+<div class=mcard><div class=l>Nettomietrendite</div><div class=n id=netto></div><div class=s>nach Kosten / Gesamtinvest</div></div>
+<div class="mcard o"><div class=l>Steuervorteil · Jahr 1</div><div class=n id=steuv></div><div class=s id=steuvsub></div></div>
+<div class=mcard><div class=l>Eigenkapital-Einsatz</div><div class=n id=ek></div><div class=s id=eksub></div></div>
+<div class=mcard><div class=l>Gesamtinvestition</div><div class=n id=invest></div><div class=s id=investsub></div></div>
+<div class=mcard><div class=l>Break-even (kum. Cashflow)</div><div class=n id=breakeven></div><div class=s>ab wann positiv</div></div>
+</div>
+</div>
+</div>
+
+<div class=card>
+<h2>Steuervorteil je nach Einkommen — dasselbe Objekt, verschiedene Steuerzahler</h2>
+<div class=callout><b>Der Hebel:</b> Der steuerliche Verlust aus Vermietung (v. a. durch Zinsen + AfA) wird mit deinem übrigen Einkommen verrechnet — die Erstattung fällt am <b>Grenzsteuersatz</b> an. Wer mehr verdient, spart an derselben Immobilie mehr Steuern.</div>
+<table class=tbl><thead><tr><th>Zu verst. Einkommen</th><th>Grenzsteuersatz</th><th>Steuervorteil Jahr 1</th><th>über Haltedauer</th><th></th></tr></thead><tbody id=incTbl></tbody></table>
+<div class=note id=incNote></div>
+</div>
+
+<div class=card>
+<h2>Cashflow nach Steuer je Jahr</h2>
+<div id=chartCF></div>
+<div class=legend><span><i style="background:#047857"></i>positiver Cashflow</span><span><i style="background:#b91c1c"></i>Zuzahlung</span><span><i style="background:#1d4ed8;height:2px;width:16px;border-radius:0"></i>kumuliert</span></div>
+</div>
+
+<div class=card>
+<h2>Vermögensaufbau — Immobilie vs. Eigenkapital in Aktien</h2>
+<div id=chartVerm></div>
+<div class=legend><span><i style="background:#059669"></i>Immobilie: Wert − Restschuld + Cashflows</span><span><i style="background:#1d4ed8"></i>Aktien-Alternative (nach KapESt)</span><span><i style="background:#a16207;height:2px;width:16px;border-radius:0"></i>Restschuld</span></div>
+</div>
+
+<div class=card>
+<h2>Verkauf nach der Haltedauer</h2>
+<div id=verkaufbox></div>
+<div style="height:14px"></div>
+<div id=compareGraphic></div>
+<div class=note id=irrNote></div>
+</div>
+
+<div class=card>
+<h2>Wichtige Hinweise</h2>
+<div class=disc id=disc></div>
+</div>
+</div>
+
+<script>
+// ===== Verifizierter deutscher Einkommensteuer-Tarif §32a EStG (2025 & 2026), Grundtarif =====
+function estTax(zvE,jahr){var x=Math.floor(Math.max(0,zvE));var steuer,grenz;
+ if(jahr<=2025){
+  if(x<=12096){steuer=0;grenz=0;}
+  else if(x<=17443){var y=(x-12096)/10000;steuer=(932.30*y+1400)*y;grenz=(2*932.30*y+1400)/10000;}
+  else if(x<=68480){var z=(x-17443)/10000;steuer=(176.64*z+2397)*z+1015.13;grenz=(2*176.64*z+2397)/10000;}
+  else if(x<=277825){steuer=0.42*x-10911.92;grenz=0.42;}
+  else{steuer=0.45*x-19246.67;grenz=0.45;}
+ }else{
+  if(x<=12348){steuer=0;grenz=0;}
+  else if(x<=17799){var y2=(x-12348)/10000;steuer=(914.51*y2+1400)*y2;grenz=(2*914.51*y2+1400)/10000;}
+  else if(x<=69878){var z2=(x-17799)/10000;steuer=(173.10*z2+2397)*z2+1034.87;grenz=(2*173.10*z2+2397)/10000;}
+  else if(x<=277825){steuer=0.42*x-11135.63;grenz=0.42;}
+  else{steuer=0.45*x-19470.38;grenz=0.45;}
+ }
+ return{steuer:Math.floor(steuer),grenz:grenz};}
+function soli(est,jahr,split){var F=(jahr<=2025?19950:20350)*(split?2:1);if(est<=F)return 0;return Math.min(0.055*est,0.119*(est-F));}
+function estGesamt(zvE,jahr,split,kiSt){var e=split?2*estTax(zvE/2,jahr).steuer:estTax(zvE,jahr).steuer;return e+soli(e,jahr,split)+kiSt*e;}
+// Steuerwirkung von Zusatz-Einkommen delta (delta<0 = Verlust → Erstattung, negativ)
+function steuerDelta(zvE,delta,jahr,split,kiSt){return estGesamt(zvE+delta,jahr,split,kiSt)-estGesamt(Math.max(0,zvE),jahr,split,kiSt);}
+
+const GREST={'Baden-Württemberg':5.0,'Bayern':3.5,'Berlin':6.0,'Brandenburg':6.5,'Bremen':5.5,'Hamburg':5.5,'Hessen':6.0,'Mecklenburg-Vorpommern':6.0,'Niedersachsen':5.0,'Nordrhein-Westfalen':6.5,'Rheinland-Pfalz':5.0,'Saarland':6.5,'Sachsen':5.5,'Sachsen-Anhalt':5.0,'Schleswig-Holstein':6.5,'Thüringen':5.0};
+// Nominaler deutscher Wohnimmobilien-Wertzuwachs (nur Preis, ohne Miete) je Jahr 1963–2020 (JST Macrohistory R6, housing_capgain)
+const DE_HP=[0.1627,0.0627,0.1948,0.1114,0.0919,0.0889,0.0382,0.082,0.0688,0.0645,0.0697,0.0718,0.0172,0.0177,0.0526,0.0665,0.1094,0.0705,0.0658,0.0125,0,-0.0244,0,0,-0.0125,0.0126,0.0375,0.0722,0.0494,0.0706,0.0549,0.0417,0.0101,-0.009,-0.0182,-0.0186,0.0188,0,0,-0.0277,-0.0096,-0.0192,-0.0196,0,0.0105,0.0062,0.0052,0.0256,0.054,0.0953,0.0623,0.0511,0.0517,0.0753,0.0612,0.0664,0.0577,0.0775];
+const $=id=>document.getElementById(id);
+const eur=x=>Math.round(x).toLocaleString('de-DE')+' €';
+const eurk=x=>Math.abs(x)>=1e6?(x/1e6).toLocaleString('de-DE',{minimumFractionDigits:1,maximumFractionDigits:1})+' Mio':Math.round(x/1000).toLocaleString('de-DE')+' k';
+const p1=x=>(x*100).toLocaleString('de-DE',{minimumFractionDigits:1,maximumFractionDigits:1})+' %';
+let split=false, jahr=2026, finMode='tilg', wertMode='fix';
+
+// Bundesland-Dropdown füllen
+Object.keys(GREST).forEach(l=>{const o=document.createElement('option');o.value=l;o.textContent=l+' ('+GREST[l].toLocaleString('de-DE',{minimumFractionDigits:1,maximumFractionDigits:1})+' %)';if(l==='Nordrhein-Westfalen')o.selected=true;$('bundesland').appendChild(o);});
+
+function linRate(bj){return bj<1925?0.025:(bj>=2023?0.03:0.02);}
+
+// ===== Kern-Berechnung =====
+function calc(){
+  const kaufpreis=numVal('kaufpreis'), flaeche=+$('flaeche').value||1, land=$('bundesland').value;
+  const grest=GREST[land]/100, notar=0.0125, grundbuch=0.005, makler=0.0357;
+  const nkGrest=kaufpreis*grest, nkNotar=kaufpreis*notar, nkGrundb=kaufpreis*grundbuch, nkMakler=kaufpreis*makler;
+  const nk=nkGrest+nkNotar+nkGrundb+nkMakler;                 // Kaufnebenkosten (alle aktivierbar)
+  const invest=kaufpreis+nk;                                  // Gesamtinvestition
+  const boden=Math.min(numVal('boden'),kaufpreis);            // Grund/Boden-Wert (nicht abschreibbar)
+  const gebAnteil=kaufpreis>0?(kaufpreis-boden)/kaufpreis:0;
+  const gebBasis=invest*gebAnteil;                            // AfA-Bemessung Gebäude (Kaufpreis+NK anteilig)
+  const darlehen=Math.min(numVal('darlehen'),invest);
+  const EK=invest-darlehen;
+  const bj=+$('baujahr').value, afaM=$('afa').value, s7b=$('s7b').checked, sanierA=(+$('sanier').value)/100;
+  const X=+$('halt').value;
+  const zinsS=(+$('zins').value)/100, tilgS=(+$('tilg').value)/100, zb=+$('zb').value, azinsS=(+$('azins').value)/100;
+  const miete0=numVal('miete')*12, bewirt0=numVal('bewirt'), msteig=(+$('msteig').value)/100, leer=(+$('leer').value)/100, instand=(+$('instand').value)*flaeche;
+  const zve=numVal('zve'), kiSt=+$('kist').value;
+  const wert=(+$('wert').value)/100, vmakler=(+$('vmakler').value)/100, aktien=(+$('aktien').value)/100, teilfrei=0.30;
+
+  // --- AfA-Reihe (auf Gebäudebasis) ---
+  const lr=linRate(bj);
+  function afaYear(t,restwertRef){
+    let a=0;
+    if(afaM==='deg'){ a=0.05*restwertRef.v; restwertRef.v-=a; }
+    else if(afaM==='denk'){ const san=gebBasis*sanierA, alt=gebBasis-san; const dRate=t<=8?0.09:(t<=12?0.07:0); a=dRate*san + lr*alt; }
+    else { a=lr*gebBasis; }
+    if(s7b && afaM!=='denk' && t<=4){ const bem=Math.min(gebBasis,4000*flaeche); a+=0.05*bem; } // §7b (Neubau) nicht mit Denkmal (§7h/§7i) kombinierbar
+    return a;
+  }
+
+  // --- Jahres-Simulation ---
+  const annuitaet=finMode==='rate'?numVal('rate')*12:darlehen*(zinsS+tilgS);
+  let rest=darlehen, ann=annuitaet, curZins=zinsS;
+  const restwertRef={v:gebBasis}; let kumAfA=0, kumCF=0, propPot=0, etf=EK, extSum=0, sumSur=0, breakeven=null;
+  const years=[]; let vv1=0, steu1=0;
+  for(let t=1;t<=X;t++){
+    // Finanzierung — Annuität bleibt nach Ablauf der Zinsbindung konstant (durchgehende Tilgung), nur der Zins wechselt
+    if(t===zb+1){ curZins=azinsS; }
+    const zins=rest*curZins; let tilg=Math.min(ann-zins,rest); if(tilg<0)tilg=0; rest=Math.max(0,rest-tilg); if(rest<=0.5){rest=0;}
+    // Miete & Kosten (wachsen mit Mietsteigerung)
+    const g=Math.pow(1+msteig,t-1);
+    const miete=miete0*g*(1-leer), bewirt=(bewirt0+instand)*g;
+    // AfA
+    let afa=afaYear(t,restwertRef); if(kumAfA+afa>gebBasis)afa=Math.max(0,gebBasis-kumAfA); kumAfA+=afa;
+    // Steuerliches V+V-Ergebnis + Steuerwirkung
+    const vv=miete-(zins+afa+bewirt);
+    const steu=steuerDelta(zve,vv,jahr,split,kiSt);      // >0 = Mehrsteuer, <0 = Erstattung
+    // Cashflow
+    const cfVor=miete-bewirt-(zins+tilg);
+    const cfNach=cfVor-steu;                              // Erstattung (steu<0) erhöht Cashflow
+    kumCF+=cfNach; if(breakeven===null&&kumCF>=0)breakeven=t;
+    // Opportunität: Immobilie reinvestiert den monatlichen ÜBERSCHUSS (positiven Cashflow) ins Aktiendepot; Zuzahlungen (negativer CF) werden getragen und im Aktien-Vergleich gleichermaßen ins ETF gesteckt
+    etf*=(1+aktien); propPot*=(1+aktien);
+    const ext=Math.max(0,-cfNach), sur=Math.max(0,cfNach);
+    etf+=ext; extSum+=ext; propPot+=sur; sumSur+=sur;
+    const immoWert=kaufpreis*Math.pow(1+wert,t);
+    years.push({t,zins,tilg,rest,miete,bewirt,afa,vv,steu,cfVor,cfNach,kumCF,immoWert,netImmo:immoWert-rest,propPot,etf});
+    if(t===1){vv1=vv;steu1=steu;}
+  }
+  // --- Verkauf ---
+  const verkaufspreis=kaufpreis*Math.pow(1+wert,X);
+  const verkaufskosten=verkaufspreis*vmakler;
+  let spekGewinn=0, spekSteuer=0, steuerpflichtig=(X<=10);
+  if(steuerpflichtig){ spekGewinn=verkaufspreis-verkaufskosten-(invest-kumAfA); if(spekGewinn>=1000) spekSteuer=steuerDelta(zve+years[X-1].vv,spekGewinn,jahr,split,kiSt); } // §23: Freigrenze 1.000 €, auf zvE+laufendes V+V-Ergebnis gestapelt
+  const nettoVerkauf=verkaufspreis-verkaufskosten-rest-spekSteuer;
+  // Endvermögen — Immo-Überschusstopf zahlt konsistent KapESt wie das ETF-Depot
+  const propGain=propPot-sumSur, propTax=Math.max(0,propGain)*0.25*(1-teilfrei)*(1+0.055);
+  const endImmo=propPot-propTax+nettoVerkauf;
+  const etfGain=etf-(EK+extSum), etfTax=Math.max(0,etfGain)*0.25*(1-teilfrei)*(1+0.055), endAktien=etf-etfTax;
+  // IRR Immobilie
+  const cfs=[-EK]; for(let t=1;t<X;t++)cfs.push(years[t-1].cfNach); cfs.push(years[X-1].cfNach+nettoVerkauf);
+  const irr=irrCalc(cfs);
+
+  // Historische Wertsteigerung (nominale DE-Hauspreise 1963–2020) → Bandbreite über alle Startjahre
+  let hist=null;
+  if(wertMode==='hist'){
+    const N=DE_HP.length, propPart=propPot-propTax, wins=[];
+    for(let s=0;s+X<=N;s++)wins.push(s);
+    const netY=[]; for(let t=0;t<=X;t++)netY.push([]);
+    const eis=[],vps=[],irrs=[];
+    wins.forEach(s=>{let f=1;netY[0].push(kaufpreis-darlehen);
+      for(let t=1;t<=X;t++){f*=(1+DE_HP[s+t-1]);netY[t].push(kaufpreis*f - years[t-1].rest + years[t-1].propPot);}
+      const vp=kaufpreis*f,vk=vp*vmakler;let sg=0,ss=0;
+      if(steuerpflichtig){sg=vp-vk-(invest-kumAfA);if(sg>=1000)ss=steuerDelta(zve+years[X-1].vv,sg,jahr,split,kiSt);}
+      const nv=vp-vk-rest-ss,ei=propPart+nv;eis.push(ei);vps.push(vp);
+      const cf=[-EK];for(let t=1;t<X;t++)cf.push(years[t-1].cfNach);cf.push(years[X-1].cfNach+nv);
+      const ir=irrCalc(cf);if(ir!=null)irrs.push(ir);});
+    const pc=(a,q)=>{const v=a.slice().sort((x,y)=>x-y);const k=(v.length-1)*q/100,fl=Math.floor(k),c=Math.min(fl+1,v.length-1);return v[fl]+(v[c]-v[fl])*(k-fl);};
+    const band={p10:[],p50:[],p90:[]};for(let t=0;t<=X;t++){band.p10.push(pc(netY[t],10));band.p50.push(pc(netY[t],50));band.p90.push(pc(netY[t],90));}
+    band.p10[X]=pc(eis,10);band.p50[X]=pc(eis,50);band.p90[X]=pc(eis,90); // Endpunkt = Endvermögen (inkl. Verkaufskosten/Steuer)
+    hist={n:wins.length,band,endImmo:{p10:pc(eis,10),p50:pc(eis,50),p90:pc(eis,90)},verk:{p10:pc(vps,10),p50:pc(vps,50),p90:pc(vps,90)},irr:irrs.length?{p10:pc(irrs,10),p50:pc(irrs,50),p90:pc(irrs,90)}:null};
+  }
+  return {kaufpreis,flaeche,land,grest,nk,nkGrest,nkNotar,nkGrundb,nkMakler,invest,gebAnteil,gebBasis,darlehen,EK,bj,lr,afaM,X,
+    miete0,zve,kiSt,years,vv1,steu1,kumAfA,kumCF,breakeven,wert,vmakler,hist,
+    verkaufspreis,verkaufskosten,spekGewinn,spekSteuer,steuerpflichtig,rest,nettoVerkauf,endImmo,endAktien,etf,irr,
+    brutto:miete0/kaufpreis, netto:(miete0-bewirt0-instand)/invest, ann:annuitaet};
+}
+function irrCalc(cf){const npv=r=>cf.reduce((a,c,t)=>a+c/Math.pow(1+r,t),0);let lo=-0.9,hi=1.0;if(npv(lo)<=0)return null;let g=0;while(npv(hi)>0&&hi<20){hi+=0.5;if(++g>60)break;}if(npv(hi)>0)return null;for(let i=0;i<200;i++){const m=(lo+hi)/2;(npv(m)>0)?lo=m:hi=m;}return (lo+hi)/2;}
+
+// ===== SVG-Charts =====
+function barChart(years){
+  const W=720,H=300,L=52,R=20,T=16,B=34,x0=L,x1=W-R,y0=T,y1=H-B;
+  const n=years.length; const vals=years.map(y=>y.cfNach), kum=years.map(y=>y.kumCF);
+  const allv=vals.concat(kum,[0]); const mx=Math.max(...allv),mn=Math.min(...allv);
+  const pad=(mx-mn)*0.08||1; const hi=mx+pad, lo=mn-pad;
+  const ym=v=>y1-(v-lo)/(hi-lo)*(y1-y0);
+  const bw=(x1-x0)/n*0.62;
+  let s=`<svg viewBox="0 0 ${W} ${H}">`;
+  // gridlines
+  const step=niceStep((hi-lo)/5); for(let gv=Math.ceil(lo/step)*step;gv<=hi;gv+=step){const y=ym(gv);s+=`<line x1="${x0}" y1="${y}" x2="${x1}" y2="${y}" stroke="#ece7dd"/><text x="${x0-6}" y="${y+3}" font-size="10" fill="#8b857a" text-anchor="end">${eurk(gv)}</text>`;}
+  const yz=ym(0);s+=`<line x1="${x0}" y1="${yz}" x2="${x1}" y2="${yz}" stroke="#d5cec1"/>`;
+  years.forEach((yr,i)=>{const cx=x0+(i+0.5)/n*(x1-x0);const v=yr.cfNach;const yb=ym(Math.max(v,0)),yb2=ym(Math.min(v,0));s+=`<rect x="${cx-bw/2}" y="${yb}" width="${bw}" height="${Math.max(1,yb2-yb)}" fill="${v>=0?'#047857':'#b91c1c'}" rx="2"/>`;
+    if(i%Math.ceil(n/12||1)===0||i===n-1)s+=`<text x="${cx}" y="${y1+15}" font-size="9.5" fill="#8b857a" text-anchor="middle">${yr.t}</text>`;});
+  s+=`<polyline points="${years.map((y,i)=>(x0+(i+0.5)/n*(x1-x0)).toFixed(1)+','+ym(y.kumCF).toFixed(1)).join(' ')}" fill="none" stroke="#1d4ed8" stroke-width="2.4"/>`;
+  s+=`<text x="${(x0+x1)/2}" y="${H-2}" font-size="11" fill="#57534c" text-anchor="middle">Jahr · Balken = Cashflow n. Steuer · Linie = kumuliert</text>`;
+  return s+'</svg>';
+}
+function lineChart(years,endImmo,endAktien,hist){
+  const W=720,H=300,L=54,R=20,T=16,B=34,x0=L,x1=W-R,y0=T,y1=H-B;
+  const n=years.length, EK=calcCache.EK, darl=calcCache.darlehen;
+  const immo=[Math.max(EK,0)], etfL=[Math.max(EK,0)], rest=[darl];
+  years.forEach(y=>{immo.push(y.netImmo+y.propPot); etfL.push(y.etf); rest.push(y.rest);});
+  immo[n]=endImmo; etfL[n]=endAktien;
+  const p10=hist?hist.band.p10:null, p50=hist?hist.band.p50:immo, p90=hist?hist.band.p90:null;
+  const all=(hist?p10.concat(p90,p50):immo).concat(etfL,rest,[0]); const mx=Math.max(...all),mn=Math.min(...all,0);
+  const hi=mx*1.06||1,lo=Math.min(0,mn); const ym=v=>y1-(v-lo)/(hi-lo)*(y1-y0); const xm=i=>x0+i/n*(x1-x0);
+  let s=`<svg viewBox="0 0 ${W} ${H}">`;
+  const step=niceStep((hi-lo)/5); for(let gv=Math.ceil(lo/step)*step;gv<=hi;gv+=step){const y=ym(gv);s+=`<line x1="${x0}" y1="${y}" x2="${x1}" y2="${y}" stroke="#ece7dd"/><text x="${x0-6}" y="${y+3}" font-size="10" fill="#8b857a" text-anchor="end">${eurk(gv)}</text>`;}
+  const pl=(arr,col,w,dash)=>`<polyline points="${arr.map((v,i)=>xm(i).toFixed(1)+','+ym(v).toFixed(1)).join(' ')}" fill="none" stroke="${col}" stroke-width="${w}"${dash?' stroke-dasharray="4 3"':''}/>`;
+  if(hist){
+    let poly=''; for(let i=0;i<=n;i++)poly+=xm(i).toFixed(1)+','+ym(p90[i]).toFixed(1)+' '; for(let i=n;i>=0;i--)poly+=xm(i).toFixed(1)+','+ym(p10[i]).toFixed(1)+' ';
+    s+=`<polygon points="${poly}" fill="#059669" fill-opacity="0.15"/>`;
+    s+=pl(rest,'#a16207',1.6,true)+pl(p50,'#059669',2.6,false)+pl(etfL,'#1d4ed8',2.6,false);
+  }else{
+    s+=`<polygon points="${immo.map((v,i)=>xm(i).toFixed(1)+','+ym(v).toFixed(1)).join(' ')} ${xm(n).toFixed(1)},${y1.toFixed(1)} ${xm(0).toFixed(1)},${y1.toFixed(1)}" fill="#059669" fill-opacity="0.08"/>`;
+    s+=pl(rest,'#a16207',1.6,true)+pl(immo,'#059669',2.6,false)+pl(etfL,'#1d4ed8',2.6,false);
+  }
+  for(let i=0;i<=n;i+=Math.ceil(n/10||1))s+=`<text x="${xm(i)}" y="${y1+15}" font-size="9.5" fill="#8b857a" text-anchor="middle">${i}</text>`;
+  s+=`<text x="${(x0+x1)/2}" y="${H-2}" font-size="11" fill="#57534c" text-anchor="middle">Jahre · Immobilie ${hist?'(Median + P10–P90-Band, historisch)':'(inkl. Verkauf)'} vs. Aktien-Depot · Restschuld (gestrichelt)</text>`;
+  return s+'</svg>';
+}
+function niceStep(x){if(!(x>0))return 1000;const p=Math.pow(10,Math.floor(Math.log10(x)));const f=x/p;const n=f<1.5?1:f<3?2:f<7?5:10;return n*p;}
+function compareChart(d,eImmo,hist){
+  const W=720,H=172, x0=170, x1=558, bw=x1-x0;
+  const iVal=eImmo, mxScale=Math.max(iVal,d.endAktien,hist?hist.endImmo.p90:0,1), immoWin=iVal>=d.endAktien;
+  const reinvest=d.endImmo-d.nettoVerkauf, xof=v=>x0+Math.max(0,v)/mxScale*bw;
+  const row=(y,label,val,grad,win)=>{const w=Math.max(3,val/mxScale*bw);
+    return `<text x="0" y="${y+5}" font-size="13.5" font-weight="700" fill="#1c1a17">${label}</text>`
+      +`<rect x="${x0}" y="${y-16}" width="${bw}" height="32" rx="9" fill="#ece7dd"/>`
+      +`<rect x="${x0}" y="${y-16}" width="${w.toFixed(1)}" height="32" rx="9" fill="url(#${grad})"/>`
+      +(win?`<text x="${(x0+w-17).toFixed(1)}" y="${y+6}" font-size="16" text-anchor="middle"></text>`:'')
+      +`<text x="${(x0+w+12).toFixed(1)}" y="${y+5}" font-size="15" font-weight="800" fill="${win?'#047857':'#1c1a17'}">${eur(val)}</text>`;};
+  let s=`<svg viewBox="0 0 ${W} ${H}">`;
+  s+=`<defs><linearGradient id="gt" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#059669"/><stop offset="1" stop-color="#34d399"/></linearGradient><linearGradient id="gb" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#1d4ed8"/><stop offset="1" stop-color="#60a5fa"/></linearGradient></defs>`;
+  s+=`<text x="0" y="20" font-size="12.5" font-weight="700" fill="#8b857a">ENDVERMÖGEN NACH ${d.X} JAHREN${hist?' · MEDIAN + SPANNE (HISTORISCH)':''}</text>`;
+  s+=row(64,'Immobilie',iVal,'gt',immoWin);
+  if(hist){const a=xof(hist.endImmo.p10).toFixed(1),b=xof(hist.endImmo.p90).toFixed(1);s+=`<line x1="${a}" y1="89" x2="${b}" y2="89" stroke="#065f46" stroke-width="2"/><line x1="${a}" y1="84" x2="${a}" y2="94" stroke="#065f46" stroke-width="2"/><line x1="${b}" y1="84" x2="${b}" y2="94" stroke="#065f46" stroke-width="2"/><text x="${b}" y="82" font-size="9.5" fill="#065f46" text-anchor="end">P10–P90</text>`;}
+  s+=row(116,'Aktien-ETF',d.endAktien,'gb',!immoWin);
+  const delta=Math.abs(iVal-d.endAktien);
+  s+=`<text x="${W/2}" y="158" font-size="12.5" fill="#57534c" text-anchor="middle">${immoWin?'Immobilie':'Aktien-ETF'} liegt ${eur(delta)} vorn  ·  ${hist?'Immobilie P10 '+eur(hist.endImmo.p10)+' – P90 '+eur(hist.endImmo.p90):'Immobilie: Verkauf '+eur(d.nettoVerkauf)+' + reinvestierter Überschuss '+eur(reinvest)}</text>`;
+  return s+'</svg>';
+}
+
+let calcCache=null;
+function render(){
+  split=$('vSplit').classList.contains('on'); jahr=$('y2025').classList.contains('on')?2025:2026;
+  // Label-Updates
+  $('grest_v').textContent=p1(GREST[$('bundesland').value]/100);
+  $('baujahr_v').textContent=$('baujahr').value; const lr=linRate(+$('baujahr').value);
+  $('baujahr_h').textContent='Lineare AfA: '+p1(lr)+' p.a. ('+(+$('baujahr').value<1925?'vor 1925':(+$('baujahr').value>=2023?'Neubau ab 2023':'Bestand 1925–2022'))+')';
+  $('zins_v').textContent=p1((+$('zins').value)/100);$('tilg_v').textContent=p1((+$('tilg').value)/100);
+  $('zb_v').textContent=$('zb').value;$('azins_v').textContent=p1((+$('azins').value)/100);
+  $('msteig_v').textContent=p1((+$('msteig').value)/100);$('leer_v').textContent=p1((+$('leer').value)/100);
+  $('instand_v').textContent=(+$('instand').value).toLocaleString('de-DE',{minimumFractionDigits:2,maximumFractionDigits:2})+' €';
+  $('halt_v').textContent=$('halt').value;$('wert_v').textContent=p1((+$('wert').value)/100);
+  $('vmakler_v').textContent=p1((+$('vmakler').value)/100);$('aktien_v').textContent=p1((+$('aktien').value)/100);
+  $('sanier_v').textContent=$('sanier').value+' %';
+  $('afa_h').textContent={lin:'Nur Gebäudeanteil, Grund/Boden nicht abschreibbar.',deg:'5 % vom Restbuchwert (fallend). Nur Neubau Wohnen, Vertrag/Baubeginn 10/2023–9/2029.',denk:'9 % (Jahre 1–8) + 7 % (Jahre 9–12) auf begünstigte Sanierungskosten; Altbausubstanz parallel linear.'}[$('afa').value];
+  $('sanierbox').style.display=$('afa').value==='denk'?'':'none';
+  $('s7bchk').style.display=$('afa').value==='denk'?'none':'';
+  $('tilgbox').style.display=finMode==='tilg'?'':'none';$('ratebox').style.display=finMode==='rate'?'':'none';
+  $('fmTilg').classList.toggle('on',finMode==='tilg');$('fmRate').classList.toggle('on',finMode==='rate');
+  $('wertbox').style.display=wertMode==='fix'?'':'none';$('wmFix').classList.toggle('on',wertMode==='fix');$('wmHist').classList.toggle('on',wertMode==='hist');
+  $('wert_hh').textContent=wertMode==='hist'?'Echte nominale DE-Hauspreise 1963–2020 (Ø ~4 %/J, Spanne −2,8…+19,5 %/J) — als P10–P90-Band über alle Startjahre.':'Konstante Annahme über den Regler. Historisch lag DE nominal bei ~4 %/J.';
+  const est=estGesamt(numVal('zve'),jahr,split,+$('kist').value);
+  $('zve_h').textContent='Steuer darauf ≈ '+eur(est)+' · Grenzsteuersatz ≈ '+p1(margRate(numVal('zve')));
+
+  const d=calc(); calcCache=d;
+  const HB=d.hist, eImmo=HB?HB.endImmo.p50:d.endImmo, eIrr=HB?(HB.irr?HB.irr.p50:null):d.irr, vpMed=HB?HB.verk.p50:d.verkaufspreis;
+  $('geb_h').textContent='Gebäudeanteil '+p1(d.gebAnteil)+' → AfA-Basis '+eur(d.gebBasis)+' (Grund/Boden '+p1(1-d.gebAnteil)+')';
+  $('ek_h').textContent='Eigenkapital = '+eur(d.EK)+' ('+p1(d.EK/d.invest)+' der Gesamtinvestition)';
+  if(finMode==='rate'){const dl=numVal('darlehen'),impl=dl>0?(d.ann/dl-(+$('zins').value)/100)*100:0;$('rate_h').textContent='Annuität '+eur(d.ann)+'/Jahr · anf. Tilgung ≈ '+impl.toLocaleString('de-DE',{minimumFractionDigits:1,maximumFractionDigits:1})+' %'+(impl<0?' — Rate deckt nicht die Zinsen!':'');}
+
+  // Kennzahlen
+  const cf1=d.years[0].cfNach;
+  $('cf1').textContent=eur(cf1/12)+' /Mon'; $('cf1').style.color=cf1>=0?'#047857':'#b91c1c';
+  $('cf1sub').textContent=eur(cf1)+' /Jahr'+(cf1<0?' — monatliche Zuzahlung':' — trägt sich');
+  $('brutto').textContent=p1(d.brutto);$('netto').textContent=p1(d.netto);
+  const vorteil1=-d.steu1;
+  $('steuv').textContent=eur(vorteil1); $('steuv').style.color=vorteil1>=0?'#047857':'#b91c1c';
+  $('steuvsub').textContent=d.vv1<0?('Verlust '+eur(-d.vv1)+' × Grenzsatz'):'steuerpflichtiger Überschuss';
+  $('ek').textContent=eur(d.EK);$('eksub').textContent=p1(d.EK/d.invest)+' der Investition';
+  $('invest').textContent=eur(d.invest);$('investsub').textContent='Kaufpreis + '+eur(d.nk)+' NK ('+p1(d.nk/d.kaufpreis)+')';
+  $('breakeven').textContent=d.breakeven?('Jahr '+d.breakeven):'—';
+
+  $('summary').innerHTML='Objekt <b>'+eur(d.kaufpreis)+'</b> + '+eur(d.nk)+' Kaufnebenkosten → Eigenkapital <b>'+eur(d.EK)+'</b>. Cashflow Jahr 1 nach Steuer: <b>'+eur(cf1/12)+'/Monat</b>. Nach '+d.X+' Jahren Verkauf: Endvermögen Immobilie <b>'+eur(eImmo)+'</b>'+(HB?' <span style="color:#8b857a">(P10 '+eur(HB.endImmo.p10)+' – P90 '+eur(HB.endImmo.p90)+', '+HB.n+' Startjahre)</span>':'')+' vs. Aktien <b>'+eur(d.endAktien)+'</b>. Rendite (IRR) '+ (eIrr!=null?'<b>'+p1(eIrr)+'</b> p.a.':'—')+(HB?' (Median)':'')+'.';
+
+  // Steuervorteil je Einkommen
+  const incomes=[30000,45000,60000,80000,120000,250000];
+  const kiSt=+$('kist').value; const vv1=d.vv1;
+  let maxAbs=1; const rowsData=incomes.map(E=>{const st1=steuerDelta(E,vv1,jahr,split,kiSt);const vorteil=-st1;
+    // über Haltedauer: Summe der Steuervorteile
+    let sum=0; d.years.forEach(y=>{sum+=-steuerDelta(E,y.vv,jahr,split,kiSt);});
+    maxAbs=Math.max(maxAbs,Math.abs(vorteil)); return {E,mr:margRate(E),vorteil,sum};});
+  const myZ=numVal('zve'); let ci=0; rowsData.forEach((r,i)=>{if(Math.abs(r.E-myZ)<Math.abs(rowsData[ci].E-myZ))ci=i;});
+  $('incTbl').innerHTML=rowsData.map((r,i)=>{const me=(i===ci);const bw=Math.round(Math.abs(r.vorteil)/maxAbs*120);
+    return `<tr class="${me?'me':''}"><td>${eur(r.E)}${me?' ← du':''}</td><td>${p1(r.mr)}</td><td style="color:${r.vorteil>=0?'#047857':'#b91c1c'}">${eur(r.vorteil)}</td><td>${eur(r.sum)}</td><td><span class=bar style="width:${bw}px;background:${r.vorteil>=0?'#059669':'#b91c1c'}"></span></td></tr>`;}).join('');
+  $('incNote').innerHTML='Steuervorteil = <b>exakte</b> Steuerersparnis über den Verlustbetrag ('+(vv1<0?'Verlust '+eur(-vv1):'Überschuss '+eur(vv1))+') — die tatsächliche Differenz der Gesamtsteuer (ESt + Soli + ggf. KiSt), nicht bloß Grenzsatz × Verlust (bei großen Verlusten fällt ein Teil in niedrigere Zonen). „über Haltedauer" summiert alle '+d.X+' Jahre. Hinweis: In der <b>Soli-Milderungszone</b> (zvE ≈ 75.000–116.500 € ledig, doppelt bei Splitting) kann der Vorteil ausnahmsweise leicht sinken, bevor er wieder steigt.';
+
+  $('chartCF').innerHTML=barChart(d.years);
+  $('chartVerm').innerHTML=lineChart(d.years,eImmo,d.endAktien,HB);
+
+  // Verkauf (im Historik-Modus am Median-Verkaufspreis; sonst identisch zur Punktrechnung)
+  const vpe=vpMed, vke=vpe*d.vmakler;
+  let sge=0,sse=0; if(d.steuerpflichtig){sge=vpe-vke-(d.invest-d.kumAfA); if(sge>=1000)sse=steuerDelta(numVal('zve')+d.years[d.X-1].vv,sge,jahr,split,+$('kist').value);}
+  const nve=vpe-vke-d.rest-sse, med=HB?' <span style="color:#8b857a;font-weight:400">(Median)</span>':'';
+  $('verkaufbox').innerHTML=
+   '<div class=two style="gap:11px">'+
+   mini('Verkaufspreis (Jahr '+d.X+')'+med,eur(vpe))+
+   mini('− Verkaufskosten',eur(-vke))+
+   mini('− Restschuld',eur(-d.rest))+
+   mini(d.steuerpflichtig?('− Spekulationssteuer (≤ 10 J.)'):'Verkauf steuerfrei (> 10 J.)',d.steuerpflichtig?eur(-sse):'0 €')+
+   '</div>'+
+   '<div class=callout style="margin:12px 0 0">'+(d.steuerpflichtig
+      ?(sge>0
+         ?'Verkauf innerhalb der <b>10-Jahres-Spekulationsfrist</b> (§23 EStG): Gewinn <b>'+eur(sge)+'</b> steuerpflichtig (die kumulierte AfA von '+eur(d.kumAfA)+' erhöht den Gewinn). Steuer ≈ <b>'+eur(sse)+'</b>.'
+         :'Verkauf innerhalb der <b>10-Jahres-Frist</b>, aber mit <b>Veräußerungsverlust</b> ('+eur(sge)+') — keine Steuer, aber auch nicht mit übrigem Einkommen verrechenbar (§23 EStG).')
+      :'Haltedauer über <b>10 Jahre</b> → Veräußerungsgewinn <b>steuerfrei</b> (§23 EStG). Die kumulierte AfA von '+eur(d.kumAfA)+' bleibt endgültig ein Steuervorteil.')+'</div>'+
+   '<div style="text-align:center;font-size:15px;font-weight:700;margin-top:12px">Netto-Verkaufserlös'+med+': <span style="color:#047857">'+eur(nve)+'</span></div>';
+  $('compareGraphic').innerHTML=compareChart(d,eImmo,HB);
+  $('irrNote').innerHTML='Nach-Steuer-Rendite (IRR) der Immobilie: <b>'+(eIrr!=null?p1(eIrr)+' p.a.':'—')+'</b>'+(HB&&HB.irr?' (Median; P10 '+p1(HB.irr.p10)+' – P90 '+p1(HB.irr.p90)+')':'')+'. '+(eImmo>=d.endAktien?'Die Immobilie liegt vorn':'Die Aktien-Alternative liegt vorn')+' — '+(HB?'Wertsteigerung <b>historisch 1963–2020</b>':'Wertsteigerung <b>'+$('wert').value+' %</b> (Annahme)')+', Aktien '+$('aktien').value+' % p.a. Beide Seiten mit gleichem Eigenkapital und gleichen Zuzahlungen.';
+
+  $('disc').innerHTML=DISC;
+}
+function mini(l,v){return '<div class=mcard><div class=l>'+l+'</div><div class=n style="font-size:16px">'+v+'</div></div>';}
+function margRate(zve){const base=estGesamt(zve,jahr,split,+$('kist').value);const up=estGesamt(zve+1000,jahr,split,+$('kist').value);return (up-base)/1000;}
+
+const DISC='<b>Kein Steuer-, Rechts- oder Anlageberatung</b> — ein Rechenwerkzeug mit Annahmen. Für die konkrete Anwendung (Kaufpreisaufteilung, AfA-Wahl, §7b/§7i-Voraussetzungen, Liebhaberei) einen Steuerberater hinzuziehen.<br>'+
+'• Einkommensteuer nach <b>§32a EStG, Grundtarif</b> (2025/2026, verifiziert); bei „verheiratet" Splitting (2× Tarif auf halbes zvE). Soli (5,5 % mit Milderungszone) und ggf. Kirchensteuer auf die ESt. Die §51a-Kinderfreibetragsfiktion ist nicht abgebildet.<br>'+
+'• <b>AfA-Satz nach Fertigstellungsjahr</b> (vor 1925: 2,5 %, 1925–2022: 2 %, ab 2023: 3 %), nicht nach Steuerjahr. Degressive AfA (§7 Abs. 5a) und §7b sind zeitlich befristet und an enge Voraussetzungen gebunden. Grund/Boden ist nie abschreibbar.<br>'+
+'• <b>Grunderwerbsteuer</b> je Bundesland (Länderhoheit, kann sich ändern; z. B. Bremen 5,0→5,5 % zum 1.7.2025). Notar ≈ 1,25 %, Grundbuch ≈ 0,5 %, Makler-Käuferanteil ≈ 3,57 % — alle aktiviert und mit dem Gebäudeanteil abgeschrieben.<br>'+
+'• Vereinfachungen: erstes AfA-Jahr voll (nicht 1/12 monatsgenau), jährliche statt monatliche Annuität (überzeichnet die Restschuld um 1–2 %), Instandhaltung als sofort abzugsfähig behandelt (real erst bei Verausgabung), <b>15 %-Grenze anschaffungsnahe Herstellungskosten</b> und Vorfälligkeitsentschädigung nicht modelliert. Der Steuervorteil aus Verlusten setzt Einkünfteerzielungsabsicht voraus.<br>'+
+'• AfA-Detail: die <b>degressive AfA</b> läuft rein geometrisch (kein modellierter Wechsel zur linearen Restwert-AfA, der bei sehr langer Haltedauer günstiger wäre); die <b>§7b-Sonder-AfA</b> ist nur mit linearer/degressiver AfA kombinierbar (nicht mit Denkmal) und wird ab Jahr 5 vereinfacht als reguläre AfA fortgeführt.<br>'+
+'• <b>Verkauf</b>: § 23 EStG — Gewinn nach > 10 Jahren steuerfrei, innerhalb steuerpflichtig zum Grenzsatz (kumulierte AfA erhöht den Gewinn). Freigrenze 1.000 €/Jahr angewandt.<br>'+
+'• <b>Wertsteigerung</b>: „Annahme" = konstanter Regler-Wert (nominal). „historisch 1963–2020" = echte nominale deutsche Wohnimmobilien-Preisänderungen (JST Macrohistory, nur Preis ohne Miete) über alle zusammenhängenden Startjahre → P10–P90-Band. Die laufenden Cashflows/Steuern bleiben dabei deterministisch; nur der Verkaufswert variiert. Vergangene Wertentwicklung ist kein Indikator für die Zukunft.<br>'+
+'• <b>Aktien-Vergleich</b> vereinfacht: gleiches Eigenkapital + gleiche Zuzahlungen im ETF, 25 % KapESt auf 70 % des Gewinns (30 % Teilfreistellung) + Soli; Vorabpauschale nur näherungsweise. Kapitalmarkt- und Immobilien-Annahmen sind keine Prognosen.<br>'+
+'• Rechtsstand 2025/2026. Quelle Steuerlogik: §32a/§7/§7b/§23 EStG (gesetze-im-internet.de), GrEStG der Länder, BMF. Vor Kauf amtlich verifizieren.';
+
+// € mit Tausender-Trennzeichen: parse + Live-Formatierung (Caret von rechts stabil)
+function numVal(id){return parseInt(($(id).value||'0').replace(/\D/g,''),10)||0;}
+function fmtInput(el){const raw=el.value.replace(/\D/g,'');const cfe=el.value.length-(el.selectionStart||el.value.length);el.value=raw===''?'':parseInt(raw,10).toLocaleString('de-DE');const pos=Math.max(0,el.value.length-cfe);try{el.setSelectionRange(pos,pos);}catch(e){}}
+document.querySelectorAll('input.eurin').forEach(el=>{el.addEventListener('input',()=>{fmtInput(el);render();});});
+['flaeche','baujahr','zins','tilg','zb','azins','msteig','leer','instand','halt','wert','vmakler','aktien','sanier'].forEach(id=>{const el=$(id);if(el)el.addEventListener('input',render);});
+['bundesland','afa','kist'].forEach(id=>$(id).addEventListener('change',render));
+$('s7b').addEventListener('change',render);
+$('vSingle').addEventListener('click',()=>{$('vSingle').classList.add('on');$('vSplit').classList.remove('on');render();});
+$('vSplit').addEventListener('click',()=>{$('vSplit').classList.add('on');$('vSingle').classList.remove('on');render();});
+$('y2025').addEventListener('click',()=>{$('y2025').classList.add('on');$('y2026').classList.remove('on');render();});
+$('y2026').addEventListener('click',()=>{$('y2026').classList.add('on');$('y2025').classList.remove('on');render();});
+$('fmTilg').addEventListener('click',()=>{finMode='tilg';render();});
+$('fmRate').addEventListener('click',()=>{finMode='rate';render();});
+$('wmFix').addEventListener('click',()=>{wertMode='fix';render();});
+$('wmHist').addEventListener('click',()=>{wertMode='hist';render();});
+render();
+</script>
+</body></html>

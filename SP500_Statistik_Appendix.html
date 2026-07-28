@@ -1,0 +1,112 @@
+<!DOCTYPE html><html lang=de><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1">
+<title>S&amp;P 500 &middot; Statistik-Appendix</title>
+<script src="assets/chart.umd.min.js?v=4"></script>
+<link rel=stylesheet href="assets/site.css?v=4">
+<script defer src="assets/site-map.js?v=4"></script>
+<script defer src="assets/datenstand.js?v=4"></script>
+<script defer src="assets/site.js?v=4"></script>
+<style>
+/* seitenspezifisch */
+.chartbox{position:relative;height:380px}
+.tbl{margin-top:4px}
+.tbl td.v.r{color:var(--accent);font-weight:600}
+.tbl tr.hot td{background:var(--accent-soft);color:var(--accent);font-weight:700}
+.take.r{border-left-color:var(--bad)}
+ul.take{margin:0;padding:16px 22px 16px 42px}
+ul.take li{margin:9px 0}
+</style></head><body data-section="Risiko"><div class=wrap>
+<div class=kicker>Statistik-Appendix</div>
+<h1>Wie <em>belastbar</em> sind die Sch&auml;tzungen?</h1>
+<p class=lead>Jede Wahrscheinlichkeit in diesen Analysen tr&auml;gt eine Fehlerspanne. Dieser Appendix macht sie sichtbar: wo die Daten tragen, wo sie nur noch eine Gr&ouml;&szlig;enordnung hergeben &mdash; und warum die reale Rechnung die ehrlichere ist.</p>
+<div class=sub>S&amp;P&nbsp;500, 19.241 Tagesrenditen (1950&ndash;2026) &middot; Hill-Tail-Index, Block-Bootstrap-CIs, real vs. nominal &middot; CPI von FRED</div>
+
+<section class=card>
+<h2>01 &mdash; Tagesrenditen</h2>
+<h3>Power-Law-Tails: der Exponent &alpha;</h3>
+<p>Komplement&auml;re Verteilung der Verlusttage, log-log. Eine Gerade bedeutet Potenzgesetz: die Normalverteilung (rot) st&uuml;rzt ab, die Realit&auml;t (blau) bleibt linear.</p>
+<div class=chartbox><canvas id=tail></canvas></div>
+<div class=grid2 style="margin-top:14px">
+<div>
+<p class=sub style="margin:0 0 6px"><b>Hill-Sch&auml;tzer</b> (volle Ordnungsstatistiken), &alpha; &plusmn; SE:</p>
+<table class=tbl><thead><tr><th>k (Tail-Tage)</th><th style=text-align:right>&alpha; links (Verluste)</th><th style=text-align:right>&alpha; rechts (Gewinne)</th></tr></thead><tbody><tr><td class=v>50</td><td class=v>2.89 &plusmn; 0.41</td><td class=v>3.48 &plusmn; 0.49</td></tr><tr><td class=v>100</td><td class=v>2.80 &plusmn; 0.28</td><td class=v>3.49 &plusmn; 0.35</td></tr><tr><td class=v>200</td><td class=v>3.05 &plusmn; 0.22</td><td class=v>3.09 &plusmn; 0.22</td></tr><tr><td class=v>400</td><td class=v>2.92 &plusmn; 0.15</td><td class=v>3.10 &plusmn; 0.15</td></tr><tr><td class=v>800</td><td class=v>2.70 &plusmn; 0.10</td><td class=v>2.83 &plusmn; 0.10</td></tr></tbody></table>
+</div>
+<div>
+<p class=sub style="margin:0 0 6px"><b>Welche Momente existieren?</b></p>
+<table class=tbl><thead><tr><th>Gr&ouml;&szlig;e</th><th style=text-align:right>braucht</th><th>Status</th></tr></thead><tbody>
+<tr><td>Mittelwert</td><td class=v>&alpha;&gt;1</td><td>&#10003;</td></tr>
+<tr><td>Varianz / Std / Sharpe</td><td class=v>&alpha;&gt;2</td><td>&#10003;</td></tr>
+<tr><td>Schiefe</td><td class=v>&alpha;&gt;3</td><td>grenzwertig</td></tr>
+<tr class=hot><td>Kurtosis (4. Moment)</td><td class=v>&alpha;&gt;4</td><td><b>divergiert</b></td></tr>
+</tbody></table>
+</div>
+</div>
+<div class="take r"><b>&alpha; &asymp; 2,8&ndash;3,1</b> (beide Tails, SE ~0,1&ndash;0,2) &mdash; das &bdquo;<a href="SP500_Taleb_Analyse.html">inverse cubic law</a>&ldquo;. Es liegt ~7&nbsp;SE <b>unter 4</b> und ~6&nbsp;SE <b>&uuml;ber 2</b>: Varianz existiert, aber das 4.&nbsp;Moment divergiert. Die Stichproben-Kurtosis von 20 hat kein stabiles Ziel &mdash; allein der 19.10.1987 tr&auml;gt z&#8308;/N&nbsp;=&nbsp;<b>9.5</b> (~48&nbsp;%) bei. Jede 4.-Moment-Statistik (Kurtosis, gau&szlig;sches VaR) ist statistisch haltlos.</div>
+</section>
+
+<section class=card>
+<h2>02 &mdash; Unsicherheit</h2>
+<h3>Konfidenzintervalle der 10-Jahres-Wahrscheinlichkeiten</h3>
+<p>Zwei unabh&auml;ngige Methoden, beide ehrlich gegen&uuml;ber der Abh&auml;ngigkeit der Fenster. Die &bdquo;16.728 Fenster&ldquo; sind effektiv nur <b>~7,7 unabh&auml;ngige Dekaden</b> (Varianzinflation ~2.187&times;, naive SE ~47&times; zu klein).</p>
+<div class=grid2>
+<div>
+<p class=sub style="margin:0 0 6px"><b>A) Clopper-Pearson</b> (auf ~8 unabh. Dekaden)</p>
+<table class=tbl><thead><tr><th>Ereignis in</th><th style=text-align:right>Punkt</th><th style=text-align:right>95%-CI</th></tr></thead><tbody>
+<tr><td>0 von 8</td><td class=v>0 %</td><td class=v>[0 .. 37]</td></tr>
+<tr class=hot><td>1 von 8 (&approx; P&lt;0%)</td><td class=v>12,5 %</td><td class=v>[0,3 .. 53]</td></tr>
+<tr class=hot><td>2 von 8 (&approx; P&lt;7%)</td><td class=v>25 %</td><td class=v>[3 .. 65]</td></tr>
+<tr><td>3 von 8</td><td class=v>37,5 %</td><td class=v>[9 .. 76]</td></tr>
+</tbody></table>
+</div>
+<div>
+<p class=sub style="margin:0 0 6px"><b>B) Moving-Block-Bootstrap</b> (B=400, Punkt + 95%-CI)</p>
+<table class=tbl><thead><tr><th>Blockl&auml;nge</th><th style=text-align:right>Median</th><th style=text-align:right>P(&lt;0%)</th><th style=text-align:right>P(&lt;7%)</th></tr></thead><tbody><tr><td>1 Monat</td><td class=v>11.2 [7.2 .. 15.4]</td><td class=v>0.0 [0.0 .. 10.9]</td><td class=v>19.1 [0.5 .. 48.1]</td></tr><tr><td>1 Jahr</td><td class=v>11.2 [7.4 .. 15.7]</td><td class=v>0.0 [0.0 .. 13.2]</td><td class=v>19.1 [0.2 .. 48.3]</td></tr><tr><td>3 Jahre</td><td class=v>11.4 [7.8 .. 14.9]</td><td class=v>0.0 [0.0 .. 11.3]</td><td class=v>18.6 [0.1 .. 43.7]</td></tr></tbody></table>
+</div>
+</div>
+<div class=take>Beide sagen dasselbe: der <b>Median (~11 %) ist belastbar</b> (Bootstrap-CI grob [7&nbsp;%; 15&nbsp;%]) &mdash; weil &alpha;&gt;2, gl&auml;ttet der Grenzwertsatz die 10-Jahres-Summen. Die <b>Tail-Wahrscheinlichkeiten sind es nicht</b>: P(&lt;7&nbsp;%) liegt irgendwo in <b>[~0&nbsp;%; ~50&nbsp;%]</b>, P(&lt;0&nbsp;%) in [~0&nbsp;%; ~13&nbsp;%]. Bemerkenswert: die Blockl&auml;nge &auml;ndert das CI kaum &mdash; die Unsicherheit steckt nicht in der Methode, sondern in den nur 76&nbsp;Jahren.</div>
+</section>
+
+<section class=card>
+<h2>03 &mdash; Kaufkraft</h2>
+<h3>Real statt nominal &mdash; der linke Tail wird fett</h3>
+<p><a href="SP500_10Jahres_Renditeverteilung.html">Dieselben 10-Jahres-Fenster</a> (j&auml;hrlich, n=67), einmal nominal (Total Return) und einmal mit echtem CPI deflationiert. Verteilungsfunktionen P(Rendite &lt; x):</p>
+<div class=chartbox><canvas id=realnom></canvas></div>
+<div class=grid2 style="margin-top:14px">
+<div><table class=tbl><thead><tr><th>Kennzahl</th><th style=text-align:right>nominal</th><th style=text-align:right>real</th></tr></thead><tbody><tr><td>Median p.a.</td><td class=v>11.9 %</td><td class="v r">7.5 %</td></tr><tr><td>Mittel p.a.</td><td class=v>10.5 %</td><td class="v r">6.8 %</td></tr><tr><td>schlechtestes Jahrzehnt</td><td class=v>-0.3 % (1998-2008)</td><td class="v r">-4.4 % (1968-1978)</td></tr><tr class=hot><td>P(&lt; 0 %)</td><td class=v>1 %</td><td class="v r">18 %</td></tr><tr><td>P(&lt; 4 %)</td><td class=v>12 %</td><td class="v r">24 %</td></tr><tr><td>P(&lt; 7 %)</td><td class=v>22 %</td><td class="v r">45 %</td></tr></tbody></table></div>
+<div><div class="take r" style="margin:0"><a href="Inflation_Cantillon_Vermoegenspreise.html">Inflationsbereinigt kippt das Bild</a>: <b>P(&lt;0&nbsp;%) springt von 1&nbsp;% auf 18&nbsp;%</b>. Der Median f&auml;llt von 11.9&nbsp;% auf 7.5&nbsp;%. Das schlechteste reale Jahrzehnt war <b>1968&ndash;1978 mit -4.4&nbsp;%/Jahr</b> (Stagflation) &mdash; nominal sah es harmlos aus. <b>Kaufkraft&ndash;Verlust &uuml;ber 10&nbsp;Jahre ist real also gar nicht selten.</b></div></div>
+</div>
+</section>
+
+<section class=card>
+<h2>Bilanz</h2>
+<h3>Was belastbar ist &mdash; und was nicht</h3>
+<ul class=take>
+<li><b>Tages-Ebene:</b> Power-Law mit &alpha;&asymp;3 ist hart belegt (Hill, ~7&nbsp;SE unter 4). Kurtosis, gau&szlig;sches VaR &amp; Co. sind nicht sch&auml;tzbar &mdash; ein Punkt (1987) dominiert.</li>
+<li><b>10-Jahres-Mitte:</b> belastbar (Median ~11&nbsp;% nominal, CI [7;15]) &mdash; Aggregation rettet, weil &alpha;&gt;2.</li>
+<li><b>10-Jahres-Tails:</b> nicht belastbar &mdash; P(&lt;0), P(&lt;7) sind nur auf eine Gr&ouml;&szlig;enordnung bekannt. &bdquo;1,4&nbsp;%&ldquo; ist Scheingenauigkeit.</li>
+<li><b>Real ist das, was z&auml;hlt:</b> inflationsbereinigt ist ein verlorenes Jahrzehnt (~18&nbsp;%) und sub-7&nbsp;% (~45&nbsp;%) viel wahrscheinlicher als nominal. <a href="Altersvorsorge_Rechner.html">F&uuml;r die Altersvorsorge</a> ist die reale Verteilung die ehrliche.</li>
+</ul>
+</section>
+
+<div class=foot>Hill auf vollen Ordnungsstatistiken; Moving-Block-Bootstrap (zirkul&auml;r, B=400); Clopper-Pearson auf der effektiven Dekaden-Stichprobe. Real = Total Return (Kurs + ~2,8&nbsp;% Div.) deflationiert mit CPIAUCSL (FRED). Annahmen wie zuvor; j&auml;hrliche Fenster (n=67) f&uuml;r den Real-Nominal-Vergleich.</div>
+</div>
+<script>
+const P={"emp": [[2.98, 145], [3.97, 58], [4.96, 30], [5.96, 20], [6.95, 9], [7.94, 7], [9.93, 2]], "gau": [[2.98, 25.973388], [3.97, 0.609386], [4.96, 0.005515], [5.96, 1.9e-05], [6.95, 0.0], [7.94, 0.0], [9.93, 0.0]], "fit": [[2.8, 202.17], [10.2, 2.46]], "cdfN": [[-6.0, 0.0], [-5.5, 0.0], [-5.0, 0.0], [-4.5, 0.0], [-4.0, 0.0], [-3.5, 0.0], [-3.0, 0.0], [-2.5, 0.0], [-2.0, 0.0], [-1.5, 0.0], [-1.0, 0.0], [-0.5, 0.0], [0.0, 1.5], [0.5, 3.0], [1.0, 4.5], [1.5, 4.5], [2.0, 4.5], [2.5, 7.5], [3.0, 10.4], [3.5, 10.4], [4.0, 11.9], [4.5, 13.4], [5.0, 16.4], [5.5, 16.4], [6.0, 19.4], [6.5, 19.4], [7.0, 22.4], [7.5, 25.4], [8.0, 29.9], [8.5, 35.8], [9.0, 37.3], [9.5, 40.3], [10.0, 43.3], [10.5, 47.8], [11.0, 47.8], [11.5, 47.8], [12.0, 50.7], [12.5, 59.7], [13.0, 59.7], [13.5, 64.2], [14.0, 70.1], [14.5, 79.1], [15.0, 85.1], [15.5, 86.6], [16.0, 89.6], [16.5, 92.5], [17.0, 92.5], [17.5, 94.0], [18.0, 95.5], [18.5, 97.0], [19.0, 98.5], [19.5, 100.0], [20.0, 100.0]], "cdfR": [[-6.0, 0.0], [-5.5, 0.0], [-5.0, 0.0], [-4.5, 0.0], [-4.0, 3.0], [-3.5, 6.0], [-3.0, 9.0], [-2.5, 11.9], [-2.0, 13.4], [-1.5, 13.4], [-1.0, 14.9], [-0.5, 14.9], [0.0, 17.9], [0.5, 19.4], [1.0, 19.4], [1.5, 22.4], [2.0, 22.4], [2.5, 22.4], [3.0, 22.4], [3.5, 23.9], [4.0, 23.9], [4.5, 25.4], [5.0, 32.8], [5.5, 34.3], [6.0, 38.8], [6.5, 43.3], [7.0, 44.8], [7.5, 49.3], [8.0, 55.2], [8.5, 56.7], [9.0, 56.7], [9.5, 56.7], [10.0, 62.7], [10.5, 67.2], [11.0, 79.1], [11.5, 79.1], [12.0, 82.1], [12.5, 88.1], [13.0, 89.6], [13.5, 92.5], [14.0, 94.0], [14.5, 94.0], [15.0, 95.5], [15.5, 98.5], [16.0, 100.0], [16.5, 100.0], [17.0, 100.0], [17.5, 100.0], [18.0, 100.0], [18.5, 100.0], [19.0, 100.0], [19.5, 100.0], [20.0, 100.0]]};
+Chart.defaults.font.family="-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif";
+Chart.defaults.color="#57534c";
+new Chart(document.getElementById('tail'),{data:{datasets:[
+ {type:'scatter',label:'tatsächlich (Verlusttage)',data:P.emp.map(p=>({x:p[0],y:p[1]})),backgroundColor:'#1d4ed8',pointRadius:4},
+ {type:'line',label:'Potenzgesetz-Fit',data:P.fit.map(p=>({x:p[0],y:p[1]})),borderColor:'#1d4ed8',borderWidth:1.5,borderDash:[6,4],pointRadius:0},
+ {type:'line',label:'Normalverteilung',data:P.gau.map(p=>({x:p[0],y:p[1]})),borderColor:'#b91c1c',borderWidth:2,pointRadius:0}
+]},options:{maintainAspectRatio:false,parsing:false,scales:{
+ x:{type:'logarithmic',min:2.5,max:11,title:{display:true,text:'Tagesverlust größer als ... (%)'},ticks:{callback:v=>v+'%'},grid:{color:'#ece7dd'}},
+ y:{type:'logarithmic',min:0.001,max:300,title:{display:true,text:'Anzahl Tage (log)'},grid:{color:'#ece7dd'}}},
+ plugins:{legend:{labels:{usePointStyle:true,boxWidth:8}},tooltip:{callbacks:{title:it=>'> '+it[0].parsed.x+'%',label:it=>it.dataset.label+': '+(it.parsed.y>=1?Math.round(it.parsed.y):it.parsed.y.toExponential(1))}}}}});
+
+new Chart(document.getElementById('realnom'),{type:'line',data:{datasets:[
+ {label:'nominal',data:P.cdfN.map(p=>({x:p[0],y:p[1]})),borderColor:'#1d4ed8',borderWidth:2.5,pointRadius:0,tension:.15},
+ {label:'real (inflationsbereinigt)',data:P.cdfR.map(p=>({x:p[0],y:p[1]})),borderColor:'#c2410c',borderWidth:2.5,pointRadius:0,tension:.15}
+]},options:{maintainAspectRatio:false,parsing:false,scales:{
+ x:{type:'linear',min:-6,max:20,title:{display:true,text:'annualisierte 10-Jahres-Rendite (%)'},ticks:{callback:v=>v+'%'},grid:{color:'#ece7dd'}},
+ y:{min:0,max:100,title:{display:true,text:'P(Rendite < x) (%)'},ticks:{callback:v=>v+'%'},grid:{color:'#ece7dd'}}},
+ plugins:{legend:{labels:{usePointStyle:true,boxWidth:8}},tooltip:{callbacks:{title:it=>'Rendite '+it[0].parsed.x+'%',label:it=>it.dataset.label+': P(darunter)='+it.parsed.y+'%'}}}}});
+</script></body></html>

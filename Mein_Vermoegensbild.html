@@ -1,0 +1,469 @@
+<!DOCTYPE html><html lang=de><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1">
+<title>Mein Vermögensbild — alles auf einen Blick</title>
+<link rel=stylesheet href="assets/site.css?v=12">
+<script defer src="assets/site-map.js?v=12"></script>
+<script defer src="assets/datenstand.js?v=12"></script>
+<script defer src="assets/site.js?v=12"></script>
+<script defer src="assets/profil.js?v=12"></script>
+<script defer src="assets/de-rente.js?v=12"></script>
+<script defer src="assets/de-kapitalertrag.js?v=12"></script>
+<script defer src="assets/de-vermoegen.js?v=12"></script>
+<style>
+.two{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media(max-width:820px){.two{grid-template-columns:1fr}}
+.saeulen{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin-bottom:18px}
+.sae{background:var(--card);border:1px solid var(--rule);border-radius:12px;padding:15px 17px}
+.sae .l{font-size:11.5px;color:var(--ink-3)}
+.sae .v{font-family:var(--serif);font-size:25px;font-weight:700;line-height:1.1;margin-top:3px;font-variant-numeric:tabular-nums}
+.sae .s{font-size:11.5px;color:var(--ink-3);margin-top:4px;line-height:1.45}
+.sae.a{border-left:3px solid var(--s1)}.sae.b{border-left:3px solid var(--s2)}
+.sae.c{border-left:3px solid var(--s3)}.sae.d{border-left:3px solid var(--s5)}
+.sae.e{border-left:3px solid var(--s4)}
+.zr{background:var(--card-2);border:1px solid var(--rule);border-radius:12px;padding:16px 18px;margin-top:16px}
+.zr p{font-size:13px;line-height:1.6;color:var(--ink-2);margin:0 0 10px}
+.leer{background:var(--card-2);border:1px dashed var(--rule);border-radius:12px;padding:26px 22px;text-align:center;color:var(--ink-3);font-size:14px}
+.wl{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:12px;margin-top:6px}
+.wl a{display:block;background:var(--card);border:1px solid var(--rule);border-radius:12px;padding:14px 16px;text-decoration:none;color:inherit;transition:border-color .14s,transform .14s}
+.wl a:hover{border-color:var(--accent);transform:translateY(-2px)}
+.wl .t{font-family:var(--serif);font-size:16px;font-weight:700;line-height:1.25;margin-bottom:4px}
+.wl .b{font-size:12.5px;color:var(--ink-2);line-height:1.45}
+.aktion{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
+.btn{font-family:var(--sans);font-size:12.5px;font-weight:600;padding:8px 14px;border:1px solid var(--rule);
+  background:var(--card);border-radius:9px;cursor:pointer;color:var(--ink-2)}
+.btn:hover{border-color:var(--accent);color:var(--accent)}
+.herl{background:var(--card-2);border:1px solid var(--rule);border-radius:12px;padding:14px 16px;margin-top:14px}
+.hl{font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.13em;color:var(--ink-3);margin-bottom:9px}
+.hltab{width:100%;border-collapse:collapse;font-size:13px}
+.hltab td{padding:5px 0;border-bottom:1px solid var(--rule-soft);color:var(--ink-2)}
+.hltab td.r{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap;color:var(--ink)}
+.hltab tr.erg td{border-bottom:0;padding-top:9px;font-weight:700;color:var(--ink)}
+.hlf{font-size:11.5px;color:var(--ink-3);line-height:1.55;margin-top:9px}
+.ctrl[vorgabe]{background:var(--card-2);border:1px solid var(--rule);border-left:3px solid var(--ink-3);
+  border-radius:0 10px 10px 0;padding:12px 14px}
+.ctrl[vorgabe] input[type=range]{accent-color:var(--ink-3)}
+.tagv{display:inline-block;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.11em;
+  color:var(--ink-3);border:1px solid var(--rule);border-radius:3px;padding:1px 5px;margin-left:6px;vertical-align:2px}
+</style>
+</head><body data-section="Werkzeug"><div class=wrap>
+
+<div class=kicker>Werkzeug · Gesamtbild</div>
+<h1>Mein <em>Vermögensbild</em></h1>
+<p class=lead>Einmal eintragen, überall verwenden. Diese Seite führt zusammen, was die einzelnen Rechner getrennt betrachten: die gesetzliche Rente als Fundament, das angesparte Vermögen darauf, die Einordnung im Land — und was daraus für den Ruhestand folgt. Die Angaben bleiben ausschließlich in diesem Browser gespeichert.</p>
+
+<div class=take id=take>Trage links deine Eckdaten ein — das Gesamtbild entsteht dann hier.</div>
+
+<div class=grid2>
+<div class=card>
+<h2>Deine Eckdaten</h2>
+
+<div class=grp>Person</div>
+<div class=two>
+<div class=ctrl><div class=clabel><span>Geburtsjahr</span></div><input type=number id=p_gj min=1930 max=2015 step=1 placeholder="1985"></div>
+<div class=ctrl><div class=clabel><span>Bruttojahresgehalt</span></div><input type=text inputmode=numeric class=eurin id=p_brutto placeholder="60.000"></div>
+</div>
+<div class=two>
+<div class=ctrl><div class=clabel><span>Zu verst. Einkommen</span></div><input type=text inputmode=numeric class=eurin id=p_zve placeholder="45.000"></div>
+<div class=ctrl><div class=clabel><span>Bisherige Entgeltpunkte</span><span class=cval id=p_ep_h></span></div><input type=number id=p_ep step=0.1 min=0 placeholder="optional"></div>
+</div>
+<div class=hint id=ep_hinweis></div>
+
+<div class=grp>Vermögen heute</div>
+<div class=two>
+<div class=ctrl><div class=clabel><span>Depot / Wertpapiere</span></div><input type=text inputmode=numeric class=eurin id=p_depot placeholder="0"></div>
+<div class=ctrl><div class=clabel><span>Bank- und Sparguthaben</span></div><input type=text inputmode=numeric class=eurin id=p_bank placeholder="0"></div>
+</div>
+<div class=two>
+<div class=ctrl><div class=clabel><span>Immobilienwert</span></div><input type=text inputmode=numeric class=eurin id=p_immo placeholder="0"></div>
+<div class=ctrl><div class=clabel><span>Restschuld darauf</span></div><input type=text inputmode=numeric class=eurin id=p_immoschuld placeholder="0"></div>
+</div>
+<div id=kreditbox style="display:none">
+<div class=two>
+<div class=ctrl><div class=clabel><span>Sollzins p.a.</span><span class=cval id=p_kz_v>3,8 %</span></div><input type=range id=p_kz min=0 max=8 step=0.1 value=3.8></div>
+<div class=ctrl><div class=clabel><span>Monatsrate <span class=sub>(Annuität)</span></span></div><input type=text inputmode=numeric class=eurin id=p_kr placeholder="1.200"></div>
+</div>
+<div class=hint id=kredit_h></div>
+</div>
+<div class=ctrl id=immonutzbox style="display:none"><div class=clabel><span>Im Ruhestand</span></div>
+<div class=seg><button id=iWohnen class=on>selbst bewohnen</button><button id=iVerkauf>verkaufen</button></div>
+<div class=hint id=immonutz_h></div></div>
+<div class=two>
+<div class=ctrl><div class=clabel><span>Sonstiges Vermögen</span></div><input type=text inputmode=numeric class=eurin id=p_sonst placeholder="0"></div>
+<div class=ctrl><div class=clabel><span>Sonstige Schulden</span></div><input type=text inputmode=numeric class=eurin id=p_sonstschuld placeholder="0"></div>
+</div>
+
+<div class=grp>Gehaltsentwicklung</div>
+<div class=ctrl><div class=clabel><span>Dein Gehalt steigt p.a. <span class=sub>(nominal)</span></span><span class=cval id=p_gs_v>2,5 %</span></div><input type=range id=p_gs min=0 max=6 step=0.1 value=2.5></div>
+
+<div class=ctrl vorgabe><div class=clabel><span>Allgemeine Löhne steigen p.a. <span class=tagv>Vorgabe</span></span></div>
+<select id=p_lw>
+<option value=2.5 selected>2,5 % — Voreinstellung, zwischen Langfristtrend und jüngstem Anstieg</option>
+<option value=4.8>4,8 % — Durchschnittsentgelt 2020–2026 (Inflationsschub)</option>
+<option value=4.9>4,9 % — 1950–2020, einschließlich Wirtschaftswunder</option>
+<option value=3.7>3,7 % — 1970–2020</option>
+<option value=2.3>2,3 % — 1990–2020</option>
+<option value=1.9>1,9 % — 2000–2020, die jüngste Dekade vor dem Schub</option>
+</select>
+<div class=hint><b>Dies ist keine persönliche Annahme</b>, sondern der Vergleichsmaßstab: das Durchschnittsentgelt der Rentenversicherung, durch das dein Gehalt geteilt wird. In der Regel unverändert lassen.<br>
+Die Lohndynamik hat über die Jahrzehnte klar nachgelassen — von 4,9 % seit 1950 auf 1,9 % in den 2000ern. Zuletzt zog sie wieder an. Quelle: Jordà-Schularick-Taylor Macrohistory und amtliche Durchschnittsentgelte.</div></div>
+<div class=hint id=gs_hinweis></div>
+
+<div class=grp>Sparen &amp; Ruhestand</div>
+<div class=two>
+<div class=ctrl><div class=clabel><span>Sparrate pro Monat <span class=sub>(real)</span></span></div><input type=text inputmode=numeric class=eurin id=p_rate placeholder="500"></div>
+<div class=ctrl><div class=clabel><span>Wunsch-Nettorente <span class=sub>(heutige Kaufkraft)</span></span></div><input type=text inputmode=numeric class=eurin id=p_bedarf placeholder="2.500"></div>
+</div>
+<div class=ctrl><div class=clabel><span>Geplanter Renteneintritt</span><span class=cval id=p_ra_v>67</span></div><input type=range id=p_ra min=63 max=70 step=1 value=67></div>
+
+<div class=grp>Annahmen</div>
+<div class=ctrl><div class=clabel><span>Dauer des Ruhestands</span><span class=cval id=p_rd_v>25 J</span></div><input type=range id=p_rd min=10 max=40 step=1 value=25>
+<div class=hint>Mit 67 beträgt die durchschnittliche fernere Lebenserwartung rund 18 Jahre (Männer) bzw. 21 Jahre (Frauen). Wer nicht auf den Durchschnitt, sondern auf ein hohes Alter plant, rechnet mit 25 bis 30 Jahren.</div></div>
+
+<div class=two>
+<div class=ctrl><div class=clabel><span>Erwartete Rendite p.a. <span class=sub>(nominal)</span></span><span class=cval id=p_rn_v>5,0 %</span></div><input type=range id=p_rn min=0 max=10 step=0.1 value=5></div>
+<div class=ctrl><div class=clabel><span>Erwartete Inflation p.a.</span><span class=cval id=p_inf_v>2,0 %</span></div><input type=range id=p_inf min=0 max=6 step=0.1 value=2></div>
+</div>
+<div class=hint id=rendite_h></div>
+
+<div class=ctrl><div class=clabel><span>Sicherheitspuffer <span class=sub>(soll am Ende übrig bleiben)</span></span></div>
+<input type=text inputmode=numeric class=eurin id=p_puffer placeholder="0">
+<div class=hint id=puffer_h></div></div>
+
+<div class=aktion>
+<button class=btn id=bLeeren>Angaben löschen</button>
+<span class=hint id=speicherhinweis style="align-self:center"></span>
+</div>
+</div>
+
+<div class=card>
+<h2>Das Gesamtbild — alle Beträge real, in heutiger Kaufkraft</h2>
+<div id=bild><div class=leer>Sobald Geburtsjahr und Gehalt eingetragen sind, erscheint hier die Auswertung.</div></div>
+</div>
+</div>
+
+<div class=card id=weiterkarte style="display:none">
+<h2>Damit weiterrechnen</h2>
+<p class=note id=weiterhint></p>
+<div class=wl id=weiter></div>
+</div>
+
+<div class=foot>Die Eingaben werden ausschließlich lokal im Browser gespeichert (localStorage) und nirgendwohin übertragen. Gesetzliche Rente nach §§ 64 ff. SGB VI mit den Rechengrößen 2026; Vermögenseinordnung nach Bundesbank PHF Welle 5 (Erhebung 2023). Die gesetzliche Rente, Pensionen und Betriebsrenten sind im ausgewiesenen Nettovermögen nicht enthalten — sie erscheinen hier getrennt als Rentenanspruch. Keine Steuer-, Rechts- oder Anlageberatung.</div>
+
+<script>
+const $=id=>document.getElementById(id);
+const fmt=x=>Math.round(x).toLocaleString('de-DE');
+const eur=x=>fmt(x)+' €';
+const p1=x=>(x*100).toLocaleString('de-DE',{minimumFractionDigits:1,maximumFractionDigits:1})+' %';
+const ep1=x=>Number(x).toLocaleString('de-DE',{minimumFractionDigits:1,maximumFractionDigits:1});
+
+const MAP={geburtsjahr:'p_gj',bruttoJahr:'p_brutto',zvE:'p_zve',entgeltpunkte:'p_ep',
+  depotWert:'p_depot',bankGuthaben:'p_bank',immoWert:'p_immo',immoSchuld:'p_immoschuld',
+  sonstVermoegen:'p_sonst',sonstSchulden:'p_sonstschuld',sparrateMonat:'p_rate',
+  sicherheitspuffer:'p_puffer'};
+
+function eurin(el){const raw=String(el.value||'').replace(/\D/g,'');el.value=raw===''?'':parseInt(raw,10).toLocaleString('de-DE');}
+function z(id){return Profil.zahl($(id));}
+
+function speichern(){
+  const patch={};
+  Object.keys(MAP).forEach(k=>{patch[k]=z(MAP[k]);});
+  patch.bedarf=z('p_bedarf'); patch.renteAlter=+$('p_ra').value;
+  Profil.merge(patch);
+}
+
+function auswerten(){
+  const gj=z('p_gj'), brutto=z('p_brutto'), zve=z('p_zve')||brutto;
+  const raAlter=+$('p_ra').value; $('p_ra_v').textContent=raAlter;
+  const pz=id=>(+$(id).value).toLocaleString('de-DE',{minimumFractionDigits:1,maximumFractionDigits:1})+' %';
+  $('p_gs_v').textContent=pz('p_gs');
+  $('p_rn_v').textContent=pz('p_rn'); $('p_inf_v').textContent=pz('p_inf');
+  $('p_rd_v').textContent=$('p_rd').value+' J'; $('p_kz_v').textContent=pz('p_kz');
+  $('speicherhinweis').textContent = Profil.gefuellt()?'Lokal in diesem Browser gespeichert.':'Noch nichts gespeichert.';
+
+  if(!gj||!brutto){
+    $('bild').innerHTML='<div class=leer>Sobald Geburtsjahr und Gehalt eingetragen sind, erscheint hier die Auswertung.</div>';
+    $('take').textContent='Trage links deine Eckdaten ein — das Gesamtbild entsteht dann hier.';
+    $('weiterkarte').style.display='none';
+    return;
+  }
+
+  const jetzt=new Date().getFullYear(), alter=jetzt-gj;
+  const jahreBisRente=Math.max(0,raAlter-alter);
+
+  // --- Säule 1: gesetzliche Rente ---
+  // Entgeltpunkte hängen vom Gehalt RELATIV zum Durchschnittsentgelt ab. Steigt das eigene Gehalt
+  // genauso schnell wie die allgemeinen Löhne, bleiben die Punkte pro Jahr konstant.
+  const gs=(+$('p_gs').value)/100, lw=(+$('p_lw').value)/100;
+  const relWachstum=(1+gs)/(1+lw)-1;                      // Vorsprung gegenüber der Lohnentwicklung
+  const epJahr = entgeltpunkte(brutto,2026);              // Punkte im ersten Jahr
+  const epSelbstAngegeben = z('p_ep')!==null;
+  const epJetzt = epSelbstAngegeben ? z('p_ep') : Math.max(0,(alter-21))*epJahr;
+  let epKuenftig=0, epJahrEnde=epJahr;
+  for(let t=0;t<jahreBisRente;t++){
+    const anteil=epJahr*Math.pow(1+relWachstum,t);        // Gehalt als Vielfaches des Durchschnitts
+    const gedeckelt=epProJahrRelativ(anteil,2026);        // Beitragsbemessungsgrenze deckelt
+    epKuenftig+=gedeckelt; epJahrEnde=gedeckelt;
+  }
+  const epGesamt = epJetzt+epKuenftig;
+  const zf = zugangsfaktor(raAlter*12, gj);
+  const rentenBrutto = bruttoRente(epGesamt, zf, RV.aktuellerRentenwert);
+  const rentenNetto = nettoRente(rentenBrutto, 2026, false);
+  const regelalter = regelaltersgrenzeMonate(gj)/12;
+
+  // --- Säule 2: Vermögen heute ---
+  const depot=z('p_depot')||0, bank=z('p_bank')||0, immo=z('p_immo')||0,
+        immoS=z('p_immoschuld')||0, sonst=z('p_sonst')||0, sonstS=z('p_sonstschuld')||0;
+  const netto = depot+bank+immo+sonst-immoS-sonstS;
+  const hatVermoegen = (depot+bank+immo+sonst+immoS+sonstS)>0;
+
+  // --- Immobilienkredit: Tilgungsverlauf bis zum Renteneintritt ---
+  $('kreditbox').style.display = immoS>0 ? '' : 'none';
+  $('immonutzbox').style.display = immo>0 ? '' : 'none';
+  const kz=(+$('p_kz').value)/100, krate=(z('p_kr')||0)*12;
+  let restschuld=immoS, jahreBisSchuldenfrei=null, zinsGesamt=0;
+  if(immoS>0 && krate>0){
+    let r=immoS;
+    for(let t=1;t<=60 && r>0;t++){
+      const zins=r*kz; zinsGesamt+=Math.min(zins,r+zins);
+      r=Math.max(0, r+zins-krate);
+      if(r<=0 && jahreBisSchuldenfrei===null) jahreBisSchuldenfrei=t;
+      if(t===jahreBisRente) restschuld=r;
+    }
+    if(jahreBisRente>=(jahreBisSchuldenfrei??999)) restschuld=0;
+    if(krate<=immoS*kz){ jahreBisSchuldenfrei=null; restschuld=immoS; }   // Rate deckt nicht einmal die Zinsen
+  }
+  $('kredit_h').innerHTML = immoS>0
+    ? (krate<=0 ? 'Ohne Monatsrate lässt sich der Tilgungsverlauf nicht berechnen.'
+      : (jahreBisSchuldenfrei===null
+        ? '<b style="color:var(--bad)">Die Rate deckt nicht einmal die Zinsen</b> — die Schuld würde wachsen. Rate oder Zins prüfen.'
+        : 'Bei '+eur(krate/12)+' im Monat ist der Kredit in <b>'+jahreBisSchuldenfrei+' Jahren</b> getilgt'+
+          (jahreBisSchuldenfrei<=jahreBisRente
+            ? ' — also <b>vor</b> dem Renteneintritt. Ab dann stehen '+eur(krate/12)+' im Monat zusätzlich zur Verfügung.'
+            : ' — das ist <b style="color:var(--warn)">'+(jahreBisSchuldenfrei-jahreBisRente)+' Jahre nach</b> dem Renteneintritt. Zum Rentenbeginn stehen noch '+eur(restschuld)+' offen; die Rate läuft weiter und ist im Kapitalbedarf eingerechnet.')))
+    : '';
+  const immoVerkaufen = $('iVerkauf').classList.contains('on');
+  $('immonutz_h').innerHTML = immo>0
+    ? (immoVerkaufen
+      ? 'Der Nettoerlös fließt zum Renteneintritt in das verfügbare Kapital. <b>Wertsteigerung: 1,5 % real pro Jahr</b> — der historische Durchschnitt deutscher Wohnimmobilien 1963–2020 (nur Preis, ohne Mietertrag; Jordà-Schularick-Taylor). Dieser Wert ist bewusst fest und nicht einstellbar. Verkaufskosten und Steuern sind nicht abgezogen.'
+      : 'Die Immobilie bleibt bewohnt und zählt <b>nicht</b> zum Kapital, aus dem die Rentenlücke gedeckt wird — sie erscheint nur im Nettovermögen. <b>Mietfreies Wohnen senkt allerdings den Bedarf:</b> Trage bei der Wunsch-Nettorente den Betrag ein, den du <i>ohne</i> Miete brauchst.')
+    : '';
+
+  // --- Säule 3: Einordnung ---
+  let rang=null, gruppe=null;
+  if(hatVermoegen){ rang=perzentilrang(netto); gruppe=einordnungNachAlter(netto,alter); }
+
+  // --- Säule 4: die Lücke ---
+  const bedarf=z('p_bedarf')||2500;
+  const luecke=Math.max(0,bedarf-rentenNetto);
+  // Kapitalbedarf = Barwert einer realen Rente über die gewählte Ruhestandsdauer (Regler)
+  // Nominale Rendite und Inflation werden getrennt abgefragt; gerechnet wird real.
+  const rNom=(+$('p_rn').value)/100, infl=(+$('p_inf').value)/100;
+  const rReal=(1+rNom)/(1+infl)-1;                    // Fisher, nicht rNom − infl
+  const jahreRuhestand=+$('p_rd').value, rr=rReal, rAnspar=rReal;
+  const bedarfRente = luecke>0 ? kapitalbedarfBarwert(luecke*12, jahreRuhestand, rr) : 0;
+
+  // Läuft die Kreditrate in den Ruhestand hinein, ist sie zusätzlicher Kapitalbedarf.
+  // Bei Verkauf entfällt sie, weil die Restschuld aus dem Erlös getilgt wird.
+  let restJahreKredit=0, bedarfKredit=0;
+  if(immoS>0 && krate>0 && jahreBisSchuldenfrei!==null && !immoVerkaufen){
+    restJahreKredit = Math.max(0, Math.min(jahreBisSchuldenfrei-jahreBisRente, jahreRuhestand));
+    if(restJahreKredit>0){
+      // Die Annuität ist nominal fest: nominal abzinsen, dann in heutige Kaufkraft umrechnen
+      const bwNominal = rNom>0 ? krate*(1-Math.pow(1+rNom,-restJahreKredit))/rNom : krate*restJahreKredit;
+      bedarfKredit = bwNominal/Math.pow(1+infl, jahreBisRente);
+    }
+  }
+  // Sicherheitspuffer: Betrag, der am Ende noch stehen soll — auf den Renteneintritt abgezinst
+  const puffer = z('p_puffer')||0;
+  const bedarfPuffer = puffer>0 ? puffer/Math.pow(1+rr, jahreRuhestand) : 0;
+  const kapitalbedarf = bedarfRente + bedarfKredit + bedarfPuffer;
+  const rate=(z('p_rate')||0)*12;
+  const liquide=depot+bank;
+  let projiziert=liquide;
+  for(let i=0;i<jahreBisRente;i++) projiziert=projiziert*(1+rAnspar)+rate;
+  // Bei Verkauf kommt der Nettoerlös zum Renteneintritt hinzu.
+  // Wertsteigerung: fester historischer Durchschnitt, nicht einstellbar (siehe Hinweis am Umschalter).
+  const IMMO_REAL_PA = 0.015;                                   // deutsche Wohnimmobilien, real, 1963–2020
+  const immoWertBeiRente = immo * Math.pow(1+IMMO_REAL_PA, jahreBisRente);
+  const verkaufserloes = (immo>0 && immoVerkaufen) ? Math.max(0, immoWertBeiRente-restschuld) : 0;
+  projiziert += verkaufserloes;
+  const deckung = kapitalbedarf>0 ? Math.min(1.5,projiziert/kapitalbedarf) : 1;
+
+  // Voraussichtliches Erbe: Jahr für Jahr aus dem tatsächlich vorhandenen Kapital entnehmen.
+  // Reihenfolge Verzinsung -> Entnahme am Jahresende, damit die Simulation exakt zur
+  // nachschüssigen Barwertformel des Kapitalbedarfs passt (Deckung 100 % => Rest = Puffer).
+  let rest=projiziert, pleiteNach=null;
+  const entnahmeJahr=luecke*12;
+  for(let t=1;t<=jahreRuhestand;t++){
+    let abfluss=entnahmeJahr;
+    // Kreditrate real: nominal fest, deshalb mit den Jahren real abnehmend
+    if(t<=restJahreKredit) abfluss += krate/Math.pow(1+infl, jahreBisRente+t);
+    rest = rest*(1+rr) - abfluss;
+    if(rest<=0){ pleiteNach=t; rest=0; break; }
+  }
+  const erbe=Math.max(0,rest);
+
+  $('bild').innerHTML=
+   '<div class=saeulen>'+
+   '<div class="sae a"><div class=l>Gesetzliche Rente mit '+raAlter+'</div><div class=v>'+eur(rentenNetto)+'</div>'+
+     '<div class=s>Zahlbetrag nach Kranken- und Pflegeversicherung · Zugangsfaktor '+zf.toLocaleString('de-DE',{minimumFractionDigits:3,maximumFractionDigits:3})+
+     (raAlter<regelalter?' (Abschlag)':(raAlter>regelalter?' (Zuschlag)':''))+'<br>'+
+     '<b>'+ep1(epGesamt)+' Entgeltpunkte</b> = '+ep1(epJetzt)+' bereits erworben'+(epSelbstAngegeben?' (deine Angabe)':' (geschätzt)')+
+     ' + <b>'+ep1(epKuenftig)+' bis '+raAlter+'</b>'+(jahreBisRente>0?' ('+jahreBisRente+' Jahre × '+ep1(epJahr)+')':'')+'</div></div>'+
+   '<div class="sae b"><div class=l>Nettovermögen heute</div><div class=v>'+(hatVermoegen?eur(netto):'—')+'</div>'+
+     '<div class=s>'+(hatVermoegen?('davon liquide '+eur(liquide)+(immo>0?' · Immobilie netto '+eur(immo-immoS):'')):'Noch keine Vermögensangaben')+'</div></div>'+
+   '<div class="sae c"><div class=l>Mehr als … der Haushalte</div><div class=v>'+(rang!==null?p1(rang/100):'—')+'</div>'+
+     '<div class=s>'+(gruppe?(p1((100-rang)/100)+' haben mehr'+(rang>=50?' (oberes '+p1((100-rang)/100)+')':'')+' · Median der Altersgruppe '+gruppe.altersgruppe+': '+eur(gruppe.medianGruppe)+' · Erhebung '+VERMOEGEN_ERHEBUNGSJAHR):'Vermögen eintragen für die Einordnung')+'</div></div>'+
+   '<div class="sae d"><div class=l>Lücke zum Wunsch von '+eur(bedarf)+'</div><div class=v>'+(luecke>0?eur(luecke):'gedeckt')+'</div>'+
+     '<div class=s>'+(kapitalbedarf>0
+       ? (luecke>0?'pro Monat · ':'Die Rente deckt den Wunsch, aber ')+'nötiges Kapital rund <b>'+eur(kapitalbedarf)+'</b>'+
+         (bedarfKredit>0?' — darin '+eur(bedarfKredit)+' für die Kreditrate, die noch '+restJahreKredit+' Jahre weiterläuft':'')
+       : 'Die gesetzliche Rente deckt den Wunsch bereits')+'</div></div>'+
+   '<div class="sae e"><div class=l>Voraussichtliches Erbe nach '+jahreRuhestand+' Jahren</div>'+
+     '<div class=v'+(pleiteNach!==null?' style="color:var(--bad)"':'')+'>'+(pleiteNach!==null?'0 €':eur(erbe))+'</div>'+
+     '<div class=s>'+(pleiteNach!==null
+       ? '<b style="color:var(--bad)">Das Kapital ist nach '+pleiteNach+' Jahren aufgebraucht</b> — '+(jahreRuhestand-pleiteNach)+' Jahre vor Ende des Planungshorizonts.'
+       : (puffer>0
+         ? (erbe>=puffer
+            ? 'Der angestrebte Puffer von '+eur(puffer)+' ist erreicht'+(erbe-puffer>1000?', dazu '+eur(erbe-puffer)+' aus dem Kapital über dem Bedarf':'')+'.'
+            : '<b style="color:var(--warn)">Unter dem angestrebten Puffer von '+eur(puffer)+'</b> — es fehlen '+eur(puffer-erbe)+'.')
+         : 'Ohne Puffer geplant — was hier steht, ist allein das Kapital über dem Bedarf.'))+
+     '</div>'+
+     (pleiteNach===null&&erbe>0?'<div class=s style="margin-top:6px">In heutiger Kaufkraft, vor Erbschaftsteuer.</div>':'')+'</div>'+
+   '</div>'+
+   (kapitalbedarf>0?deckungsBalken(projiziert,kapitalbedarf,deckung,jahreBisRente)+herleitung(luecke,jahreRuhestand,rr,kapitalbedarf,rAnspar,jahreBisRente,liquide,rate,verkaufserloes,bedarfRente,bedarfKredit,restJahreKredit,krate/12,bedarfPuffer,puffer):'')+
+   zeitreihenHinweis(pleiteNach,jahreRuhestand);
+
+  // Renditehinweis: was real übrig bleibt, plus historische Einordnung
+  let ein='';
+  if(rReal>0.071) ein='<b style="color:var(--bad)">Über allem, was Aktien historisch real geliefert haben (7,1 %).</b>';
+  else if(rReal>0.054) ein='<b style="color:var(--warn)">Oberhalb der 60/40-Mischung — setzt einen hohen Aktienanteil voraus.</b>';
+  else if(rReal>=0.033) ein='<span style="color:var(--good)">Im historisch belegten Bereich.</span>';
+  else if(rReal>=0.016) ein='<span style="color:var(--good)">Vorsichtig — etwa auf Anleihenniveau.</span>';
+  else if(rReal>0) ein='<span style="color:var(--ink-3)">Sehr vorsichtig, unterhalb dessen, was selbst das Sparbuch real brachte.</span>';
+  else ein='<b style="color:var(--bad)">Nach Inflation bleibt nichts übrig — das Kapital verliert real an Wert.</b>';
+  $('puffer_h').innerHTML = puffer>0
+    ? 'Erhöht den Kapitalbedarf um <b>'+eur(bedarfPuffer)+'</b> — so viel muss zum Renteneintritt zusätzlich da sein, damit nach '+jahreRuhestand+' Jahren noch '+eur(puffer)+' übrig sind (heutige Kaufkraft).'
+    : 'Ohne Puffer ist das Kapital am Ende des Planungshorizonts <b>planmäßig aufgebraucht</b>. Wer eine Reserve für lange Leben, Pflege oder ein Erbe will, trägt hier einen Betrag ein.';
+  $('rendite_h').innerHTML=
+   '<b>Real bleiben davon '+p1(rReal)+' pro Jahr</b> — gerechnet als (1 + '+p1(rNom)+') ÷ (1 + '+p1(infl)+') − 1, nicht als Differenz. '+
+   'Mit dieser realen Rendite wird sowohl bis zur Rente aufgebaut als auch im Ruhestand entnommen.<br>'+
+   '<b>Historische Orientierung, real pro Jahr:</b> Aktien USA <b>7,1 %</b> (1871–2025) · Mischung 60/40 <b>5,4 %</b> · deutsche Aktien <b>4,2 %</b> seit 1871 einschließlich 1923 und 1948 · deutsches Sparbuch <b>1,6 %</b> ab 1950. '+
+   'Über rollierende 30-Jahres-Fenster lag die 60/40-Mischung im Median bei 5,2 %, im schwächsten Zehntel bei 3,3 %.<br>'+ein;
+
+  $('gs_hinweis').innerHTML = Math.abs(relWachstum)<0.0005
+    ? 'Gehalt und allgemeine Löhne steigen gleich schnell — die Entgeltpunkte pro Jahr bleiben konstant bei <b>'+ep1(epJahr)+'</b>. Entscheidend ist nicht die Höhe der Steigerung, sondern der <b>Abstand zur allgemeinen Lohnentwicklung</b>.'
+    : (relWachstum>0
+      ? 'Dein Gehalt wächst <b>'+(relWachstum*100).toLocaleString('de-DE',{maximumFractionDigits:2})+' % pro Jahr schneller</b> als der Durchschnitt — die Entgeltpunkte steigen von '+ep1(epJahr)+' auf <b>'+ep1(epJahrEnde)+'</b> im letzten Jahr.'
+      : 'Dein Gehalt bleibt <b>'+(Math.abs(relWachstum)*100).toLocaleString('de-DE',{maximumFractionDigits:2})+' % pro Jahr hinter</b> der allgemeinen Lohnentwicklung zurück — die Entgeltpunkte sinken von '+ep1(epJahr)+' auf <b>'+ep1(epJahrEnde)+'</b> im letzten Jahr.');
+
+  $('ep_hinweis').innerHTML = epSelbstAngegeben
+    ? 'Deine Angabe wird für die bereits erworbenen Punkte verwendet. Die künftigen Jahre bis '+raAlter+' kommen mit dem heutigen Gehalt hinzu.'
+    : '<b>Grobe Schätzung:</b> angenommen wird durchgehende Beschäftigung ab 21 zum heutigen Gehalt — das überschätzt meist, weil früher weniger verdient wurde. Der genaue Wert steht in der jährlichen Renteninformation und gehört hier hinein.';
+
+  const kredZusatz = bedarfKredit>0 ? ' (davon <b>'+eur(bedarfKredit)+'</b> für die Kreditrate, die noch '+restJahreKredit+' Jahre läuft)' : '';
+  $('take').innerHTML = luecke>0
+    ? 'Mit '+alter+' Jahren und '+eur(brutto)+' Brutto stehen zum Renteneintritt mit '+raAlter+' rund <b>'+eur(rentenNetto)+'</b> gesetzliche Rente im Monat zu buche. Vom Wunsch über '+eur(bedarf)+' fehlen damit <b>'+eur(luecke)+' im Monat</b> — dafür braucht es etwa <b>'+eur(kapitalbedarf)+'</b> eigenes Kapital'+kredZusatz+'. Bei der aktuellen Sparrate wären zum Rentenbeginn voraussichtlich <b>'+eur(projiziert)+'</b> vorhanden — '+(projiziert>=kapitalbedarf ? 'das <b>'+(projiziert/kapitalbedarf).toLocaleString('de-DE',{maximumFractionDigits:1})+'-fache</b> des Nötigen.' : 'also <b>'+p1(projiziert/kapitalbedarf)+'</b> des Nötigen.')
+    : 'Mit '+alter+' Jahren und '+eur(brutto)+' Brutto deckt die gesetzliche Rente von rund <b>'+eur(rentenNetto)+'</b> den Wunsch über '+eur(bedarf)+' bereits ab.'+(bedarfKredit>0 ? ' Allerdings läuft die Kreditrate noch '+restJahreKredit+' Jahre in den Ruhestand hinein — dafür werden rund <b>'+eur(bedarfKredit)+'</b> eigenes Kapital gebraucht.' : ' Alles darüber hinaus Angesparte ist Zusatz.');
+
+  // Weiterführende Rechner mit Bezug zur eigenen Lage
+  $('weiterkarte').style.display='';
+  $('weiterhint').textContent='Die Rechner übernehmen deine Angaben automatisch.';
+  $('weiter').innerHTML=
+   karte('Rentenluecke_Rechner.html','Rente im Detail','Ab- und Zuschläge, Steuer auf die Rente und der Kapitalbedarf genauer gerechnet.')+
+   karte('Depot_Steuern_Kosten.html','Was Steuern und Kosten nehmen','Wie viel von der Rendite unterwegs verloren geht.')+
+   karte('Sparplan_Perzentile.html','An der Sparrate drehen','Was ein paar hundert Euro mehr im Monat über die Jahre ausmachen — als Bandbreite, nicht als Punkt.')+
+   (hatVermoegen?karte('Vermoegen_Einordnung.html','Einordnung im Detail','Perzentil, Altersgruppe und die Grenzen der Statistik.'):'')+
+   (immoS>0?karte('Tilgen_oder_Investieren.html','Tilgen oder investieren','Bei laufendem Kredit: was sich mehr lohnt.'):'');
+
+  speichern();
+}
+function karte(href,t,b){return '<a href="'+href+'"><div class=t>'+t+'</div><div class=b>'+b+'</div></a>';}
+
+/* Die Rechnung oben nimmt eine gleichbleibende Rendite an. Genau das ist ihre Schwäche. */
+function zeitreihenHinweis(pleiteNach,jahre){
+  return '<div class=zr>'+
+   '<div class=hl>Was diese Rechnung nicht kann</div>'+
+   '<p>Oben steht <b>eine</b> Zahl, weil <b>eine</b> gleichbleibende Rendite unterstellt wird. So verläuft kein Anlegerleben. '+
+   'Zwei Ruheständler mit identischer Durchschnittsrendite können völlig verschieden enden — es kommt auf die <b>Reihenfolge</b> der Jahre an. '+
+   'Wer die schwachen Jahre am Anfang erwischt, entnimmt aus einem schrumpfenden Depot und dem fehlt später die Substanz.'+
+   (pleiteNach!==null?' Dass die Rechnung hier bereits mit einer glatten Rendite nach '+pleiteNach+' Jahren auf null läuft, macht das umso dringlicher.':'')+'</p>'+
+   '<p>Wie das Ergebnis über <b>alle Startjahre seit 1871</b> ausgesehen hätte — mit Erfolgsquote statt Punktschätzung — zeigen die Werkzeuge auf echten Zeitreihen:</p>'+
+   '<div class=wl>'+
+   karte('Lebenszyklus_Simulator.html','Ein ganzes Finanzleben, durchgerechnet','Ansparen und Entnehmen gekoppelt durch echte historische Sequenzen — Perzentil-Fächer statt einer Zahl, USA oder Deutschland.')+
+   karte('Geschichts_Stresstest.html','Der Geschichts-Stresstest','Hätte der Entnahmeplan in <i>jedem</i> Startjahr gehalten? Erfolgsquote, Spaghetti-Chart und Heatmap der Startjahre.')+
+   '</div></div>';
+}
+
+/* Woher der Kapitalbedarf kommt — offengelegt statt behauptet */
+function herleitung(luecke,jahre,rz,bedarf,rAnspar,jahreBis,liquide,rate,verk,bRente,bKredit,kJahre,kRate,bPuffer,puffer){
+  const jl=luecke*12;
+  const ohneRendite=jl*jahre;
+  const rzT=(rz*100).toLocaleString('de-DE',{minimumFractionDigits:1,maximumFractionDigits:1});
+  return '<div class=herl>'+
+   '<div class=hl>Woher der Kapitalbedarf kommt</div>'+
+   '<table class=hltab><tbody>'+
+   (luecke>0?
+     '<tr><td>Monatliche Lücke</td><td class=r>'+eur(luecke)+'</td></tr>'+
+     '<tr><td>× 12 Monate = jährlicher Bedarf</td><td class=r>'+eur(jl)+'</td></tr>'+
+     '<tr><td>× '+jahre+' Jahre Ruhestand, ohne jede Rendite</td><td class=r>'+eur(ohneRendite)+'</td></tr>'+
+     '<tr'+((bKredit>0||bPuffer>0)?'':' class=erg')+'><td>Barwert bei '+rzT+' % <b>realer</b> Rendite auf das verbleibende Kapital</td><td class=r>'+eur(bRente)+'</td></tr>'
+    :'')+
+   (bKredit>0?
+     '<tr><td>Kreditrate '+eur(kRate)+' im Monat, die noch '+kJahre+' Jahre in den Ruhestand hineinläuft</td><td class=r>'+eur(bKredit)+'</td></tr>'
+    :'')+
+   (bPuffer>0?
+     '<tr><td>Sicherheitspuffer '+eur(puffer)+', der am Ende noch stehen soll — auf den Renteneintritt abgezinst</td><td class=r>'+eur(bPuffer)+'</td></tr>'
+    :'')+
+   ((bKredit>0||bPuffer>0)?
+     '<tr class=erg><td>Kapitalbedarf insgesamt</td><td class=r>'+eur(bedarf)+'</td></tr>'
+    :'')+
+   '</tbody></table>'+
+   (luecke>0?'<div class=hlf>Formel: Bedarf = Jahresbetrag × (1 − (1 + r)<sup>−n</sup>) ÷ r — der Barwert einer über '+jahre+' Jahre real gleichbleibenden Entnahme. '+
+   'Weil das Restkapital weiterarbeitet, liegt der Bedarf um '+eur(ohneRendite-bRente)+' unter der reinen Summe der Entnahmen. '+
+   (bPuffer>0
+     ? 'Am Ende der '+jahre+' Jahre bleibt planmäßig der Sicherheitspuffer von '+eur(puffer)+' stehen — dafür ist der Bedarf um '+eur(bPuffer)+' höher.'
+     : 'Das Kapital ist am Ende der '+jahre+' Jahre planmäßig aufgebraucht.')+'</div>':'')+
+   (bKredit>0?'<div class=hlf>Die Kreditrate ist <b>nominal fest</b> — sie wird deshalb nominal abgezinst und anschließend in heutige Kaufkraft umgerechnet. Dadurch wiegt sie mit den Jahren real leichter. Wird die Immobilie zum Renteneintritt verkauft, entfällt dieser Posten, weil die Restschuld aus dem Erlös getilgt wird.</div>':'')+
+   '<div class=hlf>Die Projektion auf der linken Seite des Balkens rechnet '+eur(liquide)+' liquides Vermögen und '+eur(rate/12)+' Sparrate im Monat über '+jahreBis+' Jahre mit '+(rAnspar*100).toLocaleString('de-DE',{minimumFractionDigits:1,maximumFractionDigits:1})+' % realer Rendite hoch'+
+   (verk>0?', zuzüglich '+eur(verk)+' Nettoerlös aus dem Immobilienverkauf':'')+'. Alle Beträge in heutiger Kaufkraft.</div>'+
+   '</div>';
+}
+function deckungsBalken(ist,soll,deckung,jahre){
+  const p=Math.min(1,deckung), W=720,H=76;
+  return '<svg viewBox="0 0 '+W+' '+H+'" style="margin-top:4px">'+
+   '<text x="0" y="14" font-size="12" fill="#57534c">Voraussichtliches Kapital zum Rentenbeginn in '+jahre+' Jahren gegen den Bedarf</text>'+
+   '<rect x="0" y="26" width="'+W+'" height="26" rx="7" fill="#ece7dd"/>'+
+   '<rect x="0" y="26" width="'+(W*p).toFixed(1)+'" height="26" rx="7" fill="'+(p>=1?'#047857':(p>=0.6?'#a16207':'#b91c1c'))+'"/>'+
+   '<text x="8" y="44" font-size="13" font-weight="700" fill="#fffdfa">'+fmt(ist)+' €</text>'+
+   '<text x="'+W+'" y="70" font-size="11.5" fill="#8b857a" text-anchor="end">Bedarf '+fmt(soll)+' €</text>'+
+   '</svg>';
+}
+
+window.addEventListener('load',()=>{
+  // Profil in die Felder laden
+  const o=Profil.get();
+  Object.keys(MAP).forEach(k=>{const el=$(MAP[k]);if(el&&o[k]!=null){
+    el.value = el.classList.contains('eurin') ? Math.round(o[k]).toLocaleString('de-DE') : o[k];}});
+  if(o.bedarf!=null)$('p_bedarf').value=Math.round(o.bedarf).toLocaleString('de-DE');
+  if(o.renteAlter!=null)$('p_ra').value=o.renteAlter;
+
+  document.querySelectorAll('input.eurin').forEach(el=>el.addEventListener('input',()=>{eurin(el);auswerten();}));
+  ['p_gj','p_ep','p_ra','p_gs','p_rd','p_rn','p_inf','p_kz'].forEach(id=>{
+    const el=$(id); if(el) el.addEventListener('input',auswerten);
+  });
+  const lw=$('p_lw'); if(lw) lw.addEventListener('change',auswerten);
+  // Umschalter über Delegation — bleibt auch dann funktionsfähig, wenn ein Element fehlt
+  document.addEventListener('click',e=>{
+    const b=e.target.closest('#immonutzbox .seg button'); if(!b) return;
+    b.parentElement.querySelectorAll('button').forEach(x=>x.classList.remove('on'));
+    b.classList.add('on'); auswerten();
+  });
+  $('bLeeren').addEventListener('click',()=>{
+    Profil.leeren();
+    document.querySelectorAll('#p_gj,#p_ep,input.eurin').forEach(el=>el.value='');
+    $('p_ra').value=67; auswerten();
+  });
+  auswerten();
+});
+</script>
+</div></body></html>

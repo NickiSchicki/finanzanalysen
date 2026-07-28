@@ -1,0 +1,60 @@
+<!DOCTYPE html><html lang=de><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1">
+<title>Momentum &rarr; Mean-Reversion: marktweit?</title>
+<script src="assets/chart.umd.min.js?v=4"></script>
+<link rel=stylesheet href="assets/site.css?v=4">
+<script defer src="assets/site-map.js?v=4"></script>
+<script defer src="assets/datenstand.js?v=4"></script>
+<script defer src="assets/site.js?v=4"></script>
+<style>
+/* seitenspezifisch */
+.chartbox{position:relative;height:440px;background:transparent;border:0;padding:0;margin:6px 0 18px}
+ul.take{padding:16px 22px 16px 42px;margin:0}
+ul.take li{margin:9px 0}
+ul.take li:first-child{margin-top:0}
+ul.take li:last-child{margin-bottom:0}
+.tbl td.v{font-weight:700}
+.tbl td.neu{color:var(--ink-3)}
+.tbl td.mut{color:var(--ink-3);opacity:.4}
+</style></head><body data-section="Strategien"><div class=wrap>
+<div class=kicker>Sechs M&auml;rkte &middot; Anomalien &amp; Regime</div>
+<h1>Ist der Regimewechsel S&amp;P-spezifisch &mdash; oder <em>marktweit</em>?</h1>
+<p class=lead>Das <a href="SP500_Momentum_MeanReversion.html">Varianz-Ratio VR(10)</a> misst je Dekade, ob ein Markt Bewegungen fortsetzt oder zur Mitte zur&uuml;ckkehrt: Werte &uuml;ber&nbsp;1 stehen f&uuml;r Momentum, Werte unter&nbsp;1 f&uuml;r Mean-Reversion. Sechs M&auml;rkte im direkten Vergleich.</p>
+
+<section class=card>
+<h2>Der Vergleich</h2>
+<h3>Varianz-Ratio je Dekade</h3>
+<p>Gestrichelt = Random Walk (VR&nbsp;=&nbsp;1). Linien darunter = Mean-Reversion. Die US-Aktienindizes (dick) sinken am tiefsten, international bleiben die Werte n&auml;her an&nbsp;1.</p>
+<div class=chartbox><canvas id=cmp></canvas></div>
+<div class=take>Der Befund: <b>nicht S&amp;P-spezifisch, aber auch nicht universell.</b> Am st&auml;rksten und eindeutigsten in <b>US-Aktien</b> (Nasdaq 2,08&rarr;0,80, S&amp;P 1,39&rarr;0,73) &mdash; das alte Momentum ist dort vollst&auml;ndig verschwunden. <b>International</b> (Nikkei, FTSE, DAX) zeigt sich derselbe Trend, aber <b>milder und uneinheitlich</b>: Japan war nie extrem, Gro&szlig;britannien kehrte nach 2000 stark um und erholte sich teils, der DAX liegt in den 2020ern sogar wieder leicht &uuml;ber&nbsp;1. <b>Gold</b> verhielt sich lange wie ein Random Walk und zeigt Mean-Reversion erst in den 2020ern.</div>
+</section>
+
+<section class=card>
+<h2>Die Matrix</h2>
+<h3>VR(10) je Markt und Dekade</h3>
+<table class=tbl><thead><tr><th>Markt</th><th>1950s</th><th>1960s</th><th>1970s</th><th>1980s</th><th>1990s</th><th>2000s</th><th>2010s</th><th>2020s</th></tr></thead><tbody><tr><td><b style=color:#1d4ed8>S&P 500</b></td><td class='v pos'>1.07</td><td class='v pos'>1.39</td><td class='v pos'>1.36</td><td class='v neu'>0.99</td><td class='v neg'>0.86</td><td class='v neg'>0.73</td><td class='v neg'>0.79</td><td class='v neg'>0.80</td></tr><tr><td><b style=color:#059669>Nasdaq</b></td><td class=v mut>&middot;</td><td class=v mut>&middot;</td><td class='v pos'>2.08</td><td class='v pos'>1.91</td><td class='v pos'>1.20</td><td class='v neg'>0.82</td><td class='v neg'>0.82</td><td class='v neg'>0.80</td></tr><tr><td><b style=color:#6d28d9>Nikkei (JP)</b></td><td class=v mut>&middot;</td><td class='v neu'>0.98</td><td class='v pos'>1.19</td><td class='v neg'>0.93</td><td class='v neg'>0.86</td><td class='v neg'>0.84</td><td class='v neg'>0.89</td><td class='v neg'>0.88</td></tr><tr><td><b style=color:#047857>FTSE (UK)</b></td><td class=v mut>&middot;</td><td class=v mut>&middot;</td><td class=v mut>&middot;</td><td class='v pos'>1.28</td><td class='v neu'>0.97</td><td class='v neg'>0.73</td><td class='v neg'>0.88</td><td class='v neu'>0.99</td></tr><tr><td><b style=color:#c2410c>DAX (DE)</b></td><td class=v mut>&middot;</td><td class=v mut>&middot;</td><td class=v mut>&middot;</td><td class=v mut>&middot;</td><td class='v neg'>0.95</td><td class='v neg'>0.87</td><td class='v neg'>0.91</td><td class='v pos'>1.09</td></tr><tr><td><b style=color:#a16207>Gold</b></td><td class=v mut>&middot;</td><td class=v mut>&middot;</td><td class=v mut>&middot;</td><td class=v mut>&middot;</td><td class=v mut>&middot;</td><td class='v neu'>0.97</td><td class='v neg'>0.94</td><td class='v neg'>0.80</td></tr></tbody></table>
+<p class=note style=margin-top:12px>Gr&uuml;n = Momentum (&ge;1,05), rot = Mean-Reversion (&le;0,95), grau = neutral. Punkt = keine Daten (Index startete sp&auml;ter).</p>
+</section>
+
+<section class=card>
+<h2>Einordnung</h2>
+<h3>Was das bedeutet</h3>
+<ul class=take>
+<li><b>Ein US-Aktien-Ph&auml;nomen, nicht nur ein S&amp;P-Ph&auml;nomen.</b> S&amp;P und Nasdaq kippten gemeinsam und am deutlichsten. Nasdaqs 70er-Momentum (VR&nbsp;2,08) lag sogar &uuml;ber dem des S&amp;P.</li>
+<li><b>Teilweise global, aber abgeschw&auml;cht.</b> Auch internationale Indizes verloren ihr Momentum, jedoch weniger klar &mdash; passend dazu, dass <a href="SP500_Anomalien_aktuell.html">die mutma&szlig;lichen Treiber</a> (ETF-Arbitrage, 0DTE-Optionen, elektronisches Market-Making, Dip-Buying) <b>in US-M&auml;rkten am ausgepr&auml;gtesten</b> sind.</li>
+<li><b>Kein universelles Gesetz.</b> DAX und FTSE liegen zuletzt nahe am Random Walk, Gold ist erst k&uuml;rzlich mean-reverting. Die <a href="SP500_MeanReversion_Strategie.html">&bdquo;Mean-Reversion-&Auml;ra&ldquo; ist real</a>, aber kein Naturgesetz f&uuml;r alle Anlageklassen.</li>
+</ul>
+<p class=note><b>Einschr&auml;nkung:</b> International und Gold haben k&uuml;rzere Historien (keine Momentum-Basis aus den 60er- und 70er-Jahren), <a href="SP500_Statistik_Appendix.html">kleinere j&uuml;ngste Stichproben</a>, Indizes in Lokalw&auml;hrung.</p>
+</section>
+
+<div class=foot>Eigene Berechnung, t&auml;gliche Schlusskurse (Yahoo Finance: ^GSPC, ^IXIC, ^N225, ^FTSE, ^GDAXI, GC=F). VR(10)=1+2&Sigma;(1&minus;k/10)&rho;&#8342; je Dekade. DAX-1980er ausgelassen (zu wenige Tage). 2020er = ~6,5 Jahre.</div>
+</div>
+<script>
+const P={"labels": ["1950er", "1960er", "1970er", "1980er", "1990er", "2000er", "2010er", "2020er"], "assets": [{"n": "S&P 500", "c": "#1d4ed8", "d": [1.07, 1.39, 1.36, 0.99, 0.86, 0.73, 0.79, 0.8]}, {"n": "Nasdaq", "c": "#059669", "d": [null, null, 2.08, 1.91, 1.2, 0.82, 0.82, 0.8]}, {"n": "Nikkei (JP)", "c": "#6d28d9", "d": [null, 0.98, 1.19, 0.93, 0.86, 0.84, 0.89, 0.88]}, {"n": "FTSE (UK)", "c": "#047857", "d": [null, null, null, 1.28, 0.97, 0.73, 0.88, 0.99]}, {"n": "DAX (DE)", "c": "#c2410c", "d": [null, null, null, null, 0.95, 0.87, 0.91, 1.09]}, {"n": "Gold", "c": "#a16207", "d": [null, null, null, null, null, 0.97, 0.94, 0.8]}]};
+Chart.defaults.font.family="-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif";
+Chart.defaults.color="#57534c";
+const ds=P.assets.map(a=>({label:a.n,data:a.d,borderColor:a.c,backgroundColor:a.c,borderWidth:(a.n=='S&P 500'||a.n=='Nasdaq')?3:1.8,pointRadius:3,spanGaps:true,tension:.2}));
+ds.push({label:'Random Walk (VR=1)',data:P.labels.map(()=>1),borderColor:'#8b857a',borderWidth:1.5,borderDash:[6,5],pointRadius:0});
+new Chart(document.getElementById('cmp'),{type:'line',data:{labels:P.labels,datasets:ds},options:{maintainAspectRatio:false,scales:{
+ y:{min:0.6,max:2.15,title:{display:true,text:'VR(10) — Varianz-Ratio'},grid:{color:c=>Math.abs(c.tick.value-1)<0.001?'#d5cec1':'#ece7dd'}},
+ x:{grid:{display:false}}},plugins:{legend:{labels:{usePointStyle:true,boxWidth:8}},tooltip:{callbacks:{label:it=>it.dataset.label+': '+(it.parsed.y==null?'—':it.parsed.y)}}}}});
+</script></body></html>

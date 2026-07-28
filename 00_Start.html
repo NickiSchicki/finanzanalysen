@@ -1,0 +1,946 @@
+<!DOCTYPE html><html lang=de><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1">
+<title>Finanzanalysen — was 150 Jahre Marktdaten für dein Geld bedeuten</title>
+<meta name=description content="Ertrag, Preis und Pfad: was Aktien real lieferten, wie teuer der Markt heute steht und was daraus für die eigene Altersvorsorge folgt. Alles nachgerechnet, alles im Browser.">
+<link rel=stylesheet href="assets/site.css?v=4">
+<script defer src="assets/site-map.js?v=4"></script>
+<script defer src="assets/datenstand.js?v=4"></script>
+<script defer src="assets/profil.js?v=4"></script>
+<script defer src="assets/de-rente.js?v=4"></script>
+<script defer src="assets/de-vermoegen.js?v=4"></script>
+<script defer src="assets/site.js?v=4"></script>
+<style>
+/* ===== Startseite: eigene Bausteine ======================================= */
+
+/* — Aufmacher — */
+.mast{padding:22px 0 30px;border-bottom:1px solid var(--rule)}
+.mast h1{font-size:clamp(40px,6.6vw,78px);line-height:.98;margin:0 0 20px;letter-spacing:-.03em}
+.mast .lead{font-size:19px;max-width:62ch;margin-bottom:0}
+.trio{display:grid;grid-template-columns:repeat(3,1fr);gap:0;margin-top:34px;border-top:1px solid var(--rule)}
+.trio>div{padding:20px 22px 4px;border-right:1px solid var(--rule)}
+.trio>div:last-child{border-right:0}
+.trio>div:first-child{padding-left:0}
+.trio .n{font-family:var(--serif);font-size:clamp(34px,4.6vw,50px);font-weight:700;line-height:1;letter-spacing:-.03em}
+.trio .n.a{color:var(--accent)}
+.trio .n.g{color:var(--good)}
+.trio .t{font-size:13.5px;line-height:1.45;color:var(--ink-2);margin-top:9px;max-width:32ch}
+.trio .q{font-size:11px;color:var(--ink-3);margin-top:8px}
+.trio .q a{color:var(--ink-3);border-bottom:1px solid var(--rule)}
+.trio .q a:hover{color:var(--accent);border-color:var(--accent)}
+@media(max-width:760px){
+  .trio{grid-template-columns:1fr}
+  .trio>div{border-right:0;border-bottom:1px solid var(--rule);padding:16px 0 14px}
+  .trio>div:last-child{border-bottom:0}
+}
+
+/* — Dein Stand: der personalisierte Block — */
+.mein{background:var(--ink);color:#f2ede4;border-radius:16px;padding:26px 28px;margin:34px 0 0}
+.mein h2{font-family:var(--serif);font-size:27px;font-weight:700;text-transform:none;letter-spacing:-.018em;
+  color:#fff;margin:0 0 8px;line-height:1.15}
+.mein .hl{font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.16em;color:#b9b0a1;margin-bottom:10px}
+.mein p{color:#cdc5b8;font-size:14.5px;line-height:1.6;margin:0 0 18px;max-width:74ch}
+.mein p b{color:#fff}
+.meinform{display:grid;grid-template-columns:repeat(auto-fit,minmax(148px,1fr));gap:12px;align-items:end}
+.meinform label{display:block;font-size:11.5px;color:#b9b0a1;margin-bottom:5px}
+.meinform input{width:100%;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.18);border-radius:9px;
+  padding:10px 12px;font-family:var(--sans);font-size:15px;font-weight:600;color:#fff;font-variant-numeric:tabular-nums}
+.meinform input:focus{outline:2px solid var(--accent);outline-offset:1px;background:rgba(255,255,255,.11)}
+.meinform input::placeholder{color:#8b8377;font-weight:400}
+.meinszen{margin-top:20px}
+.meinszen .sl{display:block;font-size:11.5px;color:#b9b0a1;margin-bottom:6px}
+.meinszen .seg{border-color:rgba(255,255,255,.2);max-width:600px}
+.meinszen .seg button{color:#cdc5b8;background:transparent;border-right-color:rgba(255,255,255,.2);padding:9px 6px}
+.meinszen .seg button:hover{color:#fff}
+.meinszen .seg button.on{background:var(--accent);color:#fff}
+.meinszen .sh{font-size:11.5px;color:#8b8377;margin-top:7px;line-height:1.5;max-width:74ch}
+.meinbsp{display:inline-block;font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.13em;
+  color:#f0b48b;border:1px solid rgba(240,180,139,.4);border-radius:5px;padding:3px 8px;margin-top:20px}
+.meinerg{display:grid;grid-template-columns:repeat(auto-fit,minmax(168px,1fr));gap:10px;margin-top:12px}
+.meinerg>div{background:#232019;border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:15px 17px}
+.meinerg .l{font-size:11px;color:#b9b0a1;line-height:1.35}
+.meinerg .v{font-family:var(--serif);font-size:29px;font-weight:700;color:#fff;margin-top:5px;line-height:1;letter-spacing:-.02em}
+.meinerg .s{font-size:11px;color:#948b7e;margin-top:6px;line-height:1.45}
+.meinsatz{font-size:14.5px;line-height:1.6;color:#cdc5b8;margin:18px 0 0;max-width:74ch}
+.meinsatz b{color:#fff}
+.meinfoot{display:flex;flex-wrap:wrap;gap:9px;align-items:center;margin-top:18px}
+.meinfoot a{display:inline-block;font-size:12.5px;font-weight:600;color:#f2ede4;text-decoration:none;
+  border:1px solid rgba(255,255,255,.25);border-radius:8px;padding:7px 13px}
+.meinfoot a:hover{border-color:var(--accent);background:rgba(194,65,12,.22)}
+.meinfoot a.pri{background:var(--accent);border-color:var(--accent);color:#fff}
+.meinfoot .hinw{font-size:11.5px;color:#8b8377;margin-left:auto;text-align:right}
+.meinfoot button{font-family:var(--sans);font-size:11.5px;color:#8b8377;background:none;border:0;cursor:pointer;
+  text-decoration:underline;padding:0}
+.meinfoot button:hover{color:#cdc5b8}
+@media(max-width:600px){.mein{padding:22px 20px}.meinfoot .hinw{margin-left:0;width:100%;text-align:left}}
+
+/* — Befunde: eine Zahl, ein Satz, eine Quelle — */
+.bef{display:grid;grid-template-columns:repeat(auto-fill,minmax(266px,1fr));gap:1px;background:var(--rule);
+  border:1px solid var(--rule);border-radius:14px;overflow:hidden}
+.bef a{display:block;background:var(--card);padding:19px 21px 17px;text-decoration:none;color:inherit;transition:background .15s}
+.bef a:hover{background:var(--card-2)}
+.bef .n{font-family:var(--serif);font-size:31px;font-weight:700;letter-spacing:-.025em;line-height:1.05;color:var(--ink)}
+.bef .n.a{color:var(--accent)}.bef .n.g{color:var(--good)}.bef .n.b{color:var(--bad)}
+.bef .t{font-size:13.5px;line-height:1.5;color:var(--ink-2);margin-top:9px}
+.bef .q{font-size:10.5px;text-transform:uppercase;letter-spacing:.11em;color:var(--ink-3);margin-top:11px}
+.bef a:hover .q{color:var(--accent)}
+
+/* — Perzentil-Streifen — */
+.pz{margin-top:4px}
+.pzr{display:grid;grid-template-columns:minmax(150px,240px) 1fr 48px;gap:14px;align-items:center;
+  padding:9px 0;border-bottom:1px solid var(--rule-soft)}
+.pzr:last-child{border-bottom:0}
+.pzr .k{font-size:13px;font-weight:600;color:var(--ink);line-height:1.3}
+.pzr .k span{display:block;font-size:11px;font-weight:400;color:var(--ink-3);margin-top:2px}
+.pzr .bar{position:relative;height:9px;border-radius:5px;background:var(--card-2);border:1px solid var(--rule-soft)}
+.pzr .bar i{position:absolute;top:0;bottom:0;border-radius:5px;display:block}
+.pzr .bar u{position:absolute;top:-3px;bottom:-3px;width:1px;background:var(--ink-3);opacity:.45;left:50%}
+.pzr .p{font-family:var(--serif);font-size:15px;font-weight:700;text-align:right;font-variant-numeric:tabular-nums}
+.pzskala{display:grid;grid-template-columns:minmax(150px,240px) 1fr 48px;gap:14px;font-size:10.5px;color:var(--ink-3);margin-top:7px}
+.pzskala .s{display:flex;justify-content:space-between}
+@media(max-width:640px){
+  .pzr{grid-template-columns:1fr 48px;row-gap:7px}
+  .pzr .k{grid-column:1/3}.pzr .bar{grid-column:1/2}
+  .pzskala{grid-template-columns:1fr 48px}.pzskala>div:first-child{display:none}
+}
+
+/* — Charts — */
+.chartbox{position:relative;margin-bottom:20px}
+.chartbox h3{margin:0 0 3px;font-size:19px}
+.chartbox .ch-s{font-size:13.5px;color:var(--ink-2);line-height:1.55;margin:0 0 14px;max-width:76ch}
+.chtip{position:absolute;z-index:20;pointer-events:none;background:var(--ink);color:#f2ede4;font-size:12px;line-height:1.45;
+  padding:7px 10px;border-radius:8px;white-space:nowrap;box-shadow:0 6px 18px rgba(28,26,23,.18)}
+.chtip b{color:#fff}
+.chtab{margin-top:12px}
+.chtab-b{font-family:var(--sans);font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.11em;
+  color:var(--ink-3);background:none;border:1px solid var(--rule);border-radius:7px;padding:6px 11px;cursor:pointer}
+.chtab-b:hover{color:var(--accent);border-color:var(--accent)}
+.chtab-i{margin-top:11px;overflow-x:auto}
+.chartbox .legend{margin-top:12px;gap:16px}
+.chartbox .legend span{display:inline-flex;align-items:center}
+.chnote{font-size:12px;line-height:1.55;color:var(--ink-3);margin:12px 0 0;max-width:78ch}
+.chnote a{color:var(--ink-3);border-bottom:1px solid var(--rule)}
+.chnote a:hover{color:var(--accent);border-color:var(--accent)}
+
+/* — Die Zeitreihen-Werkzeuge, hervorgehoben — */
+.zr{border-left:3px solid var(--accent)}
+.zr .hl{font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.15em;color:var(--accent);margin-bottom:9px}
+.zr>h3{margin:0 0 8px}
+.zr>p{font-size:14.5px;line-height:1.6;color:var(--ink-2);max-width:74ch;margin:0 0 18px}
+.zrpaar{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media(max-width:820px){.zrpaar{grid-template-columns:1fr}}
+.zrpaar a{display:block;background:var(--card-2);border:1px solid var(--rule);border-radius:12px;
+  padding:18px 20px;text-decoration:none;color:inherit;transition:border-color .15s,transform .15s}
+.zrpaar a:hover{border-color:var(--accent);transform:translateY(-2px)}
+.zrpaar .zk{display:block;font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.13em;color:var(--accent)}
+.zrpaar .zt{display:block;font-family:var(--serif);font-size:20px;font-weight:700;letter-spacing:-.015em;
+  line-height:1.2;color:var(--ink);margin:6px 0 7px}
+.zrpaar .zb{display:block;font-size:13px;line-height:1.55;color:var(--ink-2)}
+.zrpaar .zo{display:block;font-size:11px;text-transform:uppercase;letter-spacing:.13em;color:var(--accent);
+  font-weight:700;margin-top:11px}
+
+/* — Der rote Faden — */
+.faden{position:relative;padding-left:30px;margin-top:6px}
+.faden::before{content:"";position:absolute;left:8px;top:9px;bottom:22px;width:2px;background:var(--rule)}
+.fst{position:relative;padding:0 0 26px}
+.fst:last-child{padding-bottom:0}
+.fst::before{content:"";position:absolute;left:-26px;top:5px;width:10px;height:10px;border-radius:50%;
+  background:var(--paper);border:2px solid var(--accent)}
+.fst .fk{font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.14em;color:var(--accent)}
+.fst h3{font-family:var(--serif);font-size:20px;font-weight:700;letter-spacing:-.015em;margin:4px 0 6px}
+.fst p{font-size:14.5px;line-height:1.6;color:var(--ink-2);margin:0 0 10px;max-width:72ch}
+.fst p b{color:var(--ink)}
+.fl{display:flex;flex-wrap:wrap;gap:7px}
+.fl a{font-size:12px;color:var(--ink-2);text-decoration:none;border:1px solid var(--rule);border-radius:7px;padding:4px 10px}
+.fl a:hover{color:var(--accent);border-color:var(--accent)}
+
+/* — Werkzeuge, nach Frage sortiert — */
+.wz{display:grid;grid-template-columns:repeat(auto-fill,minmax(310px,1fr));gap:14px}
+.wzk{background:var(--card);border:1px solid var(--rule);border-radius:13px;padding:18px 20px}
+.wzk .frage{font-family:var(--serif);font-style:italic;font-size:18px;font-weight:700;color:var(--accent);
+  letter-spacing:-.01em;line-height:1.25;margin-bottom:12px}
+.wzk a{display:block;text-decoration:none;color:inherit;padding:9px 0;border-top:1px solid var(--rule-soft)}
+.wzk a:first-of-type{border-top:0;padding-top:0}
+.wzk a:last-of-type{padding-bottom:0}
+.wzk a .t{font-size:14px;font-weight:600;color:var(--ink);line-height:1.35}
+.wzk a .b{font-size:12.5px;color:var(--ink-3);line-height:1.45;margin-top:2px}
+.wzk a:hover .t{color:var(--accent)}
+
+/* — Methodik — */
+.meth{display:grid;grid-template-columns:repeat(auto-fit,minmax(228px,1fr));gap:22px}
+.meth h4{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:var(--ink-3);margin:0 0 7px}
+.meth p{font-size:13px;line-height:1.6;color:var(--ink-2);margin:0}
+.meth a{color:var(--ink-2);border-bottom:1px solid var(--rule)}
+.meth a:hover{color:var(--accent);border-color:var(--accent)}
+</style>
+</head><body><div class=wrap>
+
+<!-- ============================ Aufmacher ============================ -->
+<div class=mast>
+<div class=kicker>Eigene Berechnungen &middot; Shiller &middot; FRED &middot; Jord&agrave;-Schularick-Taylor &middot; Bundesbank</div>
+<h1>Ertrag, Preis <em>und Pfad</em></h1>
+<p class=lead>Drei Zahlen entscheiden, was aus deinem Geld wird: was der Markt langfristig abwirft, zu welchem Preis du heute einsteigst und was der Weg dorthin unterwegs mit dir macht. Diese Seite zeigt alle drei &mdash; aus 150 Jahren Daten nachgerechnet, in echter Kaufkraft, und &uuml;bersetzt in deine eigene Lage.</p>
+<div class=trio>
+  <div><div class="n g" id=t_ertrag>7,1 %</div>
+    <div class=t><b>Ertrag.</b> So viel warfen US-Aktien seit 1871 real pro Jahr ab &mdash; nach Inflation, mit Dividenden.</div>
+    <div class=q>155 Jahre &middot; <a href="Lebenszyklus_Simulator.html">Shiller-Reihe</a></div></div>
+  <div><div class="n a" id=t_preis>98. Perzentil</div>
+    <div class=t><b>Preis.</b> Teurer als heute war der US-Markt in seiner ganzen Geschichte nur in zwei Prozent aller Jahre.</div>
+    <div class=q>Shiller-CAPE <span id=t_cape>40,0</span> &middot; <a href="Standortbestimmung_Maerkte_2026.html">Standortbestimmung</a></div></div>
+  <div><div class=n>92 %</div>
+    <div class=t><b>Pfad.</b> An so vielen Handelstagen seit 1950 stand der Index unter einem fr&uuml;heren H&ouml;chstkurs. Ob ein Plan das aush&auml;lt, entscheidet die <em>Reihenfolge</em> der Jahre.</div>
+    <div class=q><a href="SP500_Drawdown_Pfadrisiko.html">Drawdown</a> &middot; <a href="Geschichts_Stresstest.html">Stresstest &uuml;ber alle Startjahre</a></div></div>
+</div>
+
+<!-- ======================= Dein Stand, personalisiert ================ -->
+<section class=mein id=mein>
+<div class=hl>Dein Stand</div>
+<h2>Was hei&szlig;t das f&uuml;r dich?</h2>
+<p id=mein_p>Vier Angaben gen&uuml;gen f&uuml;r ein erstes Bild: gesetzliche Rente, Einordnung im Land und das, was am Ende monatlich zur Verf&uuml;gung steht. Die Eingaben bleiben ausschlie&szlig;lich in diesem Browser und werden f&uuml;r alle Rechner dieser Seite &uuml;bernommen.</p>
+<div class=meinform>
+  <div><label for=m_gj>Geburtsjahr</label><input type=text inputmode=numeric id=m_gj placeholder="1985"></div>
+  <div><label for=m_brutto>Bruttojahresgehalt</label><input type=text inputmode=numeric id=m_brutto placeholder="60.000"></div>
+  <div><label for=m_verm>Netto&shy;verm&ouml;gen heute</label><input type=text inputmode=numeric id=m_verm placeholder="120.000"></div>
+  <div><label for=m_rate>Sparrate im Monat</label><input type=text inputmode=numeric id=m_rate placeholder="500"></div>
+</div>
+<div class=meinszen>
+  <span class=sl>Angenommene reale Rendite</span>
+  <div class="seg tone" id=m_szen>
+    <button type=button data-r="7.1">7,1 % — historischer Schnitt</button>
+    <button type=button data-r="4.0" class=on>4,0 % — vorsichtig</button>
+    <button type=button data-r="2.0">2,0 % — was CAPE 40 impliziert</button>
+  </div>
+  <div class=sh id=m_szen_h></div>
+</div>
+<div id=mein_out></div>
+<div class=meinfoot>
+  <a class=pri href="Mein_Vermoegensbild.html">Vollst&auml;ndiges Verm&ouml;gensbild &rarr;</a>
+  <a href="Lebenszyklus_Simulator.html">Durch die echte Geschichte rechnen</a>
+  <a href="Rentenluecke_Rechner.html">Rente im Detail</a>
+  <span class=hinw id=mein_hinw>Nur lokal gespeichert &middot; <button type=button id=mein_leeren>leeren</button></span>
+</div>
+</section>
+</div>
+
+<!-- ============================== Befunde ============================ -->
+<div class=sechead><span class=num>01</span><h2>Zw&ouml;lf Befunde, die die Intuition korrigieren</h2><span class=line></span></div>
+<p class=lead style="margin-bottom:18px">Jede Zahl stammt aus einer der Analysen dieses Projekts und f&uuml;hrt per Klick dorthin.</p>
+<div class=bef>
+<a href="SP500_Taleb_Analyse.html"><div class="n a">20,7 &sigma;</div><div class=t>So weit lag der Kurssturz vom 19. Oktober 1987 unter dem Mittel. Unter einer Glockenkurve w&auml;re das ein Ereignis, das einmal in 10<sup>92</sup> Jahren vorkommt &mdash; es kam.</div><div class=q>Die Diktatur der seltenen Tage &rarr;</div></a>
+<a href="SP500_Taleb_Analyse.html"><div class=n>&minus;57 %</div><div class=t>So viel Endverm&ouml;gen kostete es, in 76 Jahren nur die zehn besten B&ouml;rsentage zu verpassen: aus dem 441-Fachen wurde das 192-Fache.</div><div class=q>Die Diktatur der seltenen Tage &rarr;</div></a>
+<a href="SP500_10Jahres_Renditeverteilung.html"><div class="n a">18 % statt 1,4 %</div><div class=t>So viele Zehnjahresfenster endeten real mit Kaufkraftverlust. Nominal waren es nur 1,4 % &mdash; der ganze Unterschied liegt in der Inflation.</div><div class=q>Wie sicher sind zehn Jahre? &rarr;</div></a>
+<a href="SP500_Drawdown_Pfadrisiko.html"><div class=n>&minus;19 %</div><div class=t>So tief fiel der Markt selbst im ruhigsten Jahrzehnt der Historie. In 93 % aller Zehnjahresfenster war es mehr.</div><div class=q>Drawdown und Pfadrisiko &rarr;</div></a>
+<a href="Lebenszyklus_Simulator.html"><div class="n g">456 &euro; vs. 25.853 &euro;</div><div class=t>So viel wurde real aus einem Euro von 1871 bis 2020 &mdash; in deutschen Aktien und im S&amp;P&nbsp;500. Derselbe Zeitraum, das 57-Fache Unterschied. In deutschen Anleihen und im Sparbuch wurde daraus fast nichts.</div><div class=q>Ein ganzes Finanzleben &rarr;</div></a>
+<a href="Geschichts_Stresstest.html"><div class="n b">28 Jahre</div><div class=t>So lange hielt das Kapital eines Ruhest&auml;ndlers, der 1966 mit 4 % Entnahmerate startete. Danach war es leer &mdash; bei Start 1932 blieb am Ende das 9,7-Fache.</div><div class=q>Der Geschichts-Stresstest &rarr;</div></a>
+<a href="Vermoegen_Einordnung.html"><div class=n>103.300 &euro;</div><div class=t>So hoch ist der Median des Nettoverm&ouml;gens deutscher Haushalte. Renten- und Pensionsanwartschaften sind darin nicht enthalten.</div><div class=q>Wo dieses Verm&ouml;gen steht &rarr;</div></a>
+<a href="Immobilien_Investitionsrechner.html"><div class="n a">42 % ab 69.878 &euro;</div><div class=t>Dort greift 2026 der Spitzensteuersatz &mdash; die 45 % beginnen erst bei 277.825 &euro;. Wer eine Immobilie abschreibt, rechnet gegen genau diesen Satz.</div><div class=q>Die vermietete Wohnung &rarr;</div></a>
+<a href="SP500_vs_Geldmenge_M2.html"><div class=n>r&sup2; = 0,01</div><div class=t>So viel der j&auml;hrlichen Schwankung des S&amp;P 500 erkl&auml;rt das Wachstum der Geldmenge M2. Also praktisch nichts.</div><div class=q>H&auml;ngt der Markt am Geld? &rarr;</div></a>
+<a href="USA_Geld_Inflation_Sachwerte.html"><div class="n b">+0,1 % pro Jahr</div><div class=t>So viel legte der US-Stundenlohn in der Produktion zwischen 1971 und 2025 real zu. Die Verm&ouml;genspreise stiegen im selben Zeitraum um ein Vielfaches.</div><div class=q>USA: Geld, Inflation, Sachwerte &rarr;</div></a>
+<a href="USA_KGV_vs_10Jahresrendite.html"><div class=n>KGV&nbsp;71 vs. CAPE&nbsp;15</div><div class=t>Im Januar 2009 zeigte das schlichte Kurs-Gewinn-Verh&auml;ltnis den teuersten Markt aller Zeiten &mdash; das CAPE einen spottbilligen. Es folgten real 11,7 % pro Jahr.</div><div class=q>Das nackte KGV misst schlechter &rarr;</div></a>
+<a href="Alles_in_Gold_gerechnet.html"><div class="n a">27-fach &harr; &minus;63 %</div><div class=t>Gemessen ab 1980 stieg der S&amp;P&nbsp;500 gegen Gold auf das 27-Fache &mdash; gemessen ab 2000 verlor er 63&nbsp;% gegen Gold. Dieselben M&auml;rkte, nur ein anderes Startjahr.</div><div class=q>Alles in Gold gerechnet &rarr;</div></a>
+<a href="SP500_Statistik_Appendix.html"><div class=n>7,7 Dekaden</div><div class=t>So viele wirklich unabh&auml;ngige Jahrzehnte stecken in 16.728 &uuml;berlappenden Zehnjahresfenstern. Jede Aussage &uuml;ber „die&nbsp;Dekade&ldquo; ruht auf sehr wenig.</div><div class=q>Wie belastbar sind die Sch&auml;tzungen? &rarr;</div></a>
+</div>
+
+<!-- ====================== Wo die Märkte heute stehen ================= -->
+<div class=sechead><span class=num>02</span><h2>Wo die M&auml;rkte heute stehen</h2><span class=line></span></div>
+<section class=card>
+<h2>Die Scorecard</h2>
+<h3>Jede Kennzahl als Perzentil ihrer eigenen Geschichte</h3>
+<p>0 = historisch niedrig, 50 = Median, 100 = historisches Extrem. Fast alles steht am Rand: oben teuer und konzentriert, unten der Geldumlauf und die erwartete Rendite.</p>
+<div class=pz id=pz></div>
+<div class=pzskala><div></div><div class=s><span>0</span><span>Median</span><span>100</span></div><div></div></div>
+<p class=note style="margin-top:14px" id=pz_ich></p>
+<p class=note style="margin-top:16px">Bewertungsperzentil eigene Rechnung auf der Shiller-Reihe 1871&ndash;2026; Konzentration, Margen und Umlaufgeschwindigkeit &uuml;bernommen aus der <a href="Standortbestimmung_Maerkte_2026.html">Standortbestimmung 2026</a>, dort mit Quellen. Eine Einordnung, keine Prognose.</p>
+</section>
+
+<!-- ============================== Vier Bilder ======================== -->
+<div class=sechead><span class=num>03</span><h2>F&uuml;nf Bilder, die alles Weitere erkl&auml;ren</h2><span class=line></span></div>
+
+<section class=chartbox>
+<h3>Das wichtigste Bild: die Reihenfolge entscheidet, nicht der Durchschnitt</h3>
+<p class=ch-s>Ein und derselbe Plan &mdash; Kapital vollst&auml;ndig in Aktien, jedes Jahr 4&nbsp;% der Anfangssumme entnommen, dreißig Jahre lang, alles real. Nur das <b>Startjahr</b> unterscheidet sich. Jeder Punkt auf der Kurve ist ein Ruhestand, der wirklich so h&auml;tte verlaufen k&ouml;nnen.</p>
+<div id=ch_seq></div>
+<p class=chnote>In den USA endete keines der 126&nbsp;Startjahre bei null &mdash; im Median blieb nach dreißig Jahren noch das <b>3,3-Fache</b> des Startkapitals &uuml;brig, 1966 aber nur das 0,03-Fache. In Deutschland ging in <b>48 von 121</b> Startjahren das Geld aus, Median 0,66-Fach. <b>46</b> dieser Pleiten liegen in Fenstern, die <b>1923 oder 1948</b> enthalten &mdash; es sind also &uuml;berwiegend die beiden W&auml;hrungszusammenbr&uuml;che, nicht die Unternehmen. Die restlichen zwei (Start 1961 und 1962) gingen allein an der deutschen Aktienbaisse der Sechziger und Siebziger zugrunde.<br><br>
+Zwei Vorbehalte, die das Bild ehrlich halten: Ab Startjahr <b>1963</b> ging kein deutscher Jahrgang mehr pleite (Median 2,5-Fach) &mdash; aber die Grenze liegt nur knapp hinter den beiden Ausf&auml;llen von 1961/62, das ist kein Sicherheitsabstand. Und beide Null-Aussagen h&auml;ngen an einer Rechenkonvention: entnimmt man am <i>Jahresanfang</i> statt am Jahresende, kippt sowohl der US-Jahrgang 1966 als auch der deutsche 1970 ins Minus. Mit Anleihen im Depot ohnehin: bei 60&nbsp;% Aktien war f&uuml;r 1966 nach 26 Jahren Schluss. <a href="Geschichts_Stresstest.html">Das im Einzelnen nachrechnen &rarr;</a><span id=bez_seq></span></p>
+</section>
+
+<section class="card zr">
+<div class=hl>Die zwei Werkzeuge, die auf echten Zeitreihen laufen</div>
+<h3>Nicht eine Zahl, sondern jeder Verlauf, den es gab</h3>
+<p>Alles auf dieser Seite bis auf das Bild oben unterstellt <b>eine</b> gleichbleibende Rendite. Das tut keine Wirklichkeit. Die beiden folgenden Rechner nehmen stattdessen die tats&auml;chlichen Jahresfolgen seit 1871 und lassen deinen Plan durch jede einzelne davon laufen &mdash; mit Erfolgsquote statt Punktsch&auml;tzung, wahlweise USA oder Deutschland.</p>
+<div class=zrpaar>
+<a href="Lebenszyklus_Simulator.html"><span class=zk>Ansparen und Entnehmen</span><span class=zt>Ein ganzes Finanzleben, durchgerechnet</span><span class=zb>Beide Phasen gekoppelt durch dieselbe historische Sequenz &mdash; Perzentil-F&auml;cher, Portfolio-Mix, Glidepath, Leitplanken. USA mit CAPE-Startfilter oder Deutschland inklusive 1923 und 1948.</span><span class=zo>&Ouml;ffnen &rarr;</span></a>
+<a href="Geschichts_Stresstest.html"><span class=zk>H&auml;tte der Plan gehalten?</span><span class=zt>Der Geschichts-Stresstest</span><span class=zb>Dein Entnahmeplan gegen <i>jedes</i> Startjahr seit 1871: Erfolgsquote, Spaghetti-Chart aller Pfade und eine Heatmap, die zeigt, welche Jahrg&auml;nge es traf und welche nicht.</span><span class=zo>&Ouml;ffnen &rarr;</span></a>
+</div>
+</section>
+
+<section class=chartbox>
+<h3>Was der Einstiegspreis &uuml;ber die n&auml;chste Dekade verr&auml;t</h3>
+<p class=ch-s>Jeder Punkt ist ein Startjahr: links die Bewertung beim Einstieg, unten die reale Rendite der zehn Jahre danach. Die Wolke ist breit &mdash; teuer hei&szlig;t nie <i>sicher&nbsp;schlecht</i>. Aber die Mitte kippt: vom g&uuml;nstigsten zum teuersten F&uuml;nftel f&auml;llt der Median von 10,6 auf 4,6&nbsp;% im Jahr, und der Anteil der Startjahre, die real Geld verloren, steigt von null auf 21&nbsp;%.</p>
+<div id=ch_cape></div>
+<p class=chnote>Reale Gesamtrendite des S&amp;P 500 nach Shiller, Startjahre 1872&ndash;2016, jeweils zum Jahresanfang. Der Zusammenhang erkl&auml;rt rund 28&nbsp;% der Streuung &mdash; viel f&uuml;r eine einzelne Kennzahl und trotzdem weit von einer Prognose entfernt. <a href="USA_CAPE_vs_10Jahresrendite.html">Ausf&uuml;hrlich mit Regression und Gegenbeispielen &rarr;</a></p>
+</section>
+
+<section class=chartbox>
+<h3>Die Rendite kommt nicht in gleichen Scheiben</h3>
+<p class=ch-s>Dieselbe Datenreihe, anders geschnitten: Wie oft endeten zehn Jahre real wo? Der Median liegt bei 7,2&nbsp;% pro Jahr &mdash; aber das schw&auml;chste Zehntel der Startjahre kam nur auf 0,1&nbsp;%, und vierzehn von 146 Jahrg&auml;ngen verloren real Geld.</p>
+<div id=ch_zehn></div>
+<p class=chnote>Startjahre jeweils zum Jahresanfang, deshalb 146&nbsp;F&auml;lle. Rechnet man &uuml;berlappende Monatsfenster, steigt der Anteil realer Verlust-Dekaden auf 18&nbsp;% &mdash; dieselbe Geschichte, feiner abgetastet. &Uuml;ber <b>zwanzig</b> Jahre gab es dagegen kein einziges reales Verlustfenster; das schw&auml;chste lag bei +0,9&nbsp;% pro Jahr. <a href="SP500_10Jahres_Renditeverteilung.html">Die Verteilung im Detail &rarr;</a><span id=bez_zehn></span></p>
+</section>
+
+<section class=chartbox>
+<h3>Der Weg dorthin f&uuml;hrt fast immer unter Wasser</h3>
+<p class=ch-s>Abstand zum h&ouml;chsten jemals erreichten realen Stand, Jahr f&uuml;r Jahr. Fast die H&auml;lfte aller Jahre endete unterhalb eines fr&uuml;heren Hochs, 1932 lag der Index real 47&nbsp;% darunter, und nach dem Hoch von 2000 dauerte es dreizehn Jahre bis zur R&uuml;ckkehr. Wer 7,1&nbsp;% pro Jahr will, muss das aushalten.</p>
+<div id=ch_uw></div>
+<p class=chnote>Jahresendst&auml;nde des realen Gesamtrendite-Index. Auf Tagesbasis gemessen liegt der Anteil der Zeit unter einem alten Hoch bei 92&nbsp;%, weil auch kleine Rutsche mitz&auml;hlen. <a href="SP500_Drawdown_Pfadrisiko.html">Drawdown, Dauer und Erholung &rarr;</a></p>
+</section>
+
+<section class=chartbox>
+<h3>Was das in Deutschland gebracht hat &mdash; und was in den USA</h3>
+<p class=ch-s>Reale Rendite pro Jahr im selben Zeitraum, 1963 bis 2020. Zwei Dinge stechen heraus: Der <b>S&amp;P&nbsp;500 liegt an der Spitze</b>, gut einen Punkt &uuml;ber deutschen Aktien &mdash; &uuml;ber 58 Jahre wurden daraus 35,55&nbsp;&euro; statt 18,76&nbsp;&euro; je eingesetztem Euro. Und die vermietete Immobilie schl&auml;gt die deutsche Aktie knapp, aber nur <i>mit</i> Mieteinnahmen: das selbstgenutzte Eigenheim liegt beim reinen Wertzuwachs auf Sparbuchniveau.</p>
+<div id=ch_de></div>
+<p class=chnote>Jord&agrave;-Schularick-Taylor Macrohistory Database (R6), reale Gesamtrenditen inklusive Inflation, ohne Steuern und Geb&uuml;hren. &Uuml;ber die lange Reihe ab 1871 wird das Bild dr&auml;stischer: Aktien machten aus einem Euro real 456&nbsp;&euro;, Anleihen und Sparbuch wurden 1923 auf null gesetzt und 1948 noch einmal auf 6,5&nbsp;%. &Uuml;ber dieselbe lange Reihe kam der S&amp;P&nbsp;500 auf <b>25.853&nbsp;&euro;</b> &mdash; das 57-Fache des deutschen Ergebnisses. Der Abstand entsteht nicht durch bessere Firmen, sondern dadurch, dass Deutschland zweimal seine W&auml;hrung verlor. <a href="Lebenszyklus_Simulator.html">Durch die echten Sequenzen rechnen &rarr;</a><span id=bez_de></span></p>
+</section>
+
+<!-- ============================ Roter Faden ========================== -->
+<div class=sechead><span class=num>04</span><h2>Der rote Faden</h2><span class=line></span></div>
+<p class=lead style="margin-bottom:20px">Sechs Kapitel, aufeinander aufbauend &mdash; zusammen alle 36 Analysen dieses Projekts. Wer alles lesen will, liest in dieser Reihenfolge.</p>
+<div class=faden>
+
+<div class=fst><div class=fk>Kapitel eins</div>
+<h3>Das Fundament: was der Staat zahlt und was fehlt</h3>
+<p>Die gesetzliche Rente folgt festen Rechengr&ouml;&szlig;en: ein Entgeltpunkt ist seit Juli 2026 genau <b>42,52&nbsp;&euro;</b> Bruttorente im Monat, wer 45 Jahre exakt das Durchschnittsentgelt verdient bekommt die Eckrente. Alles danach ist Rechnen &mdash; wie viel Kapital die L&uuml;cke schlie&szlig;t und was davon nach Steuer und Kosten bleibt.</p>
+<div class=fl><a href="Mein_Vermoegensbild.html">Mein Verm&ouml;gensbild</a><a href="Rentenluecke_Rechner.html">Rente und L&uuml;cke</a><a href="Vermoegen_Einordnung.html">Einordnung in Deutschland</a><a href="Depot_Steuern_Kosten.html">Steuern und Kosten</a></div></div>
+
+<div class=fst><div class=fk>Kapitel zwei</div>
+<h3>Wie riskant der Markt wirklich ist</h3>
+<p>Nicht die Schwankung ist das Problem, sondern ihre Form. Die Rendite entsteht in einer Handvoll Extremtage, die keine Glockenkurve abbildet &mdash; <b>54-mal</b> gab es Tagesausschl&auml;ge jenseits von f&uuml;nf Sigma, erwartet w&auml;ren 0,011. Und sie wird auf einem Pfad bezahlt, der fast immer unter Wasser liegt.</p>
+<div class=fl><a href="SP500_Taleb_Analyse.html">Die seltenen Tage</a><a href="SP500_Drawdown_Pfadrisiko.html">Drawdown und Pfad</a><a href="SP500_10Jahres_Renditeverteilung.html">Zehn Jahre Aktienmarkt</a><a href="SP500_Statistik_Appendix.html">Wie belastbar?</a><a href="Geschichts_Stresstest.html">Stresstest</a></div></div>
+
+<div class=fst><div class=fk>Kapitel drei</div>
+<h3>Warum nominale Zahlen t&auml;uschen</h3>
+<p>Neues Geld landet nicht im Warenkorb, sondern in den Verm&ouml;genspreisen. Der US-Reallohn stieg seit 1971 um <b>0,1&nbsp;% pro Jahr</b>, w&auml;hrend ein St&uuml;ck S&amp;P&nbsp;500 in Arbeitsstunden heute das <b>2,5-Fache</b> von 2000 kostet. Die popul&auml;re Umkehrung &mdash; Liquidit&auml;t steuere die Kurse &mdash; h&auml;lt der Pr&uuml;fung dagegen nicht stand.</p>
+<div class=fl><a href="Deutschland_Geld_Inflation_Sachwerte.html">Deutschland</a><a href="USA_Geld_Inflation_Sachwerte.html">USA</a><a href="Inflation_Cantillon_Vermoegenspreise.html">Cantillon</a><a href="USA_Ungleichheit_Velocity_Cantillon.html">Ungleichheit und Velocity</a><a href="SP500_vs_Geldmenge_M2.html">Geldmenge M2</a><a href="SP500_vs_NettoLiquiditaet.html">Netto-Liquidit&auml;t</a><a href="Alles_in_Gold_seit_1971.html">Alles in Gold seit 1971</a><a href="Alles_in_Gold_gerechnet.html">Alles in Gold gerechnet</a><a href="Deutschland_alles_in_Gold.html">Deutschland in Gold</a></div></div>
+
+<div class=fst><div class=fk>Kapitel vier</div>
+<h3>Was der Preis &uuml;ber die n&auml;chste Dekade sagt</h3>
+<p>Bewertung ist kein Crash-Signal mit Datum, sondern eine Aussage &uuml;ber zehn Jahre. Jeder zus&auml;tzliche CAPE-Punkt beim Einstieg kostete historisch rund <b>0,36 Prozentpunkte</b> reale Rendite pro Jahr. Ein MSCI World steckt zu 65 bis 70&nbsp;% im teuersten Markt der Welt &mdash; das ist eine Entscheidung, auch wenn sie sich passiv anf&uuml;hlt.</p>
+<div class=fl><a href="USA_CAPE_vs_10Jahresrendite.html">CAPE und die Folgedekade</a><a href="USA_KGV_vs_10Jahresrendite.html">Warum das KGV schlechter misst</a><a href="Regionen_CAPE_10Jahres_Ausblick.html">Regionen im Vergleich</a><a href="USA_Ueberblick_Geld_Aktien_Gewinne_Bewertung.html">Der Master-Chart</a></div></div>
+
+<div class=fst><div class=fk>Kapitel f&uuml;nf</div>
+<h3>Und was, wenn man es besser machen will?</h3>
+<p>Der naheliegende Schluss aus alldem lautet: dann handle ich eben klug. Dieses Kapitel ist der Versuch, genau das zu pr&uuml;fen &mdash; und er f&auml;llt &uuml;berwiegend ern&uuml;chternd aus. Die Autokorrelation des Marktes kippte tats&auml;chlich von Momentum zu Mean-Reversion, gleich in zwei unabh&auml;ngigen Ma&szlig;en und um rund <b>15 Standardfehler</b>. Zu Geld machen lie&szlig; sich das trotzdem nicht: regimeabh&auml;ngig, von Kosten gefressen, zuletzt verschwunden. Auch der Optionsweg tr&auml;gt nur halb &mdash; Konvexit&auml;t monetarisiert die V-f&ouml;rmige Erholung, aber im schleichenden B&auml;renmarkt frisst der Zeitwert sie auf. Am Ende schl&auml;gt schlicht <b>Index im Dip</b> alle getesteten Varianten.</p>
+<div class=fl><a href="SP500_Anomalien_aktuell.html">Was statistisch neu ist</a><a href="SP500_Momentum_MeanReversion.html">Momentum zu Mean-Reversion</a><a href="Regimewechsel_Anlageklassen.html">Marktweit oder S&amp;P-spezifisch?</a><a href="SP500_MeanReversion_Strategie.html">L&auml;sst sich das zu Geld machen?</a><a href="SP500_Call_im_Dip.html">Call im Dip</a><a href="SP500_Call_Strategie_verbessern.html">Was die Strategie verbessert</a></div></div>
+
+<div class=fst><div class=fk>Kapitel sechs</div>
+<h3>Was daraus folgt</h3>
+<p>Erwartungen kalibrieren statt die 7&nbsp;% der Vergangenheit fortzuschreiben. Den Klumpen entsch&auml;rfen. Das Pfadrisiko akzeptieren, aber nicht mit Kapital, das in genau zehn Jahren gebraucht wird. Und nicht timen: teuer ist kein Datum.</p>
+<div class=fl><a href="Standortbestimmung_Maerkte_2026.html">Standortbestimmung 2026</a><a href="00_Studie_Uebersicht.html">Die Studie im &Uuml;berblick</a><a href="Lebenszyklus_Simulator.html">Am eigenen Plan durchspielen</a></div></div>
+
+</div>
+
+<!-- ============================== Werkzeuge ========================== -->
+<div class=sechead><span class=num>05</span><h2>Rechner &mdash; sortiert nach der Frage, die du hast</h2><span class=line></span></div>
+<p class=lead style="margin-bottom:20px">Alle laufen vollst&auml;ndig im Browser und &uuml;bernehmen deine Angaben von oben.</p>
+<div class=wz>
+
+<div class=wzk><div class=frage>Reicht meine Rente?</div>
+<a href="Mein_Vermoegensbild.html"><div class=t>Mein Verm&ouml;gensbild</div><div class=b>Rente, Verm&ouml;gen, Einordnung, L&uuml;cke, m&ouml;gliches Erbe &mdash; alles auf einer Seite.</div></a>
+<a href="Rentenluecke_Rechner.html"><div class=t>Gesetzliche Rente und die L&uuml;cke</div><div class=b>Entgeltpunkte, Zahlbetrag nach Kranken- und Pflegeversicherung, Ab- und Zuschl&auml;ge.</div></a>
+<a href="Altersvorsorge_Rechner.html"><div class=t>Altersvorsorge-Rechner</div><div class=b>Betrag und Annahmen per Regler &rarr; reale Monatsrente und ewige Rente, live.</div></a>
+</div>
+
+<div class=wzk><div class=frage>H&auml;lt mein Kapital den Ruhestand durch?</div>
+<a href="Lebenszyklus_Simulator.html"><div class=t>Ein ganzes Finanzleben, durchgerechnet</div><div class=b>Ansparen und Entnehmen gekoppelt durch echte Sequenzen &mdash; USA oder Deutschland.</div></a>
+<a href="Geschichts_Stresstest.html"><div class=t>Der Geschichts-Stresstest</div><div class=b>H&auml;tte der Plan in <i>jedem</i> Startjahr seit 1871 gehalten? Erfolgsquote und Heatmap.</div></a>
+<a href="Sparplan_Perzentile.html"><div class=t>Sparplan-Simulator</div><div class=b>Monatlich sparen &uuml;ber historische Zehnjahresbl&ouml;cke &mdash; als Bandbreite, nicht als Punkt.</div></a>
+</div>
+
+<div class=wzk><div class=frage>Wo stehe ich im Vergleich?</div>
+<a href="Vermoegen_Einordnung.html"><div class=t>Wo dieses Verm&ouml;gen in Deutschland steht</div><div class=b>Perzentil, Altersgruppe &mdash; und die Grenzen der Statistik.</div></a>
+<a href="Mein_Vermoegensbild.html"><div class=t>Das eigene Gesamtbild</div><div class=b>Einordnung zusammen mit Rentenanspruch und Kapitalbedarf.</div></a>
+</div>
+
+<div class=wzk><div class=frage>Lohnt sich die Immobilie?</div>
+<a href="Immobilien_Investitionsrechner.html"><div class=t>Die vermietete Wohnung, durchgerechnet</div><div class=b>Kaufnebenkosten, AfA, Finanzierung, Cashflow &mdash; und der Steuervorteil je Einkommen.</div></a>
+<a href="Tilgen_oder_Investieren.html"><div class=t>Tilgen oder investieren</div><div class=b>Sondertilgung gegen Anlage &mdash; inklusive der Steuer, die nur eine Seite trifft.</div></a>
+</div>
+
+<div class=wzk><div class=frage>Was nehmen Steuern und Kosten?</div>
+<a href="Depot_Steuern_Kosten.html"><div class=t>Was Steuern und Kosten vom Depot nehmen</div><div class=b>Abgeltungsteuer, Teilfreistellung, Vorabpauschale &mdash; und die Wirkung eines Prozentpunkts Geb&uuml;hr.</div></a>
+</div>
+
+<div class=wzk><div class=frage>Wie teuer ist der Markt gerade?</div>
+<a href="Standortbestimmung_Maerkte_2026.html"><div class=t>Standortbestimmung 2026</div><div class=b>Das Gesamturteil: eine Scorecard &uuml;ber alle Dimensionen, mit Bulle und B&auml;r.</div></a>
+<a href="USA_CAPE_vs_10Jahresrendite.html"><div class=t>CAPE und die n&auml;chsten zehn Jahre</div><div class=b>145 Jahre: was hohe Bewertung f&uuml;r die reale Dekade danach bedeutete.</div></a>
+<a href="Regionen_CAPE_10Jahres_Ausblick.html"><div class=t>Wo die besseren Karten liegen</div><div class=b>USA teuer, der Rest der Welt fair bis g&uuml;nstig &mdash; Regionen im Vergleich.</div></a>
+</div>
+
+</div>
+
+<!-- ============================== Methodik =========================== -->
+<div class=sechead><span class=num>06</span><h2>Wie hier gerechnet wird</h2><span class=line></span></div>
+<section class=card>
+<div class=meth>
+<div><h4>Immer real</h4><p>Alle Renditen sind inflationsbereinigt, umgerechnet &uuml;ber die Fisher-Beziehung und nicht durch Abziehen. Wo nominal gerechnet wird, steht es dabei. Nominale Zahlen ohne Kaufkraftbezug sind der h&auml;ufigste Fehler in Finanzcharts.</p></div>
+<div><h4>Echte Sequenzen</h4><p>Wo es um Ansparen und Entnehmen geht, laufen die Rechner auf tats&auml;chlichen historischen Jahresfolgen &mdash; nicht auf einem Mittelwert. Denn &uuml;ber das Ergebnis entscheidet die Reihenfolge der Jahre, nicht ihr Durchschnitt.</p></div>
+<div><h4>Deutsches Recht, gepr&uuml;ft</h4><p>Rente nach SGB&nbsp;VI, Einkommensteuer nach &sect;&nbsp;32a EStG, Abgeltungsteuer nach &sect;&nbsp;32d, Vorabpauschale nach &sect;&nbsp;18 InvStG, AfA nach &sect;&nbsp;7 EStG &mdash; mit den Rechengr&ouml;&szlig;en 2026. Ein <a href="Selbsttest.html">Selbsttest</a> pr&uuml;ft die Rechenkerne gegen bekannte Sollwerte.</p></div>
+<div><h4>Datenst&auml;nde offen</h4><p id=meth_ds>Jede Seite tr&auml;gt unten ihren Datenstand mit Quelle und dem Datum, ab dem er gepr&uuml;ft geh&ouml;rt. Abgelaufene St&auml;nde markiert der <a href="Selbsttest.html">Selbsttest</a> automatisch.</p></div>
+<div><h4>Nichts verl&auml;sst den Browser</h4><p>Es gibt keinen Server, keine Konten, kein Tracking. Alle Eingaben liegen im localStorage dieses Browsers und werden nirgendwohin &uuml;bertragen.</p></div>
+<div><h4>Was das hier nicht ist</h4><p>Keine Anlage-, Steuer- oder Rechtsberatung und keine Prognose. Historische Verteilungen sagen, was war &mdash; nicht, was kommt. Die Stichprobe ist kleiner, als sie aussieht.</p></div>
+</div>
+</section>
+
+<div class=foot>Eigene Berechnungen auf Basis von Robert Shiller (US-Aktien, CAPE, Inflation), FRED (Geldmengen, Fed-Bilanz, L&ouml;hne), Yahoo Finance, Research Affiliates (Regionen-CAPE), der Jord&agrave;-Schularick-Taylor Macrohistory Database R6 (deutsche Anlageklassen 1871&ndash;2020) und der Bundesbank-Studie PHF Welle&nbsp;5 (Verm&ouml;gensverteilung, Erhebung 2023). Alle Rechner laufen vollst&auml;ndig im Browser. Keine Anlage-, Steuer- oder Rechtsberatung.</div>
+
+</div>
+
+<script>
+/* ======================= Daten der Startseite ============================
+   Alles aus den eingebetteten Reihen der Analyseseiten nachgerechnet.
+   Herkunft je Serie steht im Kommentar und in der Bildunterschrift.       */
+const D = {"cape":{"pts":[[1872,11.9,10.5],[1873,12.2,10.2],[1874,11.3,10.1],[1875,11.4,8.7],[1876,11.8,10.6],[1877,9.5,13.3],[1878,10.6,11.3],[1879,12.9,9.4],[1880,14.9,8.4],[1881,18.5,4.6],[1882,15.7,7.6],[1883,15.3,6.9],[1884,14.4,6],[1885,13.1,7],[1886,16.7,4.4],[1887,17.5,3.9],[1888,15.4,6],[1889,15.8,7.7],[1890,17.2,5.3],[1891,15.4,8.3],[1892,19,7.5],[1893,17.6,7.5],[1894,15.7,6.8],[1895,16.5,8.6],[1896,16.6,10.2],[1897,17,9.2],[1898,19.2,5.2],[1899,22.9,5.7],[1900,18.7,7.4],[1901,21,5.6],[1902,22.3,4.5],[1903,20.3,4.6],[1904,15.9,5.4],[1905,18.5,2.2],[1906,20.1,2.7],[1907,17.2,2.7],[1908,11.9,1.8],[1909,14.8,-1.1],[1910,14.5,-1.3],[1911,14.1,-2.8],[1912,13.8,-1.3],[1913,13.2,1.1],[1914,11.6,2],[1915,10.4,5],[1916,12.5,4.5],[1917,11,6.2],[1918,6.6,13],[1919,6.1,17.5],[1920,6,16.3],[1921,5.1,15.8],[1922,6.3,9.2],[1923,8.2,6.7],[1924,8.1,10.8],[1925,9.7,7.2],[1926,11.3,9.6],[1927,13.2,11],[1928,18.8,4],[1929,27.1,1.6],[1930,22.3,2.8],[1931,16.7,3.5],[1932,9.3,5.8],[1933,8.7,6.7],[1934,13,4.3],[1935,11.5,7],[1936,17.1,5.8],[1937,21.6,0.4],[1938,13.5,3.2],[1939,15.6,2.5],[1940,16.4,3.9],[1941,13.9,7.1],[1942,10.1,10.6],[1943,10.2,10.8],[1944,11.1,9.1],[1945,12,11.5],[1946,15.6,10.9],[1947,11.5,14.4],[1948,10.4,14.1],[1949,10.2,16.8],[1950,10.8,15.5],[1951,11.9,13.5],[1952,12.5,13.8],[1953,13,12],[1954,12,13.7],[1955,16,11],[1956,18.3,9.3],[1957,16.7,7.9],[1958,13.8,10],[1959,18,7.2],[1960,18.3,5.1],[1961,18.5,4.8],[1962,21.2,4.1],[1963,19.3,5.8],[1964,21.6,1.4],[1965,23.3,-3],[1966,24.1,-1.4],[1967,20.4,0.1],[1968,21.5,-2.5],[1969,21.2,-2.4],[1970,17.1,-0.7],[1971,16.5,0.2],[1972,17.3,-2.2],[1973,18.7,-1.3],[1974,13.5,2.6],[1975,8.9,6.4],[1976,11.2,5.6],[1977,11.4,7.7],[1978,9.2,8.7],[1979,9.3,9.3],[1980,8.8,10.7],[1981,9.3,8.8],[1982,7.4,13.1],[1983,8.8,11.2],[1984,9.9,10.6],[1985,10,9.9],[1986,11.7,10.8],[1987,14.9,10.4],[1988,13.9,13.5],[1989,15.1,15.1],[1990,17.1,14.6],[1991,15.6,14.3],[1992,19.8,9.8],[1993,20.3,6.8],[1994,21.4,8.3],[1995,20.2,8.8],[1996,24.8,6.5],[1997,28.3,5.4],[1998,32.9,2.5],[1999,40.6,-4.1],[2000,43.8,-2.8],[2001,37,-0.7],[2002,30.3,0.9],[2003,22.9,4.8],[2004,27.7,4.6],[2005,26.6,5.6],[2006,26.5,4.5],[2007,27.2,5.1],[2008,24,7.8],[2009,15.2,11.7],[2010,20.5,11.4],[2011,23,11.5],[2012,21.2,12.9],[2013,21.9,9.3],[2014,24.9,9],[2015,26.5,9.8],[2016,24.2,11.8]],"quint":[{"von":5.1,"bis":11.1,"med":10.6,"p10":6.2,"p90":15.8,"neg":0,"n":29},{"von":11.2,"bis":13.9,"med":9.4,"p10":1.8,"p90":13.5,"neg":3,"n":29},{"von":13.9,"bis":17.1,"med":7.6,"p10":-1.1,"p90":11.7,"neg":10,"n":29},{"von":17.1,"bis":21.2,"med":5.1,"p10":-1.3,"p90":9.3,"neg":14,"n":29},{"von":21.2,"bis":43.8,"med":4.6,"p10":-2.8,"p90":9.8,"neg":21,"n":29}],"heute":40,"heuteJahr":2026,"perzentil":98},"uw":{"serie":[[1872,0],[1873,0],[1874,0],[1875,0],[1876,0],[1877,-12.7],[1878,-0.1],[1879,0],[1880,0],[1881,0],[1882,-6.2],[1883,-1],[1884,0],[1885,-1.6],[1886,0],[1887,0],[1888,-4.4],[1889,0],[1890,0],[1891,-7.5],[1892,0],[1893,-1.2],[1894,-6.6],[1895,0],[1896,0],[1897,0],[1898,0],[1899,0],[1900,-10.7],[1901,0],[1902,0],[1903,-0.9],[1904,-12.8],[1905,0],[1906,0],[1907,-3.2],[1908,-22.7],[1909,0],[1910,0],[1911,0],[1912,0],[1913,0],[1914,-5.8],[1915,-11.3],[1916,0],[1917,-3.1],[1918,-29.2],[1919,-29.4],[1920,-28],[1921,-35.7],[1922,-21.7],[1923,0],[1924,0],[1925,0],[1926,0],[1927,0],[1928,0],[1929,0],[1930,-8.1],[1931,-21.5],[1932,-47],[1933,-46],[1934,-19.1],[1935,-27.1],[1936,0],[1937,0],[1938,-28.9],[1939,-17.4],[1940,-14],[1941,-21.8],[1942,-34.2],[1943,-26.9],[1944,-12.7],[1945,0],[1946,0],[1947,-23.9],[1948,-28.4],[1949,-22.4],[1950,-7.5],[1951,0],[1952,0],[1953,0],[1954,0],[1955,0],[1956,0],[1957,0],[1958,-8.2],[1959,0],[1960,0],[1961,0],[1962,0],[1963,-3.6],[1964,0],[1965,0],[1966,0],[1967,-9],[1968,0],[1969,0],[1970,-13.1],[1971,-11.6],[1972,-2.6],[1973,0],[1974,-22.2],[1975,-43.3],[1976,-26.7],[1977,-22.5],[1978,-33.1],[1979,-28.8],[1980,-26.8],[1981,-18.1],[1982,-29],[1983,-12.2],[1984,0],[1985,0],[1986,0],[1987,0],[1988,-5.3],[1989,0],[1990,0],[1991,-5.7],[1992,0],[1993,0],[1994,0],[1995,-1.4],[1996,0],[1997,0],[1998,0],[1999,0],[2000,0],[2001,-8.5],[2002,-21.5],[2003,-38.5],[2004,-22.7],[2005,-20.4],[2006,-15.8],[2007,-6.6],[2008,-11.6],[2009,-41.6],[2010,-25],[2011,-14.4],[2012,-13.8],[2013,-1.6],[2014,0],[2015,0],[2016,-4.6],[2017,0],[2018,0],[2019,-5.9],[2020,0],[2021,0],[2022,0],[2023,-16.9],[2024,-1],[2025,0],[2026,0]],"anteilUnter":48,"tiefst":-47,"tiefstJahr":1932},"zehn":{"hist":[[-3.75,4],[-1.25,10],[1.25,11],[3.75,22],[6.25,29],[8.75,27],[11.25,24],[13.75,13],[16.25,5],[18.75,1]],"median":7.2,"p10":0.1,"min":-4.1,"max":17.5,"negAnteil":9.6,"n":146,"zwanzigMin":0.9,"zwanzigMed":6.8,"zwanzigNeg":0},"de":{"klassen":[{"k":"Immobilien (mit Miete)","v":5.55},{"k":"Aktien","v":5.18},{"k":"Anleihen","v":3.44},{"k":"Immobilie (nur Wert)","v":1.47},{"k":"Sparbuch","v":1.4}],"langAktien":456,"langAnleihen":0,"langSparbuch":0.00006474990889326623},"usa":{"aktienGeo":7.08,"anleihenGeo":2.08,"einEuro":40536}};
+
+const SEQ = {"us":[[1871,6.74],[1872,6.7],[1873,6.1],[1874,5.43],[1875,6.03],[1876,6.44],[1877,8.27],[1878,5.67],[1879,5.31],[1880,4.11],[1881,2.49],[1882,3.25],[1883,3.12],[1884,2.97],[1885,3.07],[1886,2.34],[1887,1.9],[1888,1.65],[1889,1.47],[1890,1.23],[1891,1.39],[1892,1.05],[1893,1.5],[1894,1.87],[1895,2.15],[1896,2.57],[1897,2.76],[1898,2.92],[1899,2.49],[1900,3.44],[1901,1.82],[1902,0.79],[1903,0.93],[1904,2.28],[1905,1.08],[1906,0.74],[1907,1.4],[1908,2.41],[1909,1.25],[1910,1.22],[1911,1.08],[1912,0.85],[1913,1.06],[1914,1.73],[1915,2.6],[1916,1.97],[1917,1.85],[1918,3.83],[1919,4.45],[1920,5.42],[1921,8.46],[1922,7.67],[1923,6.16],[1924,6.39],[1925,6.76],[1926,6.52],[1927,5.65],[1928,2.66],[1929,0.55],[1930,1.53],[1931,3.42],[1932,10.36],[1933,10.27],[1934,6.17],[1935,9.33],[1936,4.59],[1937,1.98],[1938,6.57],[1939,5.43],[1940,4.66],[1941,6.19],[1942,9.73],[1943,9.9],[1944,6.14],[1945,3.68],[1946,2.9],[1947,5.33],[1948,5.32],[1949,5.29],[1950,4.43],[1951,3.77],[1952,2.74],[1953,2.9],[1954,3.4],[1955,1.91],[1956,1.42],[1957,1.8],[1958,2.23],[1959,1.21],[1960,1.27],[1961,1.14],[1962,0.85],[1963,1.18],[1964,0.65],[1965,0.23],[1966,0.03],[1967,0.74],[1968,0.4],[1969,0.34],[1970,2.07],[1971,2.05],[1972,1.29],[1973,0.52],[1974,2.68],[1975,6.17],[1976,4.2],[1977,4.45],[1978,6.02],[1979,3.78],[1980,4.91],[1981,4.91],[1982,6.56],[1983,5.72],[1984,5.96],[1985,6.69],[1986,4.98],[1987,3.99],[1988,5.72],[1989,4.67],[1990,4.7],[1991,6.43],[1992,5.02],[1993,4.12],[1994,4.48],[1995,5.98],[1996,4.41]],"de":[[1871,3.45],[1872,2.05],[1873,2.01],[1874,3.49],[1875,4.57],[1876,5.41],[1877,5.16],[1878,5.43],[1879,4.8],[1880,3.22],[1881,3.06],[1882,2.36],[1883,2.72],[1884,2.35],[1885,1.9],[1886,1.63],[1887,1.2],[1888,1.03],[1889,0.43],[1890,0.36],[1891,0.31],[1892,0.66],[1893,1.15],[1894,2.34],[1895,0.14],[1896,0.02],[1897,0],[1898,0],[1899,0],[1900,0],[1901,0],[1902,0],[1903,0],[1904,0],[1905,0],[1906,0],[1907,0],[1908,0],[1909,0],[1910,0],[1911,0],[1912,0],[1913,0],[1914,0],[1915,0],[1916,0],[1917,0],[1918,0],[1919,0],[1920,0],[1921,0],[1922,0],[1923,0],[1924,0],[1925,0],[1926,0.82],[1927,0],[1928,0],[1929,0],[1930,0],[1931,0.65],[1932,5.2],[1933,1.89],[1934,0.95],[1935,0.43],[1936,0],[1937,0],[1938,0],[1939,0],[1940,0],[1941,0],[1942,0],[1943,0],[1944,0],[1945,0],[1946,0],[1947,0],[1948,0],[1949,43.61],[1950,15.74],[1951,16.58],[1952,7.08],[1953,6.41],[1954,6.55],[1955,2.78],[1956,4.11],[1957,5.74],[1958,3.68],[1959,2.08],[1960,0.08],[1961,0],[1962,0],[1963,0.46],[1964,0.4],[1965,0.22],[1966,1],[1967,2.47],[1968,1.34],[1969,0.84],[1970,0.12],[1971,2.46],[1972,2.08],[1973,0.96],[1974,2.8],[1975,3.51],[1976,2.99],[1977,4.54],[1978,4.86],[1979,2.43],[1980,4.23],[1981,5.43],[1982,5.02],[1983,5.87],[1984,4.81],[1985,4.55],[1986,1.95],[1987,1.49],[1988,4.72],[1989,2.64],[1990,1.98],[1991,2.86]],"H":30,"rate":0.04,"statUs":{"min":0.03,"med":3.33,"max":10.36,"pleite":0,"n":126},"statDe":{"min":0,"med":0.66,"max":43.61,"pleite":48,"n":121},"statBrd":{"min":0.12,"med":2.47,"max":5.87,"pleite":0,"n":29},"usMin":[1966,0.03],"deMax":[1949,43.61],"ohne1923":[1961,1962]};
+
+/* Perzentil-Streifen: Bewertung eigene Rechnung, Rest aus der Standortbestimmung */
+const PZ = [
+  { k: 'US-Bewertung · Shiller-CAPE',  s: 'CAPE 40,0 — nur 1929 und 2000 waren teurer', p: 98, t: 'risk' },
+  { k: 'US-Bewertung · KGV (trailing)',s: 'rund 30, oberstes Perzentil',                p: 97, t: 'risk' },
+  { k: 'Marktkonzentration · Top 10',  s: 'nahe Rekord — wenige Titel tragen den Index',p: 98, t: 'risk' },
+  { k: 'Vermögenskonzentration · Top 1 %', s: '31,8 % — Höchststand seit 1989',         p: 99, t: 'risk' },
+  { k: 'US-Prämie gegenüber der Welt', s: 'CAPE-Aufschlag rund 2× — extrem',            p: 95, t: 'risk' },
+  { k: 'Firmengewinne und Margen',     s: 'nahe Rekord — das echte Fundament',          p: 94, t: 'gut'  },
+  { k: 'Inflation (CPI)',              s: 'normal, nahe dem 2-%-Ziel',                  p: 55, t: 'neu'  },
+  { k: 'Geldumlauf · M2-Velocity',     s: 'nahe historischem Tief',                     p: 11, t: 'risk' },
+  { k: 'Erwartete reale 10-J-Rendite USA', s: 'rund 0 % pro Jahr — nahe Tief',          p:  4, t: 'risk' }
+];
+
+const nf = (x, n) => Number(x).toLocaleString('de-DE', { minimumFractionDigits: n, maximumFractionDigits: n });
+const eur = x => Math.round(x).toLocaleString('de-DE') + ' €';
+const $ = id => document.getElementById(id);
+
+/* Dieses Skript steht im Dokument, die Bibliotheken hängen an `defer` und
+   laufen deshalb später. Alles, was site-map.js, datenstand.js, profil.js,
+   de-rente.js oder de-vermoegen.js braucht, wartet auf DOMContentLoaded. */
+function bereit(fn) {
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', fn);
+  else fn();
+}
+
+/* ---------------------- Perzentil-Streifen ------------------------------
+   Markt und Mensch in derselben Grammatik: gleiche Skala, gleiche Median-
+   Marke bei 50. Die eigene Zeile steht in --s2 und bleibt als gestrichelte
+   Einladung sichtbar, solange kein Verm&ouml;gen eingetragen ist.               */
+const F_PZ = { risk: 'var(--bad)', gut: 'var(--good)', neu: 'var(--ink-3)', ich: 'var(--s2)' };
+
+function zeichnePz(stand) {
+  const zeile = r => {
+    const von = Math.min(50, r.p), bis = Math.max(50, r.p);
+    return '<div class=pzr' + (r.t === 'ich' ? ' style="border-top:1px solid var(--rule);margin-top:6px;padding-top:13px"' : '') + '>' +
+      '<div class=k>' + r.k + '<span>' + r.s + '</span></div>' +
+      '<div class=bar><u></u><i style="left:' + von + '%;width:' + (bis - von) + '%;background:' + F_PZ[r.t] + ';opacity:.8"></i></div>' +
+      '<div class=p style="color:' + F_PZ[r.t] + '">' + r.p + '.</div></div>';
+  };
+  let html = PZ.map(zeile).join('');
+
+  if (stand && stand.rang !== null && stand.rang !== undefined) {
+    html += zeile({ k: 'Dein Nettovermögen', s: eur(stand.verm) + ' — in der deutschen Verteilung',
+                    p: Math.round(stand.rang), t: 'ich' });
+    $('pz_ich').innerHTML = 'Die letzte Zeile ist deine: dasselbe Lineal, das oben den Markt misst, angelegt an dein eigenes Vermögen. ' +
+      'Nach Altersgruppen aufgeschlüsselt steht es in der <a href="Vermoegen_Einordnung.html">Einordnung</a>.';
+  } else {
+    html += '<div class=pzr style="border-top:1px solid var(--rule);margin-top:6px;padding-top:13px;opacity:.62">' +
+      '<div class=k>Dein Nettovermögen<span>oben eintragen — dann erscheint es hier auf derselben Skala</span></div>' +
+      '<div class="bar" style="border-style:dashed;border-color:var(--rule)"><u></u></div>' +
+      '<div class=p style="color:var(--ink-3)">—</div></div>';
+    $('pz_ich').innerHTML = '';
+  }
+  $('pz').innerHTML = html;
+}
+zeichnePz(null);   /* sofort, damit die Marktzeilen ohne jedes Skript stehen */
+
+/* ---- Bez&uuml;ge zwischen eigener Lage und den Bildern ---------------------
+   Neutrale Standardfassung im HTML, ein Satz Zusatz nur bei echtem Profil. */
+function aktualisiereBezuege(stand) {
+  zeichnePz(stand);
+  const zehn = $('bez_zehn'), de = $('bez_de'), seq = $('bez_seq');
+  if (!stand || !stand.hatProfil || !stand.jahreBisRente) {
+    if (zehn) zehn.innerHTML = ''; if (de) de.innerHTML = ''; if (seq) seq.innerHTML = '';
+    return;
+  }
+  if (seq && stand.kapital) {
+    seq.innerHTML = ' <b>Für dich:</b> aus ' + eur(stand.kapital) + ' zum Renteneintritt würden mit derselben Regel ' +
+      eur(stand.kapital * SEQ.rate / 12) + ' im Monat — im US-Median blieben nach dreißig Jahren noch ' +
+      eur(stand.kapital * SEQ.statUs.med) + ' übrig, im Jahrgang 1966 dagegen ' + eur(stand.kapital * SEQ.statUs.min) + '.';
+  }
+  const j = stand.jahreBisRente;
+  if (zehn) zehn.innerHTML = ' <b>Für dich:</b> bis zum Renteneintritt sind es ' + j + ' Jahre — ' +
+    nf(j / 10, 1).replace(',0', '') + ' solcher Dekaden hintereinander, jede mit dieser Streuung.';
+  if (de && stand.verm) {
+    const waechst = r => stand.verm * Math.pow(1 + r / 100, j);
+    de.innerHTML = ' <b>Für dich:</b> aus ' + eur(stand.verm) + ' würden in ' + j + ' Jahren real ' +
+      eur(waechst(1.40)) + ' auf dem Sparbuch und ' + eur(waechst(5.18)) + ' in Aktien — dieselbe Zeit, derselbe Betrag.';
+  }
+}
+
+/* ---- Frischezeile aus dem zentralen Datenstand-Register ----------------- */
+bereit(function () {
+  const R = window.DATENSTAND; if (!R || !$('meth_ds')) return;
+  const heute = new Date().toISOString().slice(0, 10);
+  const keys = Object.keys(R).filter(k => k[0] !== '_');
+  const abgelaufen = keys.filter(k => R[k].gueltigBis && heute > R[k].gueltigBis);
+  const faellig = keys.filter(k => R[k].pruefen && heute >= R[k].pruefen && !(R[k].gueltigBis && heute > R[k].gueltigBis));
+  const naechste = keys.map(k => R[k].pruefen).filter(Boolean).sort()[0];
+  const st = (abgelaufen.length + faellig.length) === 0
+    ? '<b style="color:var(--good)">Alle ' + keys.length + ' Einträge aktuell</b>' +
+      (naechste ? ', nächste Prüfung ab ' + naechste.split('-').reverse().join('.') + '.' : '.')
+    : '<b style="color:var(--warn)">' + (abgelaufen.length + faellig.length) + ' von ' + keys.length + ' Einträgen gehören nachgeschärft.</b>';
+  $('meth_ds').innerHTML = 'Jede Seite trägt unten ihren Datenstand mit Quelle und dem Datum, ab dem er geprüft gehört. ' +
+    st + ' Geprüft wird das im <a href="Selbsttest.html">Selbsttest</a>.';
+});
+
+/* ---- Chart-Kern der Startseite -------------------------------------------
+   Vier Formen (Streuung, Balken, Fläche, Verteilung), jede mit Hover-Tooltip
+   und einer Tabellen-Zwillingsansicht. Marken dünn, Raster als Haarlinie,
+   Text immer in Textfarben — nie in der Serienfarbe.                        */
+const CH = (function () {
+  const NS = 'http://www.w3.org/2000/svg';
+  const S = { s1: '#c2410c', s2: '#1d4ed8', s3: '#059669', s4: '#6d28d9', s5: '#a16207',
+              ink: '#1c1a17', ink2: '#57534c', ink3: '#8b857a',
+              grid: '#e8e2d7', surf: '#fffdfa' };
+  const de = (x, n) => Number(x).toLocaleString('de-DE', { minimumFractionDigits: n, maximumFractionDigits: n });
+  /* Median mit Mittelung bei gerader Anzahl — sonst liegt der Wert systematisch zu hoch */
+  const median = a => { const v = [...a].sort((x, y) => x - y), n = v.length;
+    return n === 0 ? null : (n % 2 ? v[(n - 1) / 2] : (v[n / 2 - 1] + v[n / 2]) / 2); };
+
+  function el(t, a) { const e = document.createElementNS(NS, t); for (const k in a) e.setAttribute(k, a[k]); return e; }
+  function svg(w, h) { const s = el('svg', { viewBox: '0 0 ' + w + ' ' + h, preserveAspectRatio: 'xMidYMid meet' }); s.style.width = '100%'; s.style.height = 'auto'; s.style.display = 'block'; s.style.overflow = 'visible'; return s; }
+  function txt(p, x, y, s, o) { const t = el('text', Object.assign({ x: x, y: y, 'font-size': (o && o.fs) || 10.5, fill: (o && o.fill) || S.ink3, 'text-anchor': (o && o.anchor) || 'start' }, (o && o.extra) || {})); t.textContent = s; p.appendChild(t); return t; }
+
+  /* Tooltip-Schicht: ein Element pro Chart, folgt der Maus, bleibt im Kasten */
+  function tip(box) {
+    const d = document.createElement('div'); d.className = 'chtip'; d.hidden = true; box.appendChild(d);
+    return {
+      zeig(html, px, py) { d.innerHTML = html; d.hidden = false;
+        const b = box.getBoundingClientRect(), w = d.offsetWidth;
+        let x = px - w / 2; x = Math.max(4, Math.min(b.width - w - 4, x));
+        d.style.left = x + 'px'; d.style.top = Math.max(2, py - d.offsetHeight - 12) + 'px'; },
+      weg() { d.hidden = true; }
+    };
+  }
+
+  /* Tabellen-Zwilling: jeder Wert bleibt ohne Chart erreichbar */
+  function tabelle(box, kopf, zeilen) {
+    const w = document.createElement('div'); w.className = 'chtab';
+    const b = document.createElement('button'); b.type = 'button'; b.className = 'chtab-b';
+    b.setAttribute('aria-expanded', 'false'); b.textContent = 'Zahlen anzeigen';
+    const t = document.createElement('div'); t.className = 'chtab-i'; t.hidden = true;
+    t.innerHTML = '<table class=tbl><thead><tr>' + kopf.map(h => '<th>' + h + '</th>').join('') +
+      '</tr></thead><tbody>' + zeilen.map(r => '<tr>' + r.map(c => '<td>' + c + '</td>').join('') + '</tr>').join('') + '</tbody></table>';
+    b.addEventListener('click', () => { const o = t.hidden; t.hidden = !o; b.setAttribute('aria-expanded', o ? 'true' : 'false'); b.textContent = o ? 'Zahlen ausblenden' : 'Zahlen anzeigen'; });
+    w.appendChild(b); w.appendChild(t); box.appendChild(w);
+  }
+
+  function legende(box, eintraege) {
+    const l = document.createElement('div'); l.className = 'legend';
+    l.innerHTML = eintraege.map(e => '<span><i style="background:' + e.f + (e.r ? ';border-radius:50%' : '') + '"></i>' + e.t + '</span>').join('');
+    box.appendChild(l);
+  }
+
+  /* ---- 1) Streuung: CAPE gegen die folgende reale Zehnjahresrendite ------ */
+  function streuung(id, o) {
+    const box = document.getElementById(id); if (!box) return;
+    const W = 720, H = 396, L = 52, R = 16, T = 36, B = 44;
+    const s = svg(W, H); box.appendChild(s);
+    const xs = o.pts.map(p => p[1]), ys = o.pts.map(p => p[2]);
+    const x0 = 0, x1 = Math.ceil(Math.max(...xs, o.heute) / 5) * 5;
+    const y0 = Math.floor(Math.min(...ys) / 5) * 5, y1 = Math.ceil(Math.max(...ys) / 5) * 5;
+    const X = v => L + (v - x0) / (x1 - x0) * (W - L - R);
+    const Y = v => H - B - (v - y0) / (y1 - y0) * (H - T - B);
+
+    for (let v = y0; v <= y1; v += 5) {
+      s.appendChild(el('line', { x1: L, y1: Y(v), x2: W - R, y2: Y(v), stroke: v === 0 ? S.ink3 : S.grid, 'stroke-width': v === 0 ? 1.2 : 1 }));
+      txt(s, L - 8, Y(v) + 3.5, de(v, 0) + ' %', { anchor: 'end', extra: { 'font-variant-numeric': 'tabular-nums' } });
+    }
+    for (let v = x0; v <= x1; v += 10) txt(s, X(v), H - B + 16, de(v, 0), { anchor: 'middle', extra: { 'font-variant-numeric': 'tabular-nums' } });
+    txt(s, (L + W - R) / 2, H - 6, 'Shiller-CAPE zum Startzeitpunkt', { anchor: 'middle', fs: 11, fill: S.ink2 });
+    txt(s, 0, 12, 'reale Rendite p. a. der folgenden zehn Jahre', { fs: 11, fill: S.ink2 });
+
+    /* heutiger Stand als senkrechte Marke */
+    s.appendChild(el('line', { x1: X(o.heute), y1: T, x2: X(o.heute), y2: H - B, stroke: S.s1, 'stroke-width': 1.4 }));
+    txt(s, X(o.heute) - 7, T + 11, 'heute ' + de(o.heute, 1), { anchor: 'end', fs: 11, fill: S.s1, extra: { 'font-weight': 700 } });
+
+    const g = el('g', {}); s.appendChild(g);
+    o.pts.forEach(p => {
+      g.appendChild(el('circle', { cx: X(p[1]), cy: Y(p[2]), r: 4, fill: S.s2, 'fill-opacity': .42, stroke: S.surf, 'stroke-width': 1.2 }));
+    });
+    /* Median je Quintil als Stufenlinie — die Botschaft über der Wolke */
+    const stufe = [];
+    o.quint.forEach(q => { stufe.push([X(q.von), Y(q.med)], [X(q.bis), Y(q.med)]); });
+    s.appendChild(el('polyline', { points: stufe.map(p => p.join(',')).join(' '), fill: 'none', stroke: S.s1, 'stroke-width': 2.4, 'stroke-linejoin': 'round', 'stroke-linecap': 'round' }));
+    o.quint.forEach(q => {
+      const cx = (X(q.von) + X(q.bis)) / 2;
+      s.appendChild(el('circle', { cx: cx, cy: Y(q.med), r: 4.5, fill: S.s1, stroke: S.surf, 'stroke-width': 2 }));
+    });
+    /* nur die beiden Enden direkt beschriften */
+    txt(s, X(o.quint[0].von) + 4, Y(o.quint[0].med) - 12, de(o.quint[0].med, 1) + ' %', { fs: 11.5, fill: S.ink, extra: { 'font-weight': 700 } });
+    txt(s, X(o.quint[4].bis) - 4, Y(o.quint[4].med) - 12, de(o.quint[4].med, 1) + ' %', { anchor: 'end', fs: 11.5, fill: S.ink, extra: { 'font-weight': 700 } });
+
+    /* Hover: nächstgelegener Punkt, großzügige Trefferfläche */
+    const tp = tip(box), mark = el('circle', { r: 6.5, fill: 'none', stroke: S.ink, 'stroke-width': 2 }); mark.style.display = 'none'; s.appendChild(mark);
+    const hit = el('rect', { x: 0, y: 0, width: W, height: H, fill: 'transparent' }); s.appendChild(hit);
+    hit.addEventListener('mousemove', ev => {
+      const b = s.getBoundingClientRect(), k = W / b.width;
+      const mx = (ev.clientX - b.left) * k, my = (ev.clientY - b.top) * k;
+      let best = null, bd = 1e9;
+      o.pts.forEach(p => { const d = (X(p[1]) - mx) ** 2 + (Y(p[2]) - my) ** 2; if (d < bd) { bd = d; best = p; } });
+      if (!best || bd > 900) { tp.weg(); mark.style.display = 'none'; return; }
+      mark.setAttribute('cx', X(best[1])); mark.setAttribute('cy', Y(best[2])); mark.style.display = '';
+      tp.zeig('<b>Start ' + best[0] + '</b><br>CAPE ' + de(best[1], 1) + '<br>' + de(best[2], 1) + ' % real p.a. bis ' + (best[0] + 10),
+        X(best[1]) / k, Y(best[2]) / k);
+    });
+    hit.addEventListener('mouseleave', () => { tp.weg(); mark.style.display = 'none'; });
+
+    legende(box, [{ f: S.s2, t: 'ein Startjahr (' + o.pts.length + ')', r: 1 }, { f: S.s1, t: 'Median je CAPE-Fünftel' }]);
+    tabelle(box, ['CAPE-Fünftel', 'Median', '10.–90. Perzentil', 'davon negativ', 'Startjahre'],
+      o.quint.map(q => [de(q.von, 1) + '–' + de(q.bis, 1), de(q.med, 1) + ' %', de(q.p10, 1) + ' bis ' + de(q.p90, 1) + ' %', de(q.neg, 0) + ' %', q.n]));
+  }
+
+  /* ---- 2) Fläche: wie lange unter dem alten realen Hoch ------------------ */
+  function flaeche(id, o) {
+    const box = document.getElementById(id); if (!box) return;
+    const W = 720, H = 260, L = 46, R = 14, T = 16, B = 34;
+    const s = svg(W, H); box.appendChild(s);
+    const jr = o.serie.map(p => p[0]), vw = o.serie.map(p => p[1]);
+    const x0 = jr[0], x1 = jr[jr.length - 1], y0 = Math.floor(Math.min(...vw) / 10) * 10;
+    const X = v => L + (v - x0) / (x1 - x0) * (W - L - R);
+    const Y = v => T + (0 - v) / (0 - y0) * (H - T - B);
+    for (let v = 0; v >= y0; v -= 10) {
+      s.appendChild(el('line', { x1: L, y1: Y(v), x2: W - R, y2: Y(v), stroke: v === 0 ? S.ink3 : S.grid, 'stroke-width': v === 0 ? 1.2 : 1 }));
+      txt(s, L - 8, Y(v) + 3.5, de(v, 0) + ' %', { anchor: 'end', extra: { 'font-variant-numeric': 'tabular-nums' } });
+    }
+    for (let v = Math.ceil(x0 / 25) * 25; v <= x1; v += 25) txt(s, X(v), H - B + 15, v, { anchor: 'middle', extra: { 'font-variant-numeric': 'tabular-nums' } });
+
+    const pts = o.serie.map(p => X(p[0]) + ',' + Y(p[1])).join(' ');
+    s.appendChild(el('polygon', { points: X(x0) + ',' + Y(0) + ' ' + pts + ' ' + X(x1) + ',' + Y(0), fill: S.s1, 'fill-opacity': .12 }));
+    s.appendChild(el('polyline', { points: pts, fill: 'none', stroke: S.s1, 'stroke-width': 2, 'stroke-linejoin': 'round' }));
+
+    /* der Tiefpunkt bekommt als einziger ein direktes Etikett */
+    const tief = o.serie.reduce((a, b) => b[1] < a[1] ? b : a);
+    s.appendChild(el('circle', { cx: X(tief[0]), cy: Y(tief[1]), r: 4.5, fill: S.s1, stroke: S.surf, 'stroke-width': 2 }));
+    txt(s, X(tief[0]) + 9, Y(tief[1]) + 4, de(tief[1], 0) + ' % · ' + tief[0], { fs: 11.5, fill: S.ink, extra: { 'font-weight': 700 } });
+
+    const tp = tip(box), cross = el('line', { y1: T, y2: H - B, stroke: S.ink3, 'stroke-width': 1 }); cross.style.display = 'none'; s.appendChild(cross);
+    const hit = el('rect', { x: L, y: T, width: W - L - R, height: H - T - B, fill: 'transparent' }); s.appendChild(hit);
+    hit.addEventListener('mousemove', ev => {
+      const b = s.getBoundingClientRect(), k = W / b.width, mx = (ev.clientX - b.left) * k;
+      let best = o.serie[0], bd = 1e9;
+      o.serie.forEach(p => { const d = Math.abs(X(p[0]) - mx); if (d < bd) { bd = d; best = p; } });
+      cross.setAttribute('x1', X(best[0])); cross.setAttribute('x2', X(best[0])); cross.style.display = '';
+      tp.zeig('<b>' + best[0] + '</b><br>' + (best[1] < -0.05 ? de(best[1], 1) + ' % unter dem alten Realhoch' : 'auf neuem Realhoch'), X(best[0]) / k, Y(best[1]) / k);
+    });
+    hit.addEventListener('mouseleave', () => { tp.weg(); cross.style.display = 'none'; });
+
+    tabelle(box, ['Jahrzehnt', 'schlechtester Jahresstand'],
+      (function () { const m = {}; o.serie.forEach(p => { const d = Math.floor(p[0] / 10) * 10; if (!(d in m) || p[1] < m[d]) m[d] = p[1]; });
+        return Object.keys(m).map(d => [d + '–' + (+d + 9), de(m[d], 1) + ' %']); })());
+  }
+
+  /* ---- 3) Verteilung: reale Zehnjahresrenditen, Vorzeichen als Polarität - */
+  function verteilung(id, o) {
+    const box = document.getElementById(id); if (!box) return;
+    const W = 720, H = 286, L = 40, R = 14, T = 36, B = 44;
+    const s = svg(W, H); box.appendChild(s);
+    txt(s, 0, 12, 'Zahl der Startjahre je Renditeklasse', { fs: 11, fill: S.ink2 });
+    const n = o.hist.length, ymax = Math.max(...o.hist.map(h => h[1]));
+    const bw = (W - L - R) / n, bar = Math.min(22, bw - 6);
+    const Y = v => H - B - v / ymax * (H - T - B);
+    for (let v = 0; v <= ymax; v += 10) {
+      s.appendChild(el('line', { x1: L, y1: Y(v), x2: W - R, y2: Y(v), stroke: S.grid, 'stroke-width': 1 }));
+      txt(s, L - 8, Y(v) + 3.5, v, { anchor: 'end', extra: { 'font-variant-numeric': 'tabular-nums' } });
+    }
+    const tp = tip(box);
+    o.hist.forEach((h, i) => {
+      const cx = L + bw * (i + .5), neg = h[0] < 0, hgt = Y(0) - Y(h[1]);
+      const g = el('g', {}); s.appendChild(g);
+      if (hgt > 0) {
+        g.appendChild(el('path', { d: 'M' + (cx - bar / 2) + ',' + Y(0) + ' V' + (Y(h[1]) + 4) + ' a4,4 0 0 1 4,-4 h' + (bar - 8) + ' a4,4 0 0 1 4,4 V' + Y(0) + ' Z',
+          fill: neg ? S.s1 : S.s2 }));
+      }
+      txt(s, cx, H - B + 16, de(h[0], 1), { anchor: 'middle', fs: 10, extra: { 'font-variant-numeric': 'tabular-nums' } });
+      const hit = el('rect', { x: cx - bw / 2, y: T, width: bw, height: H - T - B, fill: 'transparent' }); g.appendChild(hit);
+      hit.addEventListener('mouseenter', () => {
+        const b = s.getBoundingClientRect(), k = W / b.width;
+        tp.zeig('<b>' + de(h[0] - 1.25, 1) + ' bis ' + de(h[0] + 1.25, 1) + ' % p.a.</b><br>' + h[1] + ' von ' + o.n + ' Startjahren', cx / k, Y(h[1]) / k);
+      });
+      hit.addEventListener('mouseleave', () => tp.weg());
+    });
+    const zx = L + bw * o.hist.filter(h => h[0] < 0).length;
+    s.appendChild(el('line', { x1: zx, y1: T, x2: zx, y2: H - B, stroke: S.ink3, 'stroke-width': 1.2 }));
+    txt(s, zx - 8, T + 10, 'real im Minus', { anchor: 'end', fs: 11, fill: S.ink, extra: { 'font-weight': 700 } });
+    txt(s, (L + W - R) / 2, H - 6, 'reale Rendite p.a. über zehn Jahre, Klassenmitte', { anchor: 'middle', fs: 11, fill: S.ink2 });
+
+    legende(box, [{ f: S.s1, t: 'Dekade real im Minus' }, { f: S.s2, t: 'Dekade real im Plus' }]);
+    tabelle(box, ['Klasse (% p.a.)', 'Startjahre', 'Anteil'],
+      o.hist.map(h => [de(h[0] - 1.25, 1) + ' bis ' + de(h[0] + 1.25, 1), h[1], de(100 * h[1] / o.n, 1) + ' %']));
+  }
+
+  /* ---- 4) Balken: reale Renditen deutscher Anlageklassen ----------------- */
+  function balken(id, o) {
+    const box = document.getElementById(id); if (!box) return;
+    const W = 720, zh = 40, H = o.reihen.length * zh + 34, L = 232, R = 62;
+    const s = svg(W, H); box.appendChild(s);
+    const vmax = Math.ceil(Math.max(...o.reihen.map(r => r.v)));
+    const X = v => L + v / vmax * (W - L - R);
+    for (let v = 0; v <= vmax; v++) {
+      s.appendChild(el('line', { x1: X(v), y1: 8, x2: X(v), y2: H - 26, stroke: v === 0 ? S.ink3 : S.grid, 'stroke-width': v === 0 ? 1.2 : 1 }));
+      txt(s, X(v), H - 12, de(v, 0) + ' %', { anchor: 'middle', extra: { 'font-variant-numeric': 'tabular-nums' } });
+    }
+    const tp = tip(box);
+    o.reihen.forEach((r, i) => {
+      const y = 16 + i * zh, h = 18;
+      txt(s, L - 12, y + 13, r.k, { anchor: 'end', fs: 12.5, fill: S.ink, extra: { 'font-weight': 600 } });
+      const br = X(r.v) - X(0);
+      s.appendChild(el('path', { d: 'M' + X(0) + ',' + y + ' h' + Math.max(0, br - 4) + ' a4,4 0 0 1 4,4 v' + (h - 8) + ' a4,4 0 0 1 -4,4 H' + X(0) + ' Z', fill: r.f || S.s3 }));
+      txt(s, X(r.v) + 8, y + 13, de(r.v, 1) + ' %', { fs: 12.5, fill: S.ink, extra: { 'font-weight': 700, 'font-variant-numeric': 'tabular-nums' } });
+      const hit = el('rect', { x: 0, y: y - 6, width: W, height: zh, fill: 'transparent' }); s.appendChild(hit);
+      hit.addEventListener('mouseenter', () => { const b = s.getBoundingClientRect(), k = W / b.width; tp.zeig('<b>' + r.k + '</b><br>' + de(r.v, 2) + ' % real p.a.<br>' + r.s, X(r.v) / k, (y + 8) / k); });
+      hit.addEventListener('mouseleave', () => tp.weg());
+    });
+    if (o.legende) legende(box, o.legende);
+    tabelle(box, ['Anlageklasse', 'real p.a.', 'aus 1 € wurden', 'Zeitraum'],
+      o.reihen.map(r => [r.k, de(r.v, 2) + ' %', r.e, r.z]));
+  }
+
+  /* ---- 5) Sequenz: derselbe Entnahmeplan, jedes Startjahr einmal -------- */
+  function sequenz(id, o) {
+    const box = document.getElementById(id); if (!box) return;
+    const W = 720, H = 352, L = 46, R = 16, T = 34, B = 56;
+    const s = svg(W, H); box.appendChild(s);
+    txt(s, 0, 12, 'Kapital nach ' + o.H + ' Jahren, als Vielfaches des Startkapitals', { fs: 11, fill: S.ink2 });
+
+    const alle = o.us.concat(o.de);
+    const x0 = Math.min(...alle.map(p => p[0])), x1 = Math.max(...alle.map(p => p[0]));
+    const CAP = 11;                                   /* Ausreißer wird gekappt und beschriftet */
+    const X = v => L + (v - x0) / (x1 - x0) * (W - L - R);
+    const Y = v => H - B - Math.min(v, CAP) / CAP * (H - T - B);
+
+    for (let v = 0; v <= CAP - 1; v += 2) {
+      s.appendChild(el('line', { x1: L, y1: Y(v), x2: W - R, y2: Y(v), stroke: v === 0 ? S.ink3 : S.grid, 'stroke-width': v === 0 ? 1.2 : 1 }));
+      txt(s, L - 8, Y(v) + 3.5, de(v, 0) + '×', { anchor: 'end', extra: { 'font-variant-numeric': 'tabular-nums' } });
+    }
+    /* Die eine Linie, auf die es ankommt: Kapital gerade erhalten */
+    s.appendChild(el('line', { x1: L, y1: Y(1), x2: W - R, y2: Y(1), stroke: S.ink3, 'stroke-width': 1 }));
+    txt(s, W - R - 2, Y(1) - 6, 'Startkapital erhalten', { anchor: 'end', fs: 10.5, fill: S.ink3 });
+    for (let v = Math.ceil(x0 / 20) * 20; v <= x1; v += 20) txt(s, X(v), H - B + 32, v, { anchor: 'middle', extra: { 'font-variant-numeric': 'tabular-nums' } });
+    txt(s, (L + W - R) / 2, H - 6, 'Startjahr des Ruhestands', { anchor: 'middle', fs: 11, fill: S.ink2 });
+
+    /* Startjahre, in denen Deutschland auf null lief — als Band unter der Nulllinie,
+       Jahr für Jahr, damit keine durchgehende Pleitephase suggeriert wird */
+    const pl = o.de.filter(p => p[1] === 0);
+    const bw = (W - L - R) / (x1 - x0);
+    pl.forEach(p => {
+      s.appendChild(el('rect', { x: X(p[0]) - bw / 2, y: Y(0) + 4, width: Math.max(1.5, bw), height: 7, fill: S.s1, 'fill-opacity': .8 }));
+    });
+    if (pl.length) txt(s, X(pl[0][0]) - 6, Y(0) + 11, 'Geld ausgegangen', { anchor: 'end', fs: 10.5, fill: S.s1, extra: { 'font-weight': 700 } });
+
+    [['de', S.s1], ['us', S.s2]].forEach(([k, farbe]) => {
+      s.appendChild(el('polyline', { points: o[k].map(p => X(p[0]) + ',' + Y(p[1])).join(' '),
+        fill: 'none', stroke: farbe, 'stroke-width': 2, 'stroke-linejoin': 'round', 'stroke-linecap': 'round' }));
+    });
+
+    /* Nur die beiden Extreme bekommen ein Etikett */
+    const mark = (p, farbe, t, dx, dy, anchor) => {
+      s.appendChild(el('circle', { cx: X(p[0]), cy: Y(p[1]), r: 4.5, fill: farbe, stroke: S.surf, 'stroke-width': 2 }));
+      txt(s, X(p[0]) + dx, Y(p[1]) + dy, t, { anchor: anchor, fs: 11.5, fill: S.ink, extra: { 'font-weight': 700 } });
+    };
+    mark(o.usMin, S.s2, o.usMin[0] + ': ' + de(o.usMin[1], 2) + '×', 3, 22, 'middle');
+    mark([o.deMax[0], CAP], S.s1, o.deMax[0] + ': ' + de(o.deMax[1], 1) + '×', 9, -8, 'start');
+
+    const tp = tip(box), cross = el('line', { y1: T, y2: H - B, stroke: S.ink3, 'stroke-width': 1 });
+    cross.style.display = 'none'; s.appendChild(cross);
+    const hit = el('rect', { x: L, y: T, width: W - L - R, height: H - T - B, fill: 'transparent' }); s.appendChild(hit);
+    hit.addEventListener('mousemove', ev => {
+      const b = s.getBoundingClientRect(), k = W / b.width, mx = (ev.clientX - b.left) * k;
+      const jahr = Math.round(x0 + (mx - L) / (W - L - R) * (x1 - x0));
+      const u = o.us.find(p => p[0] === jahr), d = o.de.find(p => p[0] === jahr);
+      if (!u && !d) { tp.weg(); cross.style.display = 'none'; return; }
+      cross.setAttribute('x1', X(jahr)); cross.setAttribute('x2', X(jahr)); cross.style.display = '';
+      const zeile = (n, p) => p ? '<br>' + n + ': ' + (p[1] === 0 ? 'aufgebraucht' : de(p[1], 2) + '× übrig') : '';
+      tp.zeig('<b>Start ' + jahr + '–' + (jahr + o.H) + '</b>' + zeile('USA', u) + zeile('Deutschland', d),
+        X(jahr) / k, Y(Math.max(u ? u[1] : 0, d ? d[1] : 0)) / k);
+    });
+    hit.addEventListener('mouseleave', () => { tp.weg(); cross.style.display = 'none'; });
+
+    legende(box, [{ f: S.s2, t: 'USA (S&P 500)' }, { f: S.s1, t: 'Deutschland' }]);
+    tabelle(box, ['Startjahre', 'USA Median', 'Deutschland Median', 'davon aufgebraucht'],
+      (function () {
+        const z = [];
+        for (let d0 = 1870; d0 <= 1990; d0 += 20) {
+          const f = p => p[0] >= d0 && p[0] < d0 + 20;
+          const u = o.us.filter(f).map(p => p[1]).sort((a, b) => a - b);
+          const g = o.de.filter(f).map(p => p[1]).sort((a, b) => a - b);
+          if (!u.length && !g.length) continue;
+          z.push([d0 + '–' + (d0 + 19),
+            u.length ? de(median(u), 2) + '×' : '—',
+            g.length ? de(median(g), 2) + '×' : '—',
+            g.filter(v => v === 0).length + ' von ' + g.length]);
+        }
+        return z;
+      })());
+  }
+
+  return { streuung, flaeche, verteilung, balken, sequenz };
+})();
+
+
+/* ---------------------- Vier Bilder ------------------------------------- */
+CH.streuung('ch_cape', { pts: D.cape.pts, quint: D.cape.quint, heute: D.cape.heute });
+CH.verteilung('ch_zehn', D.zehn);
+CH.flaeche('ch_uw', D.uw);
+const S2 = '#1d4ed8', S3 = '#059669';
+CH.balken('ch_de', { legende: [{ f: S3, t: 'Deutschland' }, { f: S2, t: 'USA' }], reihen: [
+  { k:'Aktien · USA',              v:6.35, f:S2, e:'35,55 €', z:'1963–2020', s:'S&P 500, Gesamtrendite (Shiller)' },
+  { k:'Immobilien · DE, mit Miete',v:5.55, f:S3, e:'23,00 €', z:'1963–2020', s:'Wertzuwachs plus reinvestierte Mieten' },
+  { k:'Aktien · DE',               v:5.18, f:S3, e:'18,76 €', z:'1963–2020', s:'Gesamtrendite mit Dividenden' },
+  { k:'Anleihen · DE',             v:3.44, f:S3, e:'7,11 €',  z:'1963–2020', s:'lange Staatsanleihen' },
+  { k:'Anleihen · USA',            v:2.02, f:S2, e:'3,19 €',  z:'1963–2020', s:'10-jährige Staatsanleihen' },
+  { k:'Eigenheim · DE, nur Wert',  v:1.47, f:S3, e:'2,33 €',  z:'1963–2020', s:'Wertzuwachs ohne Mietertrag' },
+  { k:'Sparbuch · DE',             v:1.40, f:S3, e:'2,24 €',  z:'1963–2020', s:'kurzfristige Zinsen' }
+] });
+CH.sequenz('ch_seq', SEQ);
+
+/* Aufmacher-Zahlen aus derselben Rechnung speisen */
+$('t_ertrag').textContent = nf(D.usa.aktienGeo, 1) + ' %';
+$('t_preis').textContent  = D.cape.perzentil + '. Perzentil';
+$('t_cape').textContent   = nf(D.cape.heute, 1);
+
+
+/* ---------------------- Dein Stand --------------------------------------
+   Drei Zust&auml;nde, alle drei tragen f&uuml;r sich: ohne Profil rechnet ein
+   ausdr&uuml;cklich beschriftetes Beispiel, damit das Layout nicht springt;
+   mit Teilprofil wird gerechnet, was rechenbar ist; mit vollem Profil
+   erscheint zus&auml;tzlich die Einordnung in der Verm&ouml;gensverteilung.       */
+const MEIN = (function () {
+  const P = (typeof Profil !== 'undefined') ? Profil : null;
+  const BEISPIEL = { gj: 1985, brutto: 60000, verm: 120000, rate: 500 };
+  const JAHRE_RUHESTAND = 25;
+  const EINTRITT = 22;                     // angenommener Beginn der Beitragszeit
+  let rReal = 0.04;                        // Szenario, nur Anzeige — nichts wird gespeichert
+
+  const SZEN_TEXT = {
+    '7.1': 'Der historische Schnitt von US-Aktien seit 1871. Er ist erreicht worden — aber von einem Bewertungsniveau aus, das im Median bei einem CAPE von 16 lag, nicht bei ' + nf(D.cape.heute, 0) + '.',
+    '4.0': 'Ein Mittelweg mit Puffer: unterhalb des historischen Schnitts, oberhalb dessen, was das heutige Bewertungsniveau nahelegt. Voreinstellung dieser Seite.',
+    '2.0': 'Was aus einem CAPE um ' + nf(D.cape.heute, 0) + ' historisch folgte: im teuersten Fünftel lag der Median der realen Zehnjahresrendite bei ' + nf(D.cape.quint[4].med, 1) + ' %, ein Fünftel dieser Startjahre verlor real Geld. Ein Szenario, keine Prognose.'
+  };
+
+  function zahl(el) { return P ? P.zahl(el) : (parseFloat(String(el.value).replace(/\./g, '').replace(',', '.')) || null); }
+  function fmtIn(el) { const raw = String(el.value || '').replace(/\D/g, ''); el.value = raw === '' ? '' : parseInt(raw, 10).toLocaleString('de-DE'); }
+
+  /* Wird auch vom Perzentilstreifen und den Bildunterschriften gelesen */
+  let stand = { hatProfil: false, alter: null, jahreBisRente: null, verm: null, rang: null };
+
+  function rechne() {
+    const gjE = zahl($('m_gj')), bruttoE = zahl($('m_brutto')),
+          vermE = zahl($('m_verm')), rateE = zahl($('m_rate'));
+    const eigen = !!(gjE && gjE >= 1930 && gjE <= 2015 && bruttoE);
+
+    const gj = eigen ? gjE : BEISPIEL.gj;
+    const brutto = eigen ? bruttoE : BEISPIEL.brutto;
+    const verm = eigen ? vermE : BEISPIEL.verm;
+    const rate = eigen ? (rateE || 0) : BEISPIEL.rate;
+
+    const jetzt = new Date().getFullYear(), alter = jetzt - gj;
+    const rentenalter = Math.round(regelaltersgrenzeMonate(gj) / 12);
+    const jahreBis = Math.max(0, rentenalter - alter);
+
+    /* Gesetzliche Rente: Beitragszeit ab 22 auf dem heutigen Einkommensniveau */
+    const epJahr = epProJahrRelativ(entgeltpunkte(brutto, 2026), 2026);
+    const ep = epJahr * Math.max(0, rentenalter - EINTRITT);
+    const rente = nettoRente(bruttoRente(ep, 1.0), 2026, false);
+
+    /* Kapital zum Rentenbeginn und was daraus monatlich wird — alles real */
+    let kapital = verm || 0;
+    for (let i = 0; i < jahreBis; i++) kapital = kapital * (1 + rReal) + rate * 12;
+    const bw = kapitalbedarfBarwert(1, JAHRE_RUHESTAND, rReal);
+    const entnahme = bw > 0 ? kapital / bw / 12 : 0;
+
+    const rang = (verm && verm > 0 && typeof perzentilrang === 'function') ? perzentilrang(verm) : null;
+    stand = { hatProfil: eigen, alter: alter, jahreBisRente: jahreBis, verm: eigen ? verm : null,
+              rang: eigen ? rang : null, kapital: eigen ? kapital : null };
+
+    $('mein_p').innerHTML = eigen
+      ? 'Gerechnet mit <b>' + nf(rReal * 100, 1) + ' %</b> realer Rendite pro Jahr und einer Entnahme über <b>' + JAHRE_RUHESTAND + ' Jahre</b>. ' +
+        'Die Rente unterstellt Beitragszahlung ab ' + EINTRITT + ' auf dem heutigen Einkommensniveau. Alle Beträge in heutiger Kaufkraft.'
+      : 'Vier Angaben genügen für ein erstes Bild. Solange nichts eingetragen ist, rechnet unten ein Beispiel — sobald du tippst, ersetzen deine Zahlen es. ' +
+        'Die Eingaben bleiben ausschließlich in diesem Browser und werden von allen Rechnern dieser Seite übernommen.';
+
+    const fehlt = eigen && !vermE
+      ? '<p class=meinsatz style="margin-top:12px;color:#948b7e">Mit dem Nettovermögen kommt die Einordnung in die deutsche Verteilung dazu — und das Kapital rechnet ab dem, was schon da ist.</p>'
+      : '';
+
+    $('mein_out').innerHTML =
+      (eigen ? '' : '<div class=meinbsp>Beispiel · Jahrgang ' + BEISPIEL.gj + ', ' + eur(BEISPIEL.brutto) + ' Brutto</div>') +
+      '<div class=meinerg>' +
+        '<div><div class=l>Gesetzliche Rente mit ' + rentenalter + '</div><div class=v>' + eur(rente) + '</div>' +
+          '<div class=s>Zahlbetrag nach Kranken- und Pflegeversicherung · ' + nf(ep, 1) + ' Entgeltpunkte</div></div>' +
+        '<div><div class=l>Nettovermögen heute</div><div class=v>' + (verm ? eur(verm) : '—') + '</div>' +
+          '<div class=s>' + (rang !== null
+            ? 'mehr als ' + nf(rang, 1) + ' % der deutschen Haushalte'
+            : 'Vermögen eintragen für die Einordnung') + '</div></div>' +
+        '<div><div class=l>Kapital mit ' + rentenalter + '</div><div class=v>' + eur(kapital) + '</div>' +
+          '<div class=s>' + (jahreBis > 0
+            ? jahreBis + ' Jahre × ' + eur(rate) + ' im Monat, mit ' + nf(rReal * 100, 1) + ' % real verzinst'
+            : 'Renteneintritt bereits erreicht') + '</div></div>' +
+        '<div><div class=l>Monatlich im Ruhestand</div><div class=v>' + eur(rente + entnahme) + '</div>' +
+          '<div class=s>Rente plus ' + eur(entnahme) + ' Entnahme über ' + JAHRE_RUHESTAND + ' Jahre</div></div>' +
+      '</div>' +
+      '<p class=meinsatz>' + (eigen ? 'Mit ' + alter + ' Jahren und ' : 'Im Beispiel: mit ' + alter + ' Jahren und ') + eur(brutto) +
+        ' Brutto stünden im Ruhestand rund <b>' + eur(rente + entnahme) + ' im Monat</b> zur Verfügung — davon <b>' +
+        nf(100 * rente / Math.max(1, rente + entnahme), 0) + ' %</b> aus der gesetzlichen Rente. ' +
+        'Immobilie, laufender Kredit, Erbschaften und die Steuer in der Rente sind hier nicht enthalten. ' +
+        'Das vollständige Bild rechnet das <a href="Mein_Vermoegensbild.html" style="color:#fff">Vermögensbild</a>; ' +
+        'wie stark das Ergebnis vom Startjahr abhängt, zeigt der <a href="Geschichts_Stresstest.html" style="color:#fff">Stresstest</a>.</p>' +
+      fehlt;
+
+    if (eigen && P) P.merge({ geburtsjahr: gj, bruttoJahr: brutto, sparrateMonat: rate || null });
+    if (typeof aktualisiereBezuege === 'function') aktualisiereBezuege(stand);
+  }
+
+  function start() {
+    const p = P ? P.get() : {};
+    if (p.geburtsjahr != null) $('m_gj').value = String(Math.round(p.geburtsjahr));
+    if (p.bruttoJahr != null) $('m_brutto').value = Math.round(p.bruttoJahr).toLocaleString('de-DE');
+    if (p.sparrateMonat != null) $('m_rate').value = Math.round(p.sparrateMonat).toLocaleString('de-DE');
+    const nv = P ? P.nettovermoegen() : null;
+    if (nv !== null && nv > 0) $('m_verm').value = Math.round(nv).toLocaleString('de-DE');
+
+    ['m_gj', 'm_brutto', 'm_verm', 'm_rate'].forEach(id => {
+      const el = $(id);
+      el.addEventListener('input', () => { if (id !== 'm_gj') fmtIn(el); rechne(); });
+    });
+
+    /* Szenario-Umschalter: ver&auml;ndert nur die Anzeige, schreibt nichts zur&uuml;ck */
+    $('m_szen').addEventListener('click', e => {
+      const b = e.target.closest('button'); if (!b) return;
+      $('m_szen').querySelectorAll('button').forEach(x => x.classList.remove('on'));
+      b.classList.add('on');
+      rReal = parseFloat(b.dataset.r) / 100;
+      $('m_szen_h').textContent = SZEN_TEXT[b.dataset.r] || '';
+      rechne();
+    });
+    $('m_szen_h').textContent = SZEN_TEXT['4.0'];
+
+    $('mein_leeren').addEventListener('click', () => {
+      if (P) P.leeren();
+      ['m_gj', 'm_brutto', 'm_verm', 'm_rate'].forEach(id => $(id).value = '');
+      rechne();
+    });
+    rechne();
+  }
+
+  bereit(start);
+
+  return { stand: () => stand };
+})();
+</script>
+</body></html>

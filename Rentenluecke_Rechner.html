@@ -1,0 +1,452 @@
+<!DOCTYPE html><html lang=de><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1">
+<title>Gesetzliche Rente und die Lücke</title>
+<link rel=stylesheet href="assets/site.css?v=4">
+<script defer src="assets/site-map.js?v=4"></script>
+<script defer src="assets/datenstand.js?v=4"></script>
+<script defer src="assets/site.js?v=4"></script>
+<script defer src="assets/de-rente.js?v=4"></script>
+<style>
+/* seitenspezifisch */
+.gap{background:var(--card-2);border:1px solid var(--rule);border-left:3px solid var(--s1);border-radius:0 14px 14px 0;padding:18px 22px;margin:0 0 18px}
+.gap .l{font-size:12.5px;color:var(--ink-3)}
+.gap .n{font-family:var(--serif);font-size:42px;font-weight:700;color:var(--s1);letter-spacing:-.025em;margin-top:2px;line-height:1.04;font-variant-numeric:tabular-nums}
+.gap .s{font-size:12.5px;color:var(--ink-3);margin-top:5px}
+.gap.ok{border-left-color:var(--good)}
+.gap.ok .n{color:var(--good)}
+.kpi .v.zf{font-size:24px}
+.kpi.mark{background:var(--card-2)}
+.grid2>.card{margin-bottom:0}
+.subgrp{display:grid;grid-template-columns:1fr 1fr;gap:0 16px}
+@media(max-width:520px){.subgrp{grid-template-columns:1fr}}
+.epover{display:none}
+.epover.on{display:block}
+.tbl td.c,.tbl th.c{text-align:right}
+.figcap{max-width:78ch}
+.wide2{grid-column:1/-1}
+.stack{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px}
+</style></head><body data-section="Werkzeug"><div class=wrap>
+
+<div class=hero>
+<div class=kicker>Werkzeug · Gesetzliche Rente</div>
+<h1>Gesetzliche Rente und die <em>Lücke</em></h1>
+<p class=lead>Was die Deutsche Rentenversicherung später überweist, folgt einer einzigen Formel: Entgeltpunkte mal Zugangsfaktor mal Rentenwert. Diese Seite rechnet sie durch — bis hinunter zum Zahlbetrag nach Kranken- und Pflegeversicherung, grob nach Steuer, und bis zu dem Betrag, der zum gewünschten Ruhestand fehlt.</p>
+</div>
+
+<div class=take id=take>Kernaussage wird berechnet.</div>
+
+<div class=kpis>
+<div class="kpi mark"><span class=l>Regelaltersgrenze</span><span class=v id=k_rag>—</span><span class=s id=k_rag_s>§ 35 SGB VI</span></div>
+<div class="kpi mark"><span class=l>Gewählter Rentenbeginn</span><span class=v id=k_beg>—</span><span class=s id=k_beg_s>—</span></div>
+<div class="kpi mark"><span class=l>Zugangsfaktor</span><span class="v zf" id=k_zf>—</span><span class=s id=k_zf_s>—</span></div>
+<div class="kpi mark"><span class=l>Abschlagsfrei bei 45 Beitragsjahren</span><span class=v id=k_45>—</span><span class=s>Anspruch besteht vorher nicht — früher geht nur mit Abschlag</span></div>
+</div>
+
+<div class=grid2>
+
+<div class=card>
+<h2>Eingaben</h2>
+
+<div class=grp>Person und Erwerbsleben</div>
+<div class=ctrl><div class=clabel><span>Ihr Geburtsjahr</span><span class=cval id=gj_v>1985</span></div><input type=range id=gj_r min=1955 max=2006 step=1 value=1985><div class=hint id=gj_h></div></div>
+<div class=ctrl><div class=clabel><span>Ihr Bruttojahresgehalt heute</span></div><input type=text inputmode=numeric class=eurin id=brutto value="60.000"><div class=hint id=br_h></div></div>
+<div class=subgrp>
+<div class=ctrl><div class=clabel><span>Berufseinstieg mit Alter</span><span class=cval id=ein_v>23</span></div><input type=range id=ein_r min=15 max=40 step=1 value=23><div class=hint id=ein_h></div></div>
+<div class=ctrl><div class=clabel><span>Gehalt bisher im Schnitt</span><span class=cval id=hist_v>85 %</span></div><input type=range id=hist_r min=40 max=120 step=1 value=85><div class=hint>relativ zu heute — nur für die Schätzung der bisherigen Punkte</div></div>
+</div>
+<div class=ctrl><label class=chk><input type=checkbox id=ep_use> Entgeltpunkte aus der Renteninformation verwenden</label>
+<div class="ctrl epover" id=ep_box style="margin-top:10px"><div class=clabel><span>Bisher erworbene Entgeltpunkte</span></div><input type=number id=ep_man value="20" step="0.1" min="0"><div class=hint>Der Wert steht in Ihrer jährlichen Renteninformation und ersetzt die Schätzung oben.</div></div></div>
+<div class=ctrl><div class=clabel><span>Kinderlos (Pflegeversicherung)</span></div><div class="seg tone" id=kl><button data-v="0" class=on>nein</button><button data-v="1">ja</button></div><div class=hint>Kinderlose zahlen 4,20 % statt 3,60 % Pflegebeitrag.</div></div>
+
+<div class=grp>Rentenbeginn</div>
+<div class=ctrl><div class=clabel><span>Geplantes Renteneintrittsalter</span><span class=cval id=beg_v>67 J. 0 M.</span></div><input type=range id=beg_r min=756 max=840 step=1 value=804><div class=hint id=beg_h></div></div>
+
+<div class=grp>Ruhestand und Lücke</div>
+<div class=ctrl><div class=clabel><span>Gewünschtes Nettoeinkommen im Monat</span></div><input type=text inputmode=numeric class=eurin id=bedarf value="2.500"><div class=hint>in heutiger Kaufkraft — die ganze Seite rechnet real.</div></div>
+<div class=subgrp>
+<div class=ctrl><div class=clabel><span>Rentenbezugsdauer</span><span class=cval id=dur_v>25 J.</span></div><input type=range id=dur_r min=10 max=40 step=1 value=25></div>
+<div class=ctrl><div class=clabel><span>Realzins im Ruhestand</span><span class=cval id=rz_v>2,0 %</span></div><input type=range id=rz_r min=0 max=5 step=0.1 value=2></div>
+<div class=ctrl><div class=clabel><span>Entnahmerate (Dauerentnahme)</span><span class=cval id=swr_v>3,5 %</span></div><input type=range id=swr_r min=2 max=6 step=0.1 value=3.5></div>
+<div class=ctrl><div class=clabel><span>Reale Rendite bis Rentenbeginn</span><span class=cval id=ra_v>4,0 %</span></div><input type=range id=ra_r min=0 max=8 step=0.1 value=4></div>
+</div>
+<div class=ctrl><div class=clabel><span>Lohnwachstum p. a. (nur für die Nominalanzeige)</span><span class=cval id=lw_v>2,5 %</span></div><input type=range id=lw_r min=0 max=5 step=0.1 value=2.5><div class=hint>Bis 2031 folgt der Rentenwert näherungsweise den Bruttolöhnen (§ 255e SGB VI), danach dämpft der Nachhaltigkeitsfaktor wieder.</div></div>
+</div>
+
+<div class=card>
+<h2>Ergebnis (heutige Kaufkraft)</h2>
+<div class=gap id=gapbox><div class=l>Rentenlücke pro Monat</div><div class=n id=g_luecke>—</div><div class=s id=g_sub>—</div></div>
+<div class=mrow>
+<div class=mcard><div class=l>Entgeltpunkte bei Rentenbeginn</div><div class=n id=m_ep>—</div><div class=s id=m_ep_s>—</div></div>
+<div class=mcard><div class=l>Bruttorente / Monat</div><div class=n id=m_brutto>—</div><div class=s id=m_brutto_s>—</div></div>
+<div class=mcard><div class=l>Zahlbetrag nach KV/PV</div><div class=n id=m_zahl>—</div><div class=s id=m_zahl_s>—</div></div>
+<div class=mcard><div class=l>Nach Steuer</div><div class=n id=m_steuer>—</div><div class=s id=m_steuer_s>—</div></div>
+<div class=mcard><div class=l>Deckungsgrad des Bedarfs</div><div class=n id=m_deck>—</div><div class=s id=m_deck_s>—</div></div>
+<div class=mcard><div class=l>Ihre Rente zur Eckrente</div><div class=n id=m_eck>—</div><div class=s id=m_eck_s>—</div></div>
+</div>
+<div class=callout id=nomcall>—</div>
+</div>
+
+</div>
+
+<div class="card chartbox" style="margin-top:20px">
+<h2>Von der Bruttorente zum Bedarf — wo das Geld bleibt und was fehlt</h2>
+<div id=chartWF></div>
+<div class=figcap id=capWF>—</div>
+</div>
+
+<div class="card chartbox">
+<h2>Wie die Bruttorente am Renteneintrittsalter hängt</h2>
+<div id=chartAge></div>
+<div class=legend>
+<span><i style="background:#1d4ed8"></i>mit weiteren Beitragsjahren (länger arbeiten = mehr Punkte <em>und</em> besserer Zugangsfaktor)</span>
+<span><i style="background:#8b857a"></i>nur Zugangsfaktor, Punktestand eingefroren</span>
+</div>
+<div class=figcap>Der Abschlag beträgt 0,3 % je Monat vor der Regelaltersgrenze, der Zuschlag 0,5 % je Monat danach (§ 77 Abs. 2 SGB VI). Der Zuschlag entsteht nur für Monate nach der Regelaltersgrenze, in denen trotz bestehenden Anspruchs keine Rente in Anspruch genommen wird.</div>
+</div>
+
+<div class=card>
+<h2>Die vier üblichen Varianten im Vergleich</h2>
+<table class=tbl><thead><tr><th>Rentenbeginn</th><th class=c>Entgeltpunkte</th><th class=c>Zugangsfaktor</th><th class=c>Brutto / Monat</th><th class=c>Zahlbetrag</th><th class=c>Nach Steuer</th><th class=c>Lücke</th></tr></thead><tbody id=varTbl></tbody></table>
+<div class=note>Frühestens mit 63 Jahren, und das nur als Altersrente für langjährig Versicherte (35 Jahre Wartezeit) — mit Abschlag. Die abschlagsfreie Rente nach 45 Beitragsjahren lässt sich <b>nicht</b> vorzeitig in Anspruch nehmen: vor der jeweiligen Altersgrenze existiert dieser Anspruch schlicht nicht. Normzitate: Jahrgänge vor 1964 §§ 236, 236b SGB VI, Jahrgänge ab 1964 §§ 36, 38 SGB VI.</div>
+</div>
+
+<div class=card>
+<h2>Was die Lücke an Kapital kostet</h2>
+<div class=stack>
+<div class=kpi><span class=l>Kapitalbedarf, Barwertvariante</span><span class=v id=c_bw>—</span><span class=s id=c_bw_s>—</span></div>
+<div class=kpi><span class=l>Kapitalbedarf, Dauerentnahme</span><span class=v id=c_swr>—</span><span class=s id=c_swr_s>—</span></div>
+<div class=kpi><span class=l>Nötige Sparrate ab heute</span><span class=v id=c_rate>—</span><span class=s id=c_rate_s>—</span></div>
+<div class=kpi><span class=l>Lücke pro Jahr</span><span class=v id=c_jahr>—</span><span class=s>Zahlbetrag nach Steuer gegen Wunschbedarf</span></div>
+</div>
+<div class=note style="margin-top:14px">Die Barwertvariante zehrt das Kapital über die eingestellte Bezugsdauer auf; die Dauerentnahme rechnet mit einer festen Entnahmerate und ohne Kapitalverzehr-Ende. Beide Rechnungen sind real, also inflationsbereinigt, und enthalten weder Steuern auf die Entnahmen noch Kosten noch das Reihenfolgerisiko der Renditen.</div>
+</div>
+
+<div class=card>
+<h3>Die Lücke ist eine Zahl, kein Schicksal</h3>
+<p>Die gesetzliche Rente ist in dieser Rechnung bewusst nackt: kein Grundrentenzuschlag, keine Kindererziehungszeiten, keine Betriebsrente, keine Mieteinnahmen. Wer solche Bausteine hat, verkleinert die Lücke — die Systematik bleibt dieselbe. Und sie ist unbequem eindeutig: Der Zahlbetrag folgt dem relativen Lebenseinkommen, nicht dem absoluten. Wer 45 Jahre lang genau durchschnittlich verdient, bekommt 45 Entgeltpunkte und damit die Eckrente. Alles darüber muss aus eigenem Vermögen kommen.</p>
+<p>Was der geschätzte Kapitalstock im Ruhestand wirklich aushält, hängt weniger von der Durchschnittsrendite ab als von der Reihenfolge der Jahre. Genau dafür gibt es den <a href="Lebenszyklus_Simulator.html">Lebenszyklus-Simulator</a>: Er koppelt Ansparen und Entnehmen und schickt den Plan durch echte historische Renditesequenzen — inklusive der Startjahre, in denen der Ruhestand mit einem Crash begann. Wer die hier ermittelte Lücke privat schließen will, sollte den nötigen Kapitalstock dort gegenrechnen, bevor er ihn für gesetzt hält.</p>
+</div>
+
+<div class=foot>
+<b>Rechengrundlagen.</b> Entgeltpunkte § 70 Abs. 1 SGB VI · Regelaltersgrenze §§ 35, 235 SGB VI · vorzeitiger Bezug und 45-Jahre-Grenze §§ 36, 38 bzw. 236, 236b SGB VI · Zugangsfaktor § 77 Abs. 2 SGB VI · Rentenformel §§ 64, 66, 67 SGB VI · Niveauschutzklausel § 255e SGB VI · Krankenversicherung der Rentner § 249a SGB V, durchschnittlicher Zusatzbeitrag § 242a SGB V · Pflegeversicherung § 59 SGB XI · Besteuerungsanteil und Rentenfreibetrag § 22 EStG · Einkommensteuertarif § 32a EStG. Aktueller Rentenwert 42,52 € seit 01.07.2026 (Rentenwertbestimmungsverordnung 2026); Durchschnittsentgelte 2025 und 2026 sind nach § 69 Abs. 2 SGB VI vorläufig. Datenstand 25.07.2026.
+<br><br>
+<b>Vorbehalte.</b> Die Rentenformel ist hier vereinfacht: Grundrentenzuschlag, Kindererziehungszeiten und Mütterrente, Berücksichtigungszeiten, beitragsfreie Zeiten, Zurechnungszeiten und Versorgungsausgleich fehlen. Die Steuerrechnung berücksichtigt nur Renteneinkünfte, keinen Solidaritätszuschlag, keine Kirchensteuer, kein Ehegattensplitting und keine weiteren Einkünfte; die Tarifzonen-Konstanten 2026 sind gegen den geltenden Gesetzestext abzugleichen. Die Sätze der Kranken- und Pflegeversicherung der Rentner gelten nur für die gesetzliche Rente, nicht für Betriebsrenten oder Versorgungsbezüge. Alle Projektionen über Jahrzehnte unterstellen unverändertes Recht und sind Szenarien, keine Zusagen.
+<br><br>
+<b>Keine Beratung.</b> Diese Seite ist eine Zusammenstellung öffentlich zugänglicher Rechengrößen und Rechtsvorschriften zu Informationszwecken und ersetzt keine Steuer-, Rechts- oder Anlageberatung. Verbindlich Auskunft erteilen ausschließlich die Deutsche Rentenversicherung (Rentenauskunft nach § 109 SGB VI), ein Steuerberater oder ein zugelassener Anlageberater.
+</div>
+
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  var $ = function (id) { return document.getElementById(id); };
+  var JAHR = 2026;
+
+  /* ---------- Darstellung ---------- */
+  function eur(x) { return Math.round(x).toLocaleString('de-DE') + ' €'; }
+  function eur0(x) { return Math.round(x).toLocaleString('de-DE'); }
+  function num(x, d) { return (+x).toLocaleString('de-DE', { minimumFractionDigits: d, maximumFractionDigits: d }); }
+  function pc(x, d) { return num(x * 100, d == null ? 1 : d) + ' %'; }
+  function mon(m) {
+    var j = Math.floor(m / 12), r = Math.round(m - j * 12);
+    return j + ' J. ' + r + ' M.';
+  }
+  function numVal(id) { return parseInt(($(id).value || '0').replace(/\D/g, ''), 10) || 0; }
+  function fmtInput(el) {
+    var raw = el.value.replace(/\D/g, '');
+    var cfe = el.value.length - (el.selectionStart || el.value.length);
+    el.value = raw === '' ? '' : parseInt(raw, 10).toLocaleString('de-DE');
+    var pos = Math.max(0, el.value.length - cfe);
+    try { el.setSelectionRange(pos, pos); } catch (e) {}
+  }
+
+  /* ---------- Zustand ---------- */
+  var kinderlos = 0;
+  Array.prototype.forEach.call($('kl').querySelectorAll('button'), function (b) {
+    b.addEventListener('click', function () {
+      Array.prototype.forEach.call($('kl').querySelectorAll('button'), function (o) { o.classList.remove('on'); });
+      b.classList.add('on'); kinderlos = +b.dataset.v; render();
+    });
+  });
+  $('ep_use').addEventListener('change', function () {
+    $('ep_box').classList.toggle('on', $('ep_use').checked); render();
+  });
+
+  /* ---------- Modell: alles Rechnerische aus assets/de-rente.js ---------- */
+  function modell(begMonate) {
+    var gj = +$('gj_r').value;
+    var brutto = numVal('brutto');
+    var einstieg = +$('ein_r').value;
+    var hist = +$('hist_r').value / 100;
+    var alterHeute = JAHR - gj;
+
+    var epJahrHeute = entgeltpunkte(brutto, JAHR);                    // § 70 SGB VI
+    var vielfaches = brutto / RV.durchschnittsentgelt[JAHR];
+    var epProJahr = epProJahrRelativ(vielfaches, JAHR);               // Projektion, relativ konstant
+    var epProJahrFrueher = epProJahrRelativ(vielfaches * hist, JAHR);
+
+    var jahreBisher = Math.max(0, alterHeute - einstieg);
+    var epBisher = $('ep_use').checked ? Math.max(0, +$('ep_man').value || 0)
+                                       : jahreBisher * epProJahrFrueher;
+    var restJahre = Math.max(0, begMonate / 12 - alterHeute);
+    var epKuenftig = restJahre * epProJahr;
+    var epGesamt = epBisher + epKuenftig;
+
+    var rag = regelaltersgrenzeMonate(gj);
+    var g45 = altersgrenze45JahreMonate(gj);
+    var zf = zugangsfaktor(begMonate, gj);
+    var bru = bruttoRente(epGesamt, zf, RV.aktuellerRentenwert);
+
+    var det = nettoRenteDetail(bru, JAHR, !!kinderlos);
+    var beginnJahr = gj + Math.floor(begMonate / 12);
+    var bAnteil = besteuerungsanteil(beginnJahr);
+    var fb = rentenfreibetrag(bru * 12, beginnJahr);
+    var st = nettoRenteNachSteuer(bru * 12, JAHR, !!kinderlos, beginnJahr, fb);
+
+    var bedarf = numVal('bedarf');
+    var rl = rentenluecke(bedarf, st.nettoMonat, { entnahmerate: +$('swr_r').value / 100 });
+
+    return {
+      gj: gj, alterHeute: alterHeute, jahreBisher: jahreBisher, restJahre: restJahre,
+      epJahrHeute: epJahrHeute, epProJahr: epProJahr, epBisher: epBisher,
+      epKuenftig: epKuenftig, epGesamt: epGesamt, vielfaches: vielfaches,
+      rag: rag, g45: g45, zf: zf, begMonate: begMonate, beginnJahr: beginnJahr,
+      brutto: bru, det: det, kvpv: det.kvBeitrag + det.pvBeitrag, zahl: det.netto,
+      bAnteil: bAnteil, freibetrag: fb, steuerMonat: st.einkommensteuer / 12,
+      nettoSteuer: st.nettoMonat, bedarf: bedarf, rl: rl
+    };
+  }
+
+  /* ---------- Darstellung: Sparrate (Annuität, eigene Hilfsfunktion) ---------- */
+  function sparrate(ziel, jahre, realzinsPA) {
+    var n = Math.round(jahre * 12);
+    if (n <= 0) return null;
+    var rm = Math.pow(1 + realzinsPA, 1 / 12) - 1;
+    if (Math.abs(rm) < 1e-12) return ziel / n;
+    return ziel * rm / (Math.pow(1 + rm, n) - 1);
+  }
+
+  /* ---------- Wasserfall ---------- */
+  function svgWF(d) {
+    var W = 720, H = 300, X0 = 60, X1 = 700, Y0 = 30, Y1 = 244;
+    var items = [
+      { l: 'Bruttorente', v: d.brutto, t: 't', c: '#1d4ed8' },
+      { l: 'KV / PV', v: -d.kvpv, t: 'd', c: '#a16207' },
+      { l: 'Steuer', v: -d.steuerMonat, t: 'd', c: '#a16207' },
+      { l: 'Zahlbetrag', v: d.nettoSteuer, t: 't', c: '#059669' },
+      { l: 'Lücke', v: d.rl.lueckeMonat, t: 'd', c: '#c2410c' },
+      { l: 'Bedarf', v: d.bedarf, t: 't', c: '#6d28d9' }
+    ];
+    var mx = Math.max(d.brutto, d.bedarf, 1) * 1.16;
+    var ym = function (v) { return Y1 - v / mx * (Y1 - Y0); };
+    var sw = (X1 - X0) / items.length, bw = Math.min(sw * 0.52, 62);
+    var s = '<svg viewBox="0 0 ' + W + ' ' + H + '" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;font-family:inherit">';
+    [0, .25, .5, .75, 1].forEach(function (f) {
+      var v = mx * f, y = ym(v);
+      s += '<line x1="' + X0 + '" y1="' + y.toFixed(1) + '" x2="' + X1 + '" y2="' + y.toFixed(1) + '" stroke="#ece7dd"/>';
+      s += '<text x="' + (X0 - 8) + '" y="' + (y + 3.5).toFixed(1) + '" font-size="10" fill="#8b857a" text-anchor="end">' + eur0(v) + '</text>';
+    });
+    var run = 0, prevRight = null, prevY = null;
+    items.forEach(function (it, i) {
+      var cx = X0 + sw * i + sw / 2, x = cx - bw / 2;
+      var base = it.t === 't' ? 0 : run, top = it.t === 't' ? it.v : run + it.v;
+      var y = ym(Math.max(base, top)), h = Math.max(1, Math.abs(ym(base) - ym(top)));
+      if (prevRight !== null && it.t === 'd') {
+        s += '<line x1="' + prevRight.toFixed(1) + '" y1="' + prevY.toFixed(1) + '" x2="' + x.toFixed(1) +
+             '" y2="' + prevY.toFixed(1) + '" stroke="#8b857a" stroke-width="1" stroke-dasharray="3 3"/>';
+      }
+      if (prevRight !== null && it.t === 't' && i > 0) {
+        s += '<line x1="' + prevRight.toFixed(1) + '" y1="' + ym(run).toFixed(1) + '" x2="' + x.toFixed(1) +
+             '" y2="' + ym(run).toFixed(1) + '" stroke="#8b857a" stroke-width="1" stroke-dasharray="3 3"/>';
+      }
+      s += '<rect x="' + x.toFixed(1) + '" y="' + y.toFixed(1) + '" width="' + bw.toFixed(1) + '" height="' + h.toFixed(1) +
+           '" fill="' + it.c + '" fill-opacity="' + (it.t === 't' ? '0.9' : '0.75') + '" rx="2"/>';
+      var lab = (it.t === 'd' && it.v < 0 ? '−' : '') + eur(Math.abs(it.v));
+      s += '<text x="' + cx.toFixed(1) + '" y="' + (y - 7).toFixed(1) + '" font-size="11.5" font-weight="700" fill="' + it.c + '" text-anchor="middle">' + lab + '</text>';
+      s += '<text x="' + cx.toFixed(1) + '" y="' + (Y1 + 17) + '" font-size="11" fill="#57534c" text-anchor="middle">' + it.l + '</text>';
+      run = top;
+      prevRight = x + bw; prevY = ym(top);
+    });
+    s += '<line x1="' + X0 + '" y1="' + Y1 + '" x2="' + X1 + '" y2="' + Y1 + '" stroke="#8b857a" stroke-width="1"/>';
+    s += '<text x="' + X0 + '" y="' + (Y0 - 12) + '" font-size="10.5" fill="#8b857a">Euro pro Monat, heutige Kaufkraft</text>';
+    return s + '</svg>';
+  }
+
+  /* ---------- Kurve: Bruttorente über das Renteneintrittsalter ---------- */
+  function svgAge(d) {
+    var W = 720, H = 300, X0 = 60, X1 = 700, Y0 = 26, Y1 = 244;
+    var a0 = 756, a1 = 840, pts = [], fix = [];
+    for (var m = a0; m <= a1; m++) {
+      var rest = Math.max(0, m / 12 - d.alterHeute);
+      var ep = d.epBisher + rest * d.epProJahr;
+      var zf = zugangsfaktor(m, d.gj);
+      pts.push([m, bruttoRente(ep, zf, RV.aktuellerRentenwert)]);
+      fix.push([m, bruttoRente(d.epGesamt, zf, RV.aktuellerRentenwert)]);
+    }
+    var vals = pts.map(function (p) { return p[1]; }).concat(fix.map(function (p) { return p[1]; }));
+    var mx = Math.max.apply(null, vals) * 1.1, mn = Math.min.apply(null, vals) * 0.86;
+    if (!(mx > mn)) { mx = mn + 1; }
+    var xm = function (m) { return X0 + (m - a0) / (a1 - a0) * (X1 - X0); };
+    var ym = function (v) { return Y1 - (v - mn) / (mx - mn) * (Y1 - Y0); };
+    var s = '<svg viewBox="0 0 ' + W + ' ' + H + '" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;font-family:inherit">';
+    for (var g = 0; g <= 4; g++) {
+      var v = mn + (mx - mn) * g / 4, y = ym(v);
+      s += '<line x1="' + X0 + '" y1="' + y.toFixed(1) + '" x2="' + X1 + '" y2="' + y.toFixed(1) + '" stroke="#ece7dd"/>';
+      s += '<text x="' + (X0 - 8) + '" y="' + (y + 3.5).toFixed(1) + '" font-size="10" fill="#8b857a" text-anchor="end">' + eur0(v) + '</text>';
+    }
+    for (var a = 63; a <= 70; a++) {
+      s += '<text x="' + xm(a * 12).toFixed(1) + '" y="' + (Y1 + 17) + '" font-size="10.5" fill="#8b857a" text-anchor="middle">' + a + '</text>';
+    }
+    s += '<text x="' + X1 + '" y="' + (Y1 + 33) + '" font-size="10.5" fill="#8b857a" text-anchor="end">Alter bei Rentenbeginn</text>';
+    if (d.rag >= a0 && d.rag <= a1) {
+      s += '<line x1="' + xm(d.rag).toFixed(1) + '" y1="' + Y0 + '" x2="' + xm(d.rag).toFixed(1) + '" y2="' + Y1 +
+           '" stroke="#8b857a" stroke-width="1" stroke-dasharray="4 3"/>';
+      s += '<text x="' + (xm(d.rag) + 5).toFixed(1) + '" y="' + (Y0 + 11) + '" font-size="10" fill="#8b857a">Regelaltersgrenze</text>';
+    }
+    if (d.g45 >= a0 && d.g45 <= a1) {
+      s += '<line x1="' + xm(d.g45).toFixed(1) + '" y1="' + Y0 + '" x2="' + xm(d.g45).toFixed(1) + '" y2="' + Y1 +
+           '" stroke="#059669" stroke-width="1" stroke-dasharray="2 3"/>';
+      s += '<text x="' + (xm(d.g45) - 5).toFixed(1) + '" y="' + (Y0 + 11) + '" font-size="10" fill="#059669" text-anchor="end">45 Beitragsjahre</text>';
+    }
+    s += '<polyline points="' + fix.map(function (p) { return xm(p[0]).toFixed(1) + ',' + ym(p[1]).toFixed(1); }).join(' ') +
+         '" fill="none" stroke="#8b857a" stroke-width="1.6" stroke-dasharray="5 3"/>';
+    s += '<polyline points="' + pts.map(function (p) { return xm(p[0]).toFixed(1) + ',' + ym(p[1]).toFixed(1); }).join(' ') +
+         '" fill="none" stroke="#1d4ed8" stroke-width="2"/>';
+    var cx = xm(d.begMonate), cy = ym(d.brutto);
+    s += '<circle cx="' + cx.toFixed(1) + '" cy="' + cy.toFixed(1) + '" r="4.5" fill="#c2410c"/>';
+    var anch = cx > X1 - 130 ? 'end' : 'start', dx = cx > X1 - 130 ? -9 : 9;
+    s += '<text x="' + (cx + dx).toFixed(1) + '" y="' + (cy - 9).toFixed(1) + '" font-size="11.5" font-weight="700" fill="#c2410c" text-anchor="' + anch + '">' +
+         eur(d.brutto) + '</text>';
+    s += '<text x="' + (cx + dx).toFixed(1) + '" y="' + (cy + 5).toFixed(1) + '" font-size="10" fill="#c2410c" text-anchor="' + anch + '">Ihre Wahl: ' + mon(d.begMonate) + '</text>';
+    s += '<line x1="' + X0 + '" y1="' + Y1 + '" x2="' + X1 + '" y2="' + Y1 + '" stroke="#8b857a" stroke-width="1"/>';
+    return s + '</svg>';
+  }
+
+  /* ---------- Rendern ---------- */
+  function render() {
+    var begM = +$('beg_r').value;
+    var d;
+    try { d = modell(begM); }
+    catch (e) { $('take').textContent = 'Für diese Eingabe fehlt ein amtlicher Rechenwert: ' + e.message; return; }
+
+    $('gj_v').textContent = d.gj;
+    $('ein_v').textContent = $('ein_r').value;
+    $('hist_v').textContent = $('hist_r').value + ' %';
+    $('beg_v').textContent = mon(begM);
+    $('dur_v').textContent = $('dur_r').value + ' J.';
+    $('rz_v').textContent = num($('rz_r').value, 1) + ' %';
+    $('swr_v').textContent = num($('swr_r').value, 1) + ' %';
+    $('ra_v').textContent = num($('ra_r').value, 1) + ' %';
+    $('lw_v').textContent = num($('lw_r').value, 1) + ' %';
+
+    $('gj_h').textContent = 'Alter heute: ' + d.alterHeute + ' Jahre. Regelaltersgrenze ' + mon(d.rag);
+    $('ein_h').textContent = d.jahreBisher + ' Beitragsjahre bis heute, ' + num(d.restJahre, 1) + ' Jahre bis zum Rentenbeginn.';
+    var kap = numVal('brutto') > RV.bbgJahr[JAHR]
+      ? ' Über der Beitragsbemessungsgrenze von ' + eur(RV.bbgJahr[JAHR]) + ' zählt nichts mehr.' : '';
+    $('br_h').textContent = pc(d.vielfaches, 0) + ' des Durchschnittsentgelts (' + eur(RV.durchschnittsentgelt[JAHR]) +
+      ') — das ergibt ' + num(d.epJahrHeute, 3) + ' Entgeltpunkte in diesem Jahr, maximal möglich sind ' +
+      num(maxEntgeltpunkteJahr(JAHR), 3) + '.' + kap;
+
+    var diff = begM - d.rag;
+    var zfTxt = diff < 0 ? pc(1 - d.zf, 1) + ' Abschlag' : (diff > 0 ? pc(d.zf - 1, 1) + ' Zuschlag' : 'kein Ab- oder Zuschlag');
+    $('beg_h').textContent = (diff === 0 ? 'Genau die Regelaltersgrenze' :
+      Math.abs(diff) + ' Monate ' + (diff < 0 ? 'vor' : 'nach') + ' der Regelaltersgrenze') + ' — ' + zfTxt + '.';
+
+    $('k_rag').textContent = mon(d.rag);
+    $('k_rag_s').textContent = 'Jahrgang ' + d.gj + ', §§ 35, 235 SGB VI';
+    $('k_beg').textContent = mon(begM);
+    $('k_beg_s').textContent = diff === 0 ? 'punktgenau auf der Regelaltersgrenze'
+      : Math.abs(diff) + ' Monate ' + (diff < 0 ? 'früher' : 'später');
+    $('k_zf').textContent = num(d.zf, 3);
+    $('k_zf').className = 'v zf' + (diff < 0 ? ' neg' : (diff > 0 ? ' pos' : ''));
+    $('k_zf_s').textContent = zfTxt + ' (0,3 % je Monat früher, 0,5 % je Monat später)';
+    $('k_45').textContent = mon(d.g45);
+
+    $('m_ep').textContent = num(d.epGesamt, 1);
+    $('m_ep_s').textContent = num(d.epBisher, 1) + ' bisher' + ($('ep_use').checked ? ' (Renteninformation)' : ' (geschätzt)') +
+      ' + ' + num(d.epKuenftig, 1) + ' künftig, je ' + num(d.epProJahr, 3) + ' pro Jahr';
+    $('m_brutto').textContent = eur(d.brutto);
+    $('m_brutto_s').textContent = num(d.epGesamt, 1) + ' × ' + num(d.zf, 3) + ' × ' + num(RV.aktuellerRentenwert, 2) + ' €';
+    $('m_zahl').textContent = eur(d.zahl);
+    $('m_zahl_s').textContent = '− ' + eur(d.det.kvBeitrag) + ' KV (' + pc(d.det.kvSatz, 2) + ') − ' +
+      eur(d.det.pvBeitrag) + ' PV (' + pc(d.det.pvSatz, 2) + ')';
+    $('m_steuer').textContent = eur(d.nettoSteuer);
+    $('m_steuer_s').textContent = 'Besteuerungsanteil ' + pc(d.bAnteil, 1) + ', Freibetrag ' + eur(d.freibetrag) +
+      '/Jahr fix, Steuer ' + eur(d.steuerMonat) + '/Monat';
+    $('m_deck').textContent = pc(d.rl.deckungsgrad, 0);
+    $('m_deck').className = 'n ' + (d.rl.deckungsgrad >= 1 ? 'pos' : (d.rl.deckungsgrad < 0.6 ? 'neg' : 'hot'));
+    $('m_deck_s').textContent = 'des gewünschten Nettobedarfs von ' + eur(d.bedarf);
+    var eck = bruttoRente(45, 1, RV.aktuellerRentenwert);
+    $('m_eck').textContent = pc(d.brutto / eck, 0);
+    $('m_eck_s').textContent = 'Eckrente = 45 Punkte, Zugangsfaktor 1,0 = ' + eur(eck) + ' brutto';
+
+    var ok = d.rl.lueckeMonat <= 0;
+    $('gapbox').className = 'gap' + (ok ? ' ok' : '');
+    $('g_luecke').textContent = ok ? 'keine' : eur(d.rl.lueckeMonat);
+    $('g_sub').textContent = ok
+      ? 'Der Zahlbetrag nach Steuer deckt den Wunschbedarf bereits — Überschuss ' + eur(d.nettoSteuer - d.bedarf) + ' im Monat.'
+      : eur(d.rl.lueckeJahr) + ' im Jahr — Differenz zwischen ' + eur(d.bedarf) + ' Wunschbedarf und ' + eur(d.nettoSteuer) + ' Rente nach Steuer.';
+
+    var jahreBis = Math.max(0, begM / 12 - d.alterHeute);
+    var rwNom = rentenwertProjektion(RV.aktuellerRentenwert, jahreBis, +$('lw_r').value / 100);
+    $('nomcall').innerHTML = '<b>Nominal zum Rentenbeginn ' + d.beginnJahr + ':</b> Bei ' + num($('lw_r').value, 1) +
+      ' % Lohnwachstum stünde der Rentenwert dann bei ' + num(rwNom, 2) + ' € statt heute ' + num(RV.aktuellerRentenwert, 2) +
+      ' € — die Bruttorente läge nominal bei ' + eur(d.epGesamt * d.zf * rwNom) + '. Kaufkraft gewinnt das nicht, deshalb rechnet der Rest der Seite real.';
+
+    /* Kapitalbedarf */
+    var dur = +$('dur_r').value, rz = +$('rz_r').value / 100;
+    var bw = d.rl.kapitalbedarfBarwert(dur, rz);
+    $('c_bw').textContent = eur(bw);
+    $('c_bw_s').textContent = dur + ' Jahre Bezug, ' + num(rz * 100, 1) + ' % Realzins, Kapital am Ende aufgebraucht';
+    $('c_swr').textContent = eur(d.rl.kapitalbedarfSWR);
+    $('c_swr_s').textContent = num($('swr_r').value, 1) + ' % reale Dauerentnahme, Kapital bleibt erhalten';
+    var sr = sparrate(bw, jahreBis, +$('ra_r').value / 100);
+    $('c_rate').textContent = ok ? 'keine' : (sr === null ? '—' : eur(sr));
+    $('c_rate_s').textContent = ok ? 'Es besteht keine Lücke, die geschlossen werden müsste'
+      : (sr === null ? 'Rentenbeginn liegt nicht in der Zukunft'
+      : num(jahreBis, 1) + ' Jahre sparen bei ' + num($('ra_r').value, 1) + ' % realer Rendite, Ziel Barwertvariante');
+    $('c_jahr').textContent = eur(d.rl.lueckeJahr);
+
+    /* Diagramme */
+    $('chartWF').innerHTML = svgWF(d);
+    $('capWF').textContent = 'Von ' + eur(d.brutto) + ' Bruttorente bleiben nach ' + eur(d.kvpv) +
+      ' Kranken- und Pflegeversicherung und ' + eur(d.steuerMonat) + ' Einkommensteuer ' + eur(d.nettoSteuer) +
+      ' übrig. Bis zum Wunschbedarf von ' + eur(d.bedarf) + ' fehlen ' + eur(d.rl.lueckeMonat) + ' im Monat.';
+    $('chartAge').innerHTML = svgAge(d);
+
+    /* Vergleichstabelle */
+    var rows = '';
+    [63, 65, 67, 70].forEach(function (a) {
+      var m = a * 12, x;
+      try { x = modell(m); } catch (e) { return; }
+      rows += '<tr' + (Math.abs(m - begM) < 6 ? ' class=me' : '') + '><td>mit ' + a + ' Jahren</td>' +
+        '<td class=c>' + num(x.epGesamt, 1) + '</td>' +
+        '<td class=c>' + num(x.zf, 3) + '</td>' +
+        '<td class=c>' + eur(x.brutto) + '</td>' +
+        '<td class=c>' + eur(x.zahl) + '</td>' +
+        '<td class=c>' + eur(x.nettoSteuer) + '</td>' +
+        '<td class=c>' + (x.rl.lueckeMonat > 0 ? eur(x.rl.lueckeMonat) : 'keine') + '</td></tr>';
+    });
+    $('varTbl').innerHTML = rows;
+
+    /* Kernaussage */
+    $('take').innerHTML = 'Bei ' + eur(numVal('brutto')) + ' Bruttojahresgehalt und Rentenbeginn mit ' + mon(begM) +
+      ' stehen <b>' + num(d.epGesamt, 1) + ' Entgeltpunkte</b> und ein Zugangsfaktor von <b>' + num(d.zf, 3) +
+      '</b> zu Buche: <b>' + eur(d.brutto) + '</b> brutto, <b>' + eur(d.zahl) + '</b> Zahlbetrag nach KV/PV, <b>' +
+      eur(d.nettoSteuer) + '</b> nach Steuer. ' +
+      (ok ? 'Der Wunschbedarf von ' + eur(d.bedarf) + ' ist damit gedeckt.'
+          : 'Vom Wunschbedarf ' + eur(d.bedarf) + ' fehlen <b>' + eur(d.rl.lueckeMonat) +
+            ' im Monat</b> — dafür braucht es rund <b>' + eur(bw) + '</b> eigenes Kapital zum Rentenbeginn.');
+  }
+
+  /* ---------- Ereignisse ---------- */
+  ['gj_r', 'ein_r', 'hist_r', 'beg_r', 'dur_r', 'rz_r', 'swr_r', 'ra_r', 'lw_r', 'ep_man'].forEach(function (id) {
+    $(id).addEventListener('input', render);
+  });
+  Array.prototype.forEach.call(document.querySelectorAll('input.eurin'), function (el) {
+    el.addEventListener('input', function () { fmtInput(el); render(); });
+  });
+
+  render();
+});
+</script>
+</body></html>

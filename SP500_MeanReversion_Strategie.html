@@ -1,0 +1,68 @@
+<!DOCTYPE html><html lang=de><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1">
+<title>Lässt sich die Mean-Reversion ausbeuten?</title>
+<script src="assets/chart.umd.min.js?v=4"></script>
+<link rel=stylesheet href="assets/site.css?v=4">
+<script defer src="assets/site-map.js?v=4"></script>
+<script defer src="assets/datenstand.js?v=4"></script>
+<script defer src="assets/site.js?v=4"></script>
+<style>
+/* seitenspezifisch */
+.chartbox{position:relative;height:400px}
+.tbl{margin:6px 0 4px}
+.tbl td.v{font-weight:600}
+.tbl tr.hot td{background:var(--accent-soft);font-weight:700}
+ul.take{padding:16px 22px 16px 42px}
+ul.take li{margin:9px 0}
+ul.take li:last-child{margin-bottom:0}
+.card>.take:last-child{margin-bottom:0}
+</style></head><body data-section="Strategien"><div class=wrap>
+<div class=kicker>Strategien &middot; Backtest</div>
+<h1>L&auml;sst sich die Mean-Reversion zu <em>Geld</em> machen?</h1>
+<p class=lead>Die Umkehrneigung der Tagesrenditen ist statistisch real. Handelbar wird sie dadurch nicht: &Uuml;ber 76&nbsp;Jahre bleibt eine Contrarian-Regel nach Kosten in jeder &Auml;ra hinter Buy-&amp;-Hold zur&uuml;ck.</p>
+<div class=sub>Contrarian-Strategie vs. Buy-&amp;-Hold auf dem S&amp;P 500 &middot; pro &Auml;ra, brutto &amp; netto (3&nbsp;bp/Trade)</div>
+
+<div class=card>
+<h2>Aufbau</h2>
+<h3>Die Idee &mdash; und warum es <i>keine</i> Arbitrage ist</h3>
+<p>Wenn der <a href="SP500_Momentum_MeanReversion.html">Markt mean-revertiert (negative Autokorrelation)</a>, m&uuml;sste eine <b>Contrarian-Regel</b> Geld verdienen: <a href="SP500_Call_im_Dip.html">nach einem Minus-Tag long gehen</a> (&bdquo;Buy the Dip&ldquo;), bzw. long/short gegen die Vortagesbewegung. Das ist <b>statistische Arbitrage</b> &mdash; ein riskanter Edge, <u>kein</u> risikoloser Gewinn. Getestet auf echten Tagesdaten, die Position stammt ausschlie&szlig;lich aus Vergangenheitsinformation.</p>
+<div class=chartbox><canvas id=bars></canvas></div>
+<div class=take>Das Bild ist eindeutig: <b>Buy-&amp;-Hold (blau) schl&auml;gt netto in jeder &Auml;ra.</b> Die Long-Short-Variante (rot) ist nach Kosten <b>&uuml;berall negativ</b>. Der vermeintliche &bdquo;Edge&ldquo; wird von Handelskosten und Regime aufgefressen.</div>
+</div>
+
+<div class=card>
+<h2>Ergebnis</h2>
+<h3>Annualisierte Rendite je &Auml;ra (%)</h3>
+<table class=tbl><thead><tr><th>&Auml;ra</th><th>Buy&amp;Hold</th><th>Dip brutto</th><th>Dip netto</th><th>L/S brutto</th><th>L/S netto</th></tr></thead><tbody><tr><td>1950–89 (Momentum)</td><td class='v'>+7.9</td><td class='v neg'>-10.1</td><td class='v neg'>-13.0</td><td class='v neg'>-25.6</td><td class='v neg'>-30.4</td></tr><tr class=hot><td>1990–2009</td><td class='v'>+5.9</td><td class='v pos'>+6.8</td><td class='v '>+2.7</td><td class='v '>+5.8</td><td class='v neg'>-2.1</td></tr><tr><td>2010–22 (Mean-Rev.)</td><td class='v'>+10.0</td><td class='v '>+7.7</td><td class='v '>+3.6</td><td class='v '>+4.1</td><td class='v neg'>-3.7</td></tr><tr><td>2023–26</td><td class='v'>+20.6</td><td class='v '>+13.5</td><td class='v '>+9.3</td><td class='v '>+5.8</td><td class='v neg'>-1.9</td></tr><tr><td>gesamt 1950–2026</td><td class='v'>+8.3</td><td class='v neg'>-2.0</td><td class='v neg'>-5.4</td><td class='v neg'>-12.2</td><td class='v neg'>-18.3</td></tr></tbody></table>
+<p class=note>Gr&uuml;n = schl&auml;gt Buy&amp;Hold, rot = negativ. Die Contrarian-Regel handelt rund 110&ndash;260&times; pro Jahr.</p>
+</div>
+
+<div class=card>
+<h2>Befund</h2>
+<h3>Drei Gr&uuml;nde, warum der Edge nicht zu fangen ist</h3>
+<ul class=take>
+<li><b>Regimeabh&auml;ngig &mdash; und das Regime ist im Voraus nicht bekannt.</b> In der Momentum-&Auml;ra 1950&ndash;89 h&auml;tte dieselbe Strategie <b>&minus;26&nbsp;%/Jahr</b> verloren (L/S, bereits brutto). &Uuml;ber die ganze Historie ist Contrarian ein Verlustgesch&auml;ft.</li>
+<li><b>Die Kosten fressen ihn auf.</b> Selbst in der besten &Auml;ra (1990&ndash;2009) schlug &bdquo;Buy the Dip&ldquo; brutto nur knapp (6,8 gegen 5,9&nbsp;%) &mdash; bei rund 130 Trades pro Jahr und lediglich 3&nbsp;bp Kosten f&auml;llt es netto auf 2,7&nbsp;% und damit <i>unter</i> Buy-&amp;-Hold.</li>
+<li><b>Er ist verschwunden.</b> 2023&ndash;26 macht Buy-&amp;-Hold <b>+20,6&nbsp;%</b>, die Contrarian-Strategie weit weniger &mdash; passend dazu, dass sich <a href="SP500_Anomalien_aktuell.html">die Autokorrelation seit 2023 normalisiert hat</a>. Hinzu kommt: Wer aussteigt, <a href="SP500_Taleb_Analyse.html">verpasst die besten Tage</a>, und die treten geclustert auf.</li>
+</ul>
+</div>
+
+<div class=card>
+<h2>Schluss</h2>
+<h3>Die eigentliche Lektion</h3>
+<div class=take>Eine statistisch <i>hochsignifikante</i> Anomalie (die Mean-Reversion ist real, ~15&nbsp;SE) ist trotzdem <b>keine profitable Strategie</b>. Genau deshalb kann der Effekt &uuml;berhaupt fortbestehen: Was nach Kosten Geld br&auml;chte, w&uuml;rde sofort wegarbitriert. Der Markt ist schwer zu schlagen &mdash; nicht weil er &bdquo;effizient&ldquo; im Lehrbuchsinn ist, sondern weil die ausbeutbaren St&uuml;cke d&uuml;nn, teuer und fl&uuml;chtig sind.</div>
+</div>
+
+<p class=note><b>Kein Anlageratschlag.</b> Im Gegenteil &mdash; diese Analyse zeigt, warum solche &bdquo;Edges&ldquo; in der Praxis nicht funktionieren. Vereinfachter Backtest (keine Slippage/Steuern/Leerverkaufs- &amp; Finanzierungskosten; L/S idealisiert), nur zur Veranschaulichung.</p>
+<div class=foot>Eigene Berechnung, ^GSPC Tagesrenditen 1950&ndash;2026 (Yahoo Finance). Signal = Vortagesrendite. Kosten 3&nbsp;bp je Umschichtungseinheit. Buy-the-Dip: long nach Minus-Tag, sonst Cash. L/S: long/short gegen Vortag.</div>
+</div>
+<script>
+const P={"labels": ["1950\u201389 (Momentum)", "1990\u20132009", "2010\u201322 (Mean-Rev.)", "2023\u201326"], "bh": [7.9, 5.9, 10, 20.6], "cl": [-13, 2.7, 3.6, 9.3], "cls": [-30.4, -2.1, -3.7, -1.9]};
+Chart.defaults.font.family="-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif";
+new Chart(document.getElementById('bars'),{type:'bar',data:{labels:P.labels,datasets:[
+ {label:'Buy & Hold',data:P.bh,backgroundColor:'#1d4ed8',borderRadius:4},
+ {label:'Buy-the-Dip (netto)',data:P.cl,backgroundColor:'#a16207',borderRadius:4},
+ {label:'Long-Short (netto)',data:P.cls,backgroundColor:'#b91c1c',borderRadius:4}
+]},options:{maintainAspectRatio:false,scales:{
+ y:{title:{display:true,text:'annualisierte Rendite, netto (%)'},ticks:{callback:v=>v+'%'},grid:{color:c=>c.tick.value===0?'#d5cec1':'#ece7dd'}},
+ x:{grid:{display:false}}},plugins:{legend:{labels:{usePointStyle:true,boxWidth:8}},tooltip:{callbacks:{label:it=>it.dataset.label+': '+it.parsed.y+'%'}}}}});
+</script></body></html>

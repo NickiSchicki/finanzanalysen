@@ -1,0 +1,430 @@
+<!DOCTYPE html><html lang=de><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1">
+<title>Wo dieses Vermögen in Deutschland steht</title>
+<link rel=stylesheet href="assets/site.css?v=4">
+<script defer src="assets/site-map.js?v=4"></script>
+<script defer src="assets/datenstand.js?v=4"></script>
+<script defer src="assets/site.js?v=4"></script>
+<script src="assets/de-vermoegen.js?v=4"></script>
+<style>
+/* seitenspezifisch */
+.res{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.rbox{background:var(--card-2);border:1px solid var(--rule);border-radius:12px;padding:14px 16px}
+.rbox .l{font-size:11.5px;color:var(--ink-3);margin-bottom:4px;line-height:1.45}
+.rbox .n{font-family:var(--serif);font-size:23px;font-weight:700;letter-spacing:-.02em;line-height:1.1;color:var(--ink);font-variant-numeric:tabular-nums}
+.rbox .s{font-size:11px;color:var(--ink-3);margin-top:5px;line-height:1.45}
+.rbox.wide{grid-column:1/3}
+.rbox.hi .n{color:var(--s1)}
+.nb{color:var(--ink-3);font-style:italic;font-family:var(--sans);font-size:14px;font-weight:400;letter-spacing:0}
+.flag{display:inline-block;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.11em;
+  color:var(--s5);border:1px solid var(--s5);border-radius:3px;padding:1px 4px;margin-left:6px;vertical-align:2px;font-family:var(--sans)}
+.flag.na{color:var(--ink-3);border-color:var(--rule)}
+.flag.ab{color:var(--s3);border-color:var(--s3)}
+.pc .st{display:block;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--ink-3);margin-top:5px}
+.pc.ipol{border-color:var(--s5)}
+.pc.ipol .st{color:var(--s5)}
+.tbl tr.sec td{padding-top:16px;font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:var(--ink-3);border-bottom:1px solid var(--rule)}
+.tbl td.na{color:var(--ink-3);font-style:italic}
+.extra{border-left:3px solid var(--s4)}
+.extra .n{color:var(--s4)}
+.seg.sm button{font-size:11.5px;padding:8px 4px}
+#alter_r{accent-color:var(--s2)}
+.legend i.line{width:16px;height:0;border-top:2px solid;border-radius:0}
+.legend i.dash{width:16px;height:0;border-top:2px dashed;border-radius:0}
+.legend i.ring{width:9px;height:9px;border-radius:50%;background:transparent;border:2px solid}
+.warnbox{display:none;background:var(--card-2);border:1px solid var(--rule);border-left:3px solid var(--warn);border-radius:0 10px 10px 0;color:var(--warn);padding:11px 15px;font-size:13px;margin-top:12px;line-height:1.5}
+.warnbox.on{display:block}
+.mini{font-size:12.5px}
+.mini td,.mini th{padding:7px 8px}
+</style></head><body data-section="Werkzeug"><div class=wrap>
+
+<div class=hero>
+<div class=kicker>Werkzeug · Vermögenseinordnung Deutschland</div>
+<h1>Wo dieses Vermögen in Deutschland <em>steht</em></h1>
+<p class=lead>Ein Nettovermögen ist eine Zahl ohne Maßstab, solange offen bleibt, wie die anderen stehen. Diese Seite ordnet einen Betrag in die Vermögensverteilung der deutschen Haushalte ein: Perzentilrang im Gesamtvergleich, Abstand zum Median der eigenen Altersgruppe, Abstand zu Median und Mittelwert aller Haushalte.</p>
+</div>
+
+<div class=callout><b>Was hier fehlt: die Rente.</b> Anwartschaften an die <b>gesetzliche Rentenversicherung</b>, <b>Beamtenpensionen</b> und die <b>betriebliche Altersversorgung</b> sind in dieser Statistik <b>nicht enthalten</b>. Sie zählen nicht zum Vermögensbegriff der Erhebung, obwohl sie für viele Haushalte der mit Abstand größte Posten der Alterssicherung sind. Wer hohe Anwartschaften hat — lange Erwerbsbiografie, Beamtenverhältnis, gute Betriebsrente —, steht real deutlich besser da, als der Perzentilrang auf dieser Seite zeigt. Umgekehrt sagt ein hoher Rang wenig, wenn keinerlei Anwartschaft dahintersteht. Was die eigene Anwartschaft im Ruhestand monatlich bedeutet, rechnet der <a href="Rentenluecke_Rechner.html">Rentenlücken-Rechner</a> aus.</div>
+
+<div class=tip>Erhebungsjahr <b>2023</b> (Feldzeit Mai 2023 bis Februar 2024), Werte je <b>Haushalt</b>. Quelle: Deutsche Bundesbank PHF Welle 5 / EZB HFCS Wave 2023, Tabellen J3, A3, A4. Alle Eingaben rechnen sofort neu.</div>
+
+<div class=grid2>
+
+<div class=card>
+<h2>Eingaben</h2>
+
+<div class=grp>Vermögen</div>
+<div class=ctrl><div class=clabel><span>Immobilien (Verkehrswert)</span></div>
+<input type=text inputmode=numeric class=eurin id=imm value="380.000">
+<input type=range id=imm_r min=0 max=2000000 step=10000 value=380000 style="margin-top:8px"></div>
+<div class=ctrl><div class=clabel><span>Bank- und Sparguthaben</span></div><input type=text inputmode=numeric class=eurin id=bank value="35.000"></div>
+<div class=ctrl><div class=clabel><span>Wertpapiere, Fonds, ETFs, Aktien</span></div><input type=text inputmode=numeric class=eurin id=wp value="60.000"></div>
+<div class=ctrl><div class=clabel><span>Private Renten- und Lebensversicherungen <span class=sub>(Rückkaufswert)</span></span></div><input type=text inputmode=numeric class=eurin id=lv value="25.000"></div>
+<div class=ctrl><div class=clabel><span>Betriebsvermögen, Fahrzeuge, Wertgegenstände</span></div><input type=text inputmode=numeric class=eurin id=sonst value="15.000"></div>
+
+<div class=grp>Schulden</div>
+<div class=ctrl><div class=clabel><span>Hypotheken und Immobilienkredite</span></div><input type=text inputmode=numeric class=eurin id=hypo value="255.000"></div>
+<div class=ctrl><div class=clabel><span>Konsum-, Ratenkredite, Dispo</span></div><input type=text inputmode=numeric class=eurin id=kredit value="10.000"></div>
+
+<div class=grp>Haushalt</div>
+<div class=ctrl><div class=clabel><span>Alter der Referenzperson</span><span class=cval id=alter_v>42</span></div><input type=range id=alter_r min=18 max=90 step=1 value=42>
+<div class=hint id=alter_h></div></div>
+<div class=ctrl><div class=clabel><span>Haushaltstyp <span class=sub>(optional, nur Vergleichswerte)</span></span></div>
+<select id=htyp>
+<option value=alleinlebend>alleinlebend</option>
+<option value=paarOhneKinder>Paar ohne Kinder</option>
+<option value=paarMitKindern selected>Paar mit Kindern</option>
+<option value=alleinerziehend>alleinerziehend</option>
+</select></div>
+<div class=ctrl><div class=clabel><span>Haushaltsgröße</span></div>
+<div class="seg sm" id=hgr><button data-v="1">1</button><button data-v="2">2</button><button data-v="3" class=on>3</button><button data-v="4">4</button><button data-v="5plus">5+</button></div></div>
+<div class=ctrl><div class=clabel><span>Region</span></div>
+<div class="seg sm" id=reg><button data-v="west" class=on>West</button><button data-v="ost">Ost</button><button data-v="sued">Süd (BY, BW, HE)</button></div></div>
+<div class=ctrl><div class=clabel><span>Wohnstatus</span></div>
+<div class="seg sm" id=wohn><button data-v="eigentuemerOhneHypothek">Eigentum, schuldenfrei</button><button data-v="eigentuemerMitHypothek" class=on>Eigentum mit Kredit</button><button data-v="mieter">Miete</button></div></div>
+
+<div class=grp>Getrennt ausgewiesen</div>
+<div class=ctrl><div class=clabel><span style="color:var(--s4)">Barwert gesetzliche Rente, Pension, bAV</span><span class=cval id=rbw_v style="color:var(--s4)">0 €</span></div>
+<input type=range id=rbw_r min=0 max=1000000 step=10000 value=0>
+<div class=hint>Fließt <b>nicht</b> in den Perzentilvergleich ein — die Statistik kennt diese Position nicht. Wird unten nur als separate Zusatzanzeige geführt.</div></div>
+</div>
+
+<div class=card>
+<h2>Einordnung</h2>
+<div class=rentebox>
+<div class=l>Nettovermögen nach Erhebungsdefinition (Vermögen minus Schulden)</div>
+<div class=n id=netto>250.000 €</div>
+<div class=s id=nettosub>ohne Anwartschaften an gesetzliche Rente, Pension und bAV</div>
+</div>
+
+<div class=res>
+<div class="rbox wide hi"><div class=l>Perzentilrang unter allen deutschen Haushalten</div><div class=n id=rang>mehr als 64,2 %</div><div class=s id=rangsub>entspricht Perzentil 64,2 · Erhebungsjahr 2023</div></div>
+<div class=rbox><div class=l>Median der eigenen Altersgruppe <span id=agEcho>(35–44)</span></div><div class=n id=agmed>75.900 €</div><div class=s id=agmedsub>Standardfehler ± 13.400 €</div></div>
+<div class=rbox><div class=l>Faktor zum Median der Altersgruppe</div><div class=n id=agfac>3,29 ×</div><div class=s id=agfacsub></div></div>
+<div class=rbox><div class=l>Faktor zum Gesamtmedian (103.300 €)</div><div class=n id=gmfac>2,42 ×</div><div class=s>Median aller Haushalte, belegt</div></div>
+<div class=rbox><div class=l>Faktor zum Gesamtmittelwert</div><div class=n id=mwfac>0,77 ×</div><div class=s id=mwsub></div></div>
+<div class="rbox wide"><div class=l>P90 der eigenen Altersgruppe</div><div class=n id=agp90>nicht belegt</div><div class=s id=agp90sub></div></div>
+<div class="rbox wide extra"><div class=l>Zusatzanzeige: erweitertes Vermögen inklusive Rentenbarwert</div><div class=n id=erw>250.000 €</div><div class=s>Getrennt vom offiziellen Vergleich. Für diese Größe gibt es <b>keine</b> Perzentilzuordnung — die Erhebung erfasst Anwartschaften nicht, es existiert keine Vergleichsverteilung.</div></div>
+</div>
+<div class=warnbox id=warnrang></div>
+</div>
+</div>
+
+<div class=take id=take></div>
+
+<div class="card chartbox">
+<h2>Die Verteilungskurve und die eigene Position</h2>
+<div class=ctrl style="max-width:340px"><div class=clabel><span>Größenachse</span></div>
+<div class="seg sm tone" id=skala><button data-v="log" class=on>logarithmisch</button><button data-v="lin">linear</button></div>
+<div class=hint>Logarithmisch zeigt die untere Hälfte der Verteilung lesbar. Linear zeigt, wie steil die Kurve am oberen Ende wirklich wird.</div></div>
+<div id=chart1></div>
+<div class=legend>
+<span><i class=line style="border-color:#1d4ed8"></i>Perzentilkurve, belegte Stützstellen</span>
+<span><i class=ring style="border-color:#a16207"></i>interpolierte Stützstelle (p25, p75) — nicht publiziert</span>
+<span><i style="background:#1d4ed8;border-radius:1px"></i>konstruktionsbedingt abgeleitet (p85, p95)</span>
+<span><i class=dash style="border-color:#c2410c"></i>eigene Position</span>
+</div>
+<figcaption>Nettovermögen je Haushalt gegen den Perzentilrang, Erhebungsjahr 2023. Der Rang wird zwischen den Stützstellen linear interpoliert — genau so, wie die Bibliothek rechnet. Der graue Streifen oberhalb p95 ist bewusst leer: Ein p99 je Haushalt weist weder die Bundesbank noch die EZB aus, es wird hier deshalb nicht geschätzt.</figcaption>
+</div>
+
+<div class=card>
+<h2>Belegte Stützstellen der Gesamtverteilung</h2>
+<div class=pcards id=pcards></div>
+<p class=note style="margin-top:14px">Die Stützstellen p25 und p75 stehen in keiner Publikation. Sie sind hier linear zwischen den benachbarten belegten Werten interpoliert und entsprechend gekennzeichnet. p85 und p95 sind konstruktionsbedingt exakt: Sie sind der Median der Gruppe 80–90 % beziehungsweise 90–100 % aus Tabelle A3.</p>
+</div>
+
+<div class="card chartbox">
+<h2>Median und Mittelwert nach Altersgruppen</h2>
+<div id=chart2></div>
+<div class=legend>
+<span><i style="background:#1d4ed8"></i>Median der Altersgruppe</span>
+<span><i style="background:#c2410c"></i>eigene Altersgruppe</span>
+<span><i class=dash style="border-color:#a16207"></i>Mittelwert der Altersgruppe</span>
+<span><i class=line style="border-color:#8b857a"></i>Standardfehler des Medians</span>
+</div>
+<figcaption>Der Abstand zwischen Median und Mittelwert ist das eigentliche Ergebnis dieser Grafik: In jeder Altersgruppe liegt der Mittelwert weit über dem Median, weil wenige sehr große Vermögen den Durchschnitt hochziehen. Gruppierung nach der Referenzperson des Haushalts.</figcaption>
+</div>
+
+<div class=card>
+<h2>Vergleichsgruppen</h2>
+<table class=tbl id=vgltbl></table>
+<p class=note style="margin-top:14px">Hervorgehoben ist jeweils die Gruppe, die den Angaben links entspricht. Wo eine Zelle „nicht belegt“ zeigt, weist die Primärquelle für diese Gruppe schlicht keinen Wert aus — dort wird nicht geschätzt. Die Mediane der Haushaltstypen und der Haushaltsgrößen stammen aus unterschiedlichen Aufrissen derselben Erhebung und sind deshalb nicht identisch.</p>
+</div>
+
+<div class=card>
+<h2>Kontext der Verteilung</h2>
+<div class=kpis id=kpis></div>
+<h3>Was die Zahl nicht zeigt</h3>
+<p>Der Perzentilrang oben beschreibt eine Momentaufnahme aus dem Jahr 2023 und einen eng gefassten Vermögensbegriff. Vier Einschränkungen sind wichtig genug, um sie nicht im Kleingedruckten zu verstecken.</p>
+<p><b>Erstens die Alterssicherung.</b> Gesetzliche Rente, Pension und betriebliche Altersversorgung fehlen vollständig. Für Haushalte in der unteren Verteilungshälfte ist die Rentenanwartschaft in aller Regel der größte Einzelposten der Altersvorsorge — er taucht in dieser Statistik nur nicht auf. Ein Beamtenhaushalt mit geringem Geldvermögen landet hier auf einem niedrigen Perzentil und ist trotzdem gut abgesichert; ein Selbständiger mit demselben Vermögen und ohne Anwartschaft ist es nicht. Wer diesen Teil beziffern will, findet ihn im <a href="Rentenluecke_Rechner.html">Rentenlücken-Rechner</a>; wie sich Ansparen und Entnehmen über ein ganzes Leben verhalten, zeigt der <a href="Lebenszyklus_Simulator.html">Lebenszyklus-Simulator</a>.</p>
+<p><b>Zweitens die Spitze.</b> Haushaltsbefragungen untererfassen sehr große Vermögen strukturell — die wenigen sehr reichen Haushalte nehmen selten teil und untertreiben, wenn sie teilnehmen. Deshalb existiert hier kein p99: Er wäre eine Zahl mit dem Anschein von Präzision und ohne Deckung. Werte unterhalb von p90 sind davon kaum betroffen, alles darüber ist tendenziell zu niedrig.</p>
+<p><b>Drittens das Erhebungsjahr.</b> Die Feldzeit lief von Mai 2023 bis Februar 2024. Seither gestiegene Aktienkurse und die Entwicklung der Immobilienpreise stecken nicht in den Vergleichswerten. Wer heute rechnet, vergleicht ein aktuelles eigenes Vermögen mit einer drei Jahre alten Verteilung — das verschiebt den eigenen Rang tendenziell nach oben.</p>
+<p><b>Viertens der Haushalt.</b> Alle Vergleichswerte gelten je Haushalt, nicht je Person. Ein Paarhaushalt mit 200.000 € steht in dieser Tabelle wie ein Single mit 200.000 €, obwohl pro Kopf die Hälfte übrig bleibt. Wie eine Verteilung <em>pro Erwachsenem</em> aussieht, zeigt die Nebenrechnung weiter unten — ausdrücklich als getrennte Größe.</p>
+<h3>Nominal ist nicht real</h3>
+<p id=realtext></p>
+<h3>Im europäischen Vergleich</h3>
+<p>Deutschland hat innerhalb des Euroraums einen auffällig niedrigen Median. Der Grund ist bekannt: die niedrige Wohneigentumsquote. Wohneigentum ist der Vermögensposten, der die Mitte einer Verteilung nach oben trägt, und er fehlt in Deutschland bei der Mehrheit der Haushalte.</p>
+<table class="tbl mini" id=inttbl></table>
+</div>
+
+<div class=card>
+<h2>Nebenrechnung: pro Erwachsenem statt pro Haushalt</h2>
+<p class=note id=soepnote></p>
+<table class="tbl mini" id=soeptbl></table>
+<p class=note style="margin-top:12px"><b>Nicht mit den Zahlen oben mischen.</b> Anderes Konzept (Personen ab 17 Jahren statt Haushalte), anderes Erhebungsjahr, andere Quelle, andere Abgrenzung. Die Tabelle steht hier als Größenordnung, nicht als zweiter Maßstab für die eigene Einordnung — der Perzentilrang oben bezieht sich ausschließlich auf die Haushaltsverteilung 2023.</p>
+</div>
+
+<div class=foot>
+<p><b>Quellen.</b> Gesamtverteilung, Altersgruppen und Aufrisse: Deutsche Bundesbank, Panel on Household Finances (PHF) Welle 5 / EZB Household Finance and Consumption Survey (HFCS) Wave 2023, Tabellen J3, A3 und A4; Erhebungsjahr 2023, Feldzeit Mai 2023 bis Februar 2024, Statistiktabellen Juni 2026. Perzentile p80, p90 und Gini nach Altersgruppen zusätzlich: IW-Kurzbericht 59/2025 auf Basis des PHF-2023-Scientific-Use-File (dort nach der ältesten Person im Haushalt gruppiert, deshalb nicht direkt mit den HFCS-Altersgruppen vergleichbar). Nebenrechnung pro Erwachsenem: DIW Wochenbericht 40/2019, Tabelle 1 (SOEPv34, Erhebungsjahr 2017, Personen ab 17 Jahren, 0,1 % Top-Coding).</p>
+<p class=disc>Werte mit der Kennzeichnung <b>interpoliert</b> sind nicht publiziert, sondern linear zwischen benachbarten belegten Stützstellen berechnet. Wo <b>nicht belegt</b> steht, existiert in keiner Primärquelle ein Wert; er wird hier nicht geschätzt. Der Gesamtmittelwert ist aus dem publizierten Verhältnis Mittelwert/Median abgeleitet und entsprechend gekennzeichnet. Alle Angaben je Haushalt. Anwartschaften an die gesetzliche Rentenversicherung, Beamtenpensionen und betriebliche Altersversorgung sind im Vermögensbegriff der Erhebung nicht enthalten. Diese Seite ist eine statistische Einordnung und <b>keine Steuer-, Rechts- oder Anlageberatung</b>.</p>
+</div>
+</div>
+
+<script>
+const $=id=>document.getElementById(id);
+const eur=x=>Math.round(x).toLocaleString('de-DE')+' €';
+const eurk=x=>{const a=Math.abs(x);return a>=1e6?(x/1e6).toLocaleString('de-DE',{minimumFractionDigits:0,maximumFractionDigits:2})+' Mio':(a>=1000?Math.round(x/1000).toLocaleString('de-DE')+' k':Math.round(x).toLocaleString('de-DE'));};
+const facd=x=>{const a=Math.abs(x);return a>=100?0:(a>=10?1:(a>=0.1?2:(a>=0.01?3:4)));};
+const fac=x=>x.toLocaleString('de-DE',{minimumFractionDigits:facd(x),maximumFractionDigits:facd(x)})+' ×';
+const facw=x=>x.toLocaleString('de-DE',{minimumFractionDigits:facd(x),maximumFractionDigits:facd(x)})+'-fache';
+const pct=(x,d)=>x.toLocaleString('de-DE',{minimumFractionDigits:d===undefined?1:d,maximumFractionDigits:d===undefined?1:d})+' %';
+const NBL='<span class=nb>nicht belegt</span>';
+
+/* --- Werte aus der Bibliothek, nichts davon selbst gesetzt --- */
+const PZ   = NETTOVERMOEGEN_PERZENTILE_GESAMT;
+const MED  = PZ.find(r=>r.p===50).wert;                                   // 103.300
+const P10  = PZ.find(r=>r.p===10).wert;                                   // 800
+const PTOP = PZ.filter(r=>r.wert!=null).reduce((a,b)=>b.wert>a.wert?b:a); // p95
+const MW   = MED*NETTOVERMOEGEN_KONTEXT.ungleichheit.mittelwertDurchMedian;
+const AGN  = {'16-34':'16–34','35-44':'35–44','45-54':'45–54','55-64':'55–64','65-74':'65–74','75+':'75+'};
+
+/* --- Zustand der Segment-Schalter --- */
+let scale='log', hgr='3', reg='west', wohn='eigentuemerMitHypothek';
+function seg(id,cb){const box=$(id);box.querySelectorAll('button').forEach(b=>b.addEventListener('click',()=>{
+  box.querySelectorAll('button').forEach(x=>x.classList.remove('on'));b.classList.add('on');cb(b.dataset.v);render();}));}
+
+/* --- Eingaben lesen --- */
+function numVal(id){return parseInt(($(id).value||'0').replace(/\D/g,''),10)||0;}
+function fmtInput(el){const raw=el.value.replace(/\D/g,'');const cfe=el.value.length-(el.selectionStart||el.value.length);
+  el.value=raw===''?'':parseInt(raw,10).toLocaleString('de-DE');const pos=Math.max(0,el.value.length-cfe);try{el.setSelectionRange(pos,pos);}catch(e){}}
+
+/* ============================ DIAGRAMM 1: PERZENTILKURVE ============================ */
+function svgPerz(net,rangRoh,unten,oben){
+  const W=720,H=300,X0=66,X1=704,Y0=22,Y1=246;
+  const pts=PZ.filter(r=>r.wert!=null).sort((a,b)=>a.p-b.p);
+  const isLog=scale==='log', LMIN=500, LMAX=2e6, lo=Math.log10(LMIN), hi=Math.log10(LMAX);
+  const maxLin=Math.max(PTOP.wert,net>0?net:0)*1.08;
+  const ym=v=>isLog
+    ? Y1-(Math.log10(Math.min(Math.max(v,LMIN),LMAX))-lo)/(hi-lo)*(Y1-Y0)
+    : Y1-Math.min(Math.max(v,0),maxLin)/maxLin*(Y1-Y0);
+  const xm=p=>X0+p/100*(X1-X0);
+  let s='<svg viewBox="0 0 '+W+' '+H+'" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;font-family:inherit">';
+  s+='<rect x="'+xm(95).toFixed(1)+'" y="'+Y0+'" width="'+(xm(100)-xm(95)).toFixed(1)+'" height="'+(Y1-Y0)+'" fill="#ece7dd" fill-opacity="0.8"/>';
+  ['p99','nicht','belegt'].forEach((t,i)=>{s+='<text x="'+((xm(95)+xm(100))/2).toFixed(1)+'" y="'+(Y0+14+i*11)+'" font-size="9" fill="#8b857a" text-anchor="middle">'+t+'</text>';});
+  const ticks=isLog?[1000,10000,100000,1000000]:[0,.25,.5,.75,1].map(f=>maxLin*f);
+  ticks.forEach(v=>{const y=ym(v);
+    s+='<line x1="'+X0+'" y1="'+y.toFixed(1)+'" x2="'+X1+'" y2="'+y.toFixed(1)+'" stroke="#ece7dd"/>';
+    s+='<text x="'+(X0-7)+'" y="'+(y+3).toFixed(1)+'" font-size="10" fill="#8b857a" text-anchor="end">'+eurk(v)+'</text>';});
+  [20,40,60,80].forEach(p=>{s+='<line x1="'+xm(p).toFixed(1)+'" y1="'+Y0+'" x2="'+xm(p).toFixed(1)+'" y2="'+Y1+'" stroke="#ece7dd" stroke-dasharray="2 4"/>';});
+  s+='<line x1="'+X0+'" y1="'+Y1+'" x2="'+X1+'" y2="'+Y1+'" stroke="#ece7dd"/>';
+  [0,20,40,60,80,100].forEach(p=>{s+='<text x="'+xm(p).toFixed(1)+'" y="'+(Y1+17)+'" font-size="10.5" fill="#8b857a" text-anchor="middle">'+p+'</text>';});
+  s+='<text x="'+((X0+X1)/2).toFixed(1)+'" y="'+(Y1+34)+'" font-size="10.5" fill="#8b857a" text-anchor="middle">Perzentil der Haushalte</text>';
+  s+='<polyline points="'+pts.map(r=>xm(r.p).toFixed(1)+','+ym(r.wert).toFixed(1)).join(' ')+'" fill="none" stroke="#1d4ed8" stroke-width="2"/>';
+  pts.forEach(r=>{const x=xm(r.p),y=ym(r.wert);
+    if(r.status==='interpoliert') s+='<circle cx="'+x.toFixed(1)+'" cy="'+y.toFixed(1)+'" r="4" fill="#fffdfa" stroke="#a16207" stroke-width="2"/>';
+    else if(r.status==='belegt_abgeleitet') s+='<rect x="'+(x-3.2).toFixed(1)+'" y="'+(y-3.2).toFixed(1)+'" width="6.4" height="6.4" fill="#1d4ed8"/>';
+    else s+='<circle cx="'+x.toFixed(1)+'" cy="'+y.toFixed(1)+'" r="3.2" fill="#1d4ed8"/>';});
+  const ymed=ym(MED);
+  s+='<text x="'+(xm(50)+8).toFixed(1)+'" y="'+(ymed+16).toFixed(1)+'" font-size="10" font-weight="700" fill="#1d4ed8">Median 103.300 €</text>';
+  s+='<text x="'+(xm(90)-6).toFixed(1)+'" y="'+(ym(775200)-9).toFixed(1)+'" font-size="10" fill="#1d4ed8" text-anchor="end">p90 775.200 €</text>';
+  const xr=xm(rangRoh), yr=ym(net>0?net:LMIN);
+  s+='<line x1="'+X0+'" y1="'+yr.toFixed(1)+'" x2="'+xr.toFixed(1)+'" y2="'+yr.toFixed(1)+'" stroke="#c2410c" stroke-width="1.2" stroke-dasharray="4 3"/>';
+  s+='<line x1="'+xr.toFixed(1)+'" y1="'+yr.toFixed(1)+'" x2="'+xr.toFixed(1)+'" y2="'+Y1+'" stroke="#c2410c" stroke-width="1.2" stroke-dasharray="4 3"/>';
+  s+='<circle cx="'+xr.toFixed(1)+'" cy="'+yr.toFixed(1)+'" r="5" fill="#c2410c"/>';
+  const anch=rangRoh>78?'end':'start', dx=rangRoh>78?-10:10;
+  const lab=(net>0?eur(net):'negatives Nettovermögen')+(unten||oben?'':' · p'+rangRoh.toLocaleString('de-DE',{maximumFractionDigits:1}));
+  s+='<text x="'+(xr+dx).toFixed(1)+'" y="'+(yr-9).toFixed(1)+'" font-size="11" font-weight="700" fill="#c2410c" text-anchor="'+anch+'">'+lab+'</text>';
+  if(unten||oben) s+='<text x="'+(xr+dx).toFixed(1)+'" y="'+(yr+4).toFixed(1)+'" font-size="9.5" fill="#c2410c" text-anchor="'+anch+'">Rang hier nicht weiter auflösbar</text>';
+  return s+'</svg>';
+}
+
+/* ============================ DIAGRAMM 2: ALTERSGRUPPEN ============================ */
+function svgAlter(net,gruppe){
+  const W=720,H=300,X0=66,X1=704,Y0=30,Y1=244;
+  const gs=NETTOVERMOEGEN_NACH_ALTER;
+  const topData=Math.max.apply(null,gs.map(g=>g.mittelwert));
+  const capped=net>topData*1.6, netShow=capped?topData*1.6:Math.max(net,0);
+  const ymax=Math.max(topData,netShow)*1.14;
+  const ym=v=>Y1-Math.min(Math.max(v,0),ymax)/ymax*(Y1-Y0);
+  const band=(X1-X0)/gs.length, bw=Math.min(56,band*0.5);
+  let s='<svg viewBox="0 0 '+W+' '+H+'" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;font-family:inherit">';
+  [0,.25,.5,.75,1].forEach(f=>{const v=ymax*f,y=ym(v);
+    s+='<line x1="'+X0+'" y1="'+y.toFixed(1)+'" x2="'+X1+'" y2="'+y.toFixed(1)+'" stroke="#ece7dd"/>';
+    s+='<text x="'+(X0-7)+'" y="'+(y+3).toFixed(1)+'" font-size="10" fill="#8b857a" text-anchor="end">'+(v<1?'0':eurk(v))+'</text>';});
+  gs.forEach((g,i)=>{
+    const cx=X0+i*band+band/2, x=cx-bw/2, mine=g.gruppe===gruppe;
+    s+='<rect x="'+x.toFixed(1)+'" y="'+ym(g.median).toFixed(1)+'" width="'+bw.toFixed(1)+'" height="'+(Y1-ym(g.median)).toFixed(1)+'" fill="'+(mine?'#c2410c':'#1d4ed8')+'" fill-opacity="'+(mine?'0.9':'0.72')+'"/>';
+    const se=g.standardfehler_median;
+    s+='<line x1="'+cx.toFixed(1)+'" y1="'+ym(g.median+se).toFixed(1)+'" x2="'+cx.toFixed(1)+'" y2="'+ym(Math.max(g.median-se,0)).toFixed(1)+'" stroke="#8b857a" stroke-width="1.2"/>';
+    [g.median+se,Math.max(g.median-se,0)].forEach(v=>{s+='<line x1="'+(cx-5).toFixed(1)+'" y1="'+ym(v).toFixed(1)+'" x2="'+(cx+5).toFixed(1)+'" y2="'+ym(v).toFixed(1)+'" stroke="#8b857a" stroke-width="1.2"/>';});
+    s+='<line x1="'+(cx-bw*0.62).toFixed(1)+'" y1="'+ym(g.mittelwert).toFixed(1)+'" x2="'+(cx+bw*0.62).toFixed(1)+'" y2="'+ym(g.mittelwert).toFixed(1)+'" stroke="#a16207" stroke-width="2" stroke-dasharray="5 3"/>';
+    s+='<text x="'+cx.toFixed(1)+'" y="'+(ym(g.median+se)-7).toFixed(1)+'" font-size="10" font-weight="700" fill="'+(mine?'#c2410c':'#57534c')+'" text-anchor="middle">'+eurk(g.median)+'</text>';
+    s+='<text x="'+cx.toFixed(1)+'" y="'+(Y1+17)+'" font-size="10.5" fill="'+(mine?'#c2410c':'#8b857a')+'" font-weight="'+(mine?'700':'400')+'" text-anchor="middle">'+AGN[g.gruppe]+'</text>';
+    if(i===0) s+='<text x="'+cx.toFixed(1)+'" y="'+(ym(g.mittelwert)-6).toFixed(1)+'" font-size="9.5" fill="#a16207" text-anchor="middle">Mittelwert</text>';
+  });
+  s+='<text x="'+((X0+X1)/2).toFixed(1)+'" y="'+(Y1+34)+'" font-size="10.5" fill="#8b857a" text-anchor="middle">Alter der Referenzperson</text>';
+  if(net>0){const y=ym(netShow);
+    s+='<line x1="'+X0+'" y1="'+y.toFixed(1)+'" x2="'+X1+'" y2="'+y.toFixed(1)+'" stroke="#c2410c" stroke-width="1.5" stroke-dasharray="6 4"/>';
+    s+='<text x="'+(X1-4)+'" y="'+(y-6).toFixed(1)+'" font-size="10.5" font-weight="700" fill="#c2410c" text-anchor="end">eigenes Nettovermögen '+(capped?'(über der Skala)':eur(net))+'</text>';}
+  else s+='<text x="'+(X1-4)+'" y="'+(Y0-10)+'" font-size="10.5" font-weight="700" fill="#c2410c" text-anchor="end">eigenes Nettovermögen ist null oder negativ</text>';
+  return s+'</svg>';
+}
+
+/* ============================ STATISCHE TABELLEN ============================ */
+function buildStatic(){
+  const k=NETTOVERMOEGEN_KONTEXT;
+  $('kpis').innerHTML=[
+    ['Gini-Koeffizient Nettovermögen',k.ungleichheit.gini.toLocaleString('de-DE',{minimumFractionDigits:3,maximumFractionDigits:3}),'0 = Gleichverteilung, 1 = maximale Konzentration'],
+    ['Anteil der obersten 10 %',pct(k.ungleichheit.top10Anteil*100),'mit Hinzuschätzung an der Spitze '+pct(k.ungleichheit.top10AnteilMitDWAHinzuschaetzung*100)],
+    ['Anteil der obersten 5 %',pct(k.ungleichheit.top5Anteil*100),'die mittleren 40 % halten '+pct(k.ungleichheit.anteil50bis90*100)],
+    ['P90 zu Median',fac(k.ungleichheit.p90durchMedian),'Mittelwert zu Median '+fac(k.ungleichheit.mittelwertDurchMedian)],
+    ['Haushalte mit negativem Nettovermögen',pct(k.negativesNettovermoegen.anteilGesamt_IW*100),'unter 35 Jahren '+pct(k.negativesNettovermoegen.unter35*100)+', ab 75 Jahren '+pct(k.negativesNettovermoegen.ab75*100)],
+    ['Wohneigentumsquote 2023',pct(k.wohnstatus.wohneigentumsquote2023*100),'2021 noch '+pct(k.wohnstatus.wohneigentumsquote2021*100)]
+  ].map(r=>'<div class=kpi><span class=l>'+r[0]+'</span><span class=v>'+r[1]+'</span><span class=s>'+r[2]+'</span></div>').join('');
+
+  const u=k.ungleichheit;
+  $('realtext').innerHTML='Die Spreizung wächst nominal schneller als real. Der Interquartilsabstand — der Abstand zwischen dem oberen und dem unteren Viertel — beträgt nominal <b>'+eur(u.interquartilsabstandNominal)+'</b>, in Preisen von 2010 gerechnet aber nur <b>'+eur(u.interquartilsabstandReal2010)+'</b>. Ein Teil des scheinbaren Vermögenszuwachses der vergangenen Jahre ist Preisniveau, nicht Kaufkraft. Für die eigene Einordnung heißt das: Der Perzentilrang ist eine relative Größe und bleibt von Inflation weitgehend unberührt — die absoluten Beträge daneben nicht.';
+
+  const im=k.international_median, names={DE:'Deutschland',Euroraum:'Euroraum insgesamt',FR:'Frankreich',IT:'Italien',ES:'Spanien',NL:'Niederlande',AT:'Österreich',BE:'Belgien',IE:'Irland'};
+  $('inttbl').innerHTML='<tr><th>Land</th><th>Median Nettovermögen je Haushalt</th><th>Faktor zu Deutschland</th></tr>'+
+    Object.keys(im).sort((a,b)=>im[b]-im[a]).map(c=>'<tr'+(c==='DE'?' class=me':'')+'><td>'+names[c]+'</td><td>'+eur(im[c])+'</td><td>'+fac(im[c]/im.DE)+'</td></tr>').join('');
+
+  const so=NETTOVERMOEGEN_PRO_ERWACHSENEM_SOEP2017;
+  $('soepnote').innerHTML='Erhebungsjahr <b>'+so.erhebungsjahr+'</b> — Datenalter: '+so.alterDerDaten+'. Median <b>'+eur(so.median)+'</b>, Mittelwert <b>'+eur(so.mittelwert)+'</b>, Gini '+so.gini.toLocaleString('de-DE',{minimumFractionDigits:3,maximumFractionDigits:3})+'. Anteil mit negativem Vermögen '+pct(so.anteilUnterNull*100)+', Anteil mit genau null '+pct(so.anteilGenauNull*100)+'. Quelle: '+so.quelle+'.';
+  $('soeptbl').innerHTML='<tr><th>Perzentil</th><th>Nettovermögen je Erwachsenem</th><th>Status</th></tr>'+
+    so.perzentile.map(r=>'<tr'+(r.p===50?' class=me':'')+'><td>p'+r.p+'</td><td>'+eur(r.wert)+'</td><td>'+r.status+'</td></tr>').join('');
+
+  $('pcards').innerHTML=[10,25,50,75,90].map(p=>{const r=PZ.find(x=>x.p===p);
+    const st=r.status==='interpoliert'?'interpoliert':(r.status==='belegt_abgeleitet'?'abgeleitet':'belegt');
+    return '<div class="pc'+(p===50?' med':'')+(r.status==='interpoliert'?' ipol':'')+'"><div class=l>p'+p+'</div><div class=n>'+eur(r.wert)+'</div><div class=st>'+st+'</div></div>';}).join('');
+}
+
+/* ============================ VERGLEICHSTABELLE ============================ */
+function buildVgl(net,gruppe){
+  const k=NETTOVERMOEGEN_KONTEXT;
+  const cell=v=>v==null?'<td class=na>nicht belegt</td>':'<td>'+eur(v)+'</td>';
+  const facc=v=>v==null||v===0?'<td class=na>—</td>':'<td>'+fac(net/v)+'</td>';
+  let rows='<tr><th>Vergleichsgruppe</th><th>Median</th><th>Mittelwert</th><th>eigenes Vermögen zum Median</th></tr>';
+  const row=(name,med,mw,me)=>rows+='<tr'+(me?' class=me':'')+'><td>'+name+'</td>'+cell(med)+cell(mw)+facc(med)+'</tr>';
+  const sec=t=>rows+='<tr class=sec><td colspan=4>'+t+'</td></tr>';
+
+  sec('Alle Haushalte');
+  rows+='<tr><td>Deutschland insgesamt</td><td>'+eur(MED)+'</td><td>'+eur(Math.round(MW/100)*100)+'<span class="flag ab">abgeleitet</span></td><td>'+fac(net/MED)+'</td></tr>';
+  sec('Altersgruppe der Referenzperson');
+  NETTOVERMOEGEN_NACH_ALTER.forEach(g=>row(AGN[g.gruppe]+' Jahre',g.median,g.mittelwert,g.gruppe===gruppe));
+  sec('Region');
+  [['west','West','west'],['ost','Ost','ost'],['sued','Süd (BY, BW, HE)','sued']].forEach(r=>row(r[1],k.ostWest[r[0]].median,k.ostWest[r[0]].mittelwert,reg===r[2]));
+  sec('Wohnstatus');
+  [['eigentuemerOhneHypothek','Eigentümer ohne Hypothek'],['eigentuemerMitHypothek','Eigentümer mit Hypothek'],['mieter','Mieter']]
+    .forEach(r=>row(r[1],k.wohnstatus[r[0]].median,null,wohn===r[0]));
+  sec('Haushaltstyp');
+  [['alleinlebend','alleinlebend'],['alleinerziehend','alleinerziehend'],['paarOhneKinder','Paar ohne Kinder'],['paarMitKindern','Paar mit Kindern']]
+    .forEach(r=>row(r[1],k.haushaltstyp[r[0]].median,k.haushaltstyp[r[0]].mittelwert,$('htyp').value===r[0]));
+  sec('Haushaltsgröße');
+  [['1','1 Person'],['2','2 Personen'],['3','3 Personen'],['4','4 Personen'],['5plus','5 und mehr']]
+    .forEach(r=>row(r[1],k.haushaltsgroesse[r[0]],null,hgr===r[0]));
+  $('vgltbl').innerHTML=rows;
+}
+
+/* ============================ HAUPTBERECHNUNG ============================ */
+function render(){
+  const alter=+$('alter_r').value, rbw=+$('rbw_r').value;
+  $('alter_v').textContent=alter;
+  $('rbw_v').textContent=eur(rbw);
+
+  const net=vergleichbaresNettovermoegen({
+    immobilien:numVal('imm'), bankguthaben:numVal('bank'), finanzanlagen:numVal('wp'),
+    privateRentenLV:numVal('lv'), betriebsvermoegen:numVal('sonst'),
+    schulden:numVal('hypo')+numVal('kredit')
+  });
+  const e=einordnungNachAlter(net,alter);
+  const gruppe=altersgruppeFuer(alter);
+  const unten=net<P10, oben=net>PTOP.wert;
+  const rangRoh=e.perzentilrangGesamt;                 // aus der Bibliothek
+  const obenAnteil=100-rangRoh;
+
+  $('alter_h').textContent='Altersgruppe der Statistik: '+AGN[gruppe]+' Jahre';
+  $('netto').textContent=eur(net);
+  $('netto').className='n'+(net<0?' neg':'');
+  $('nettosub').innerHTML=net<0
+    ? 'Die Schulden übersteigen das Vermögen. Das betrifft '+pct(NETTOVERMOEGEN_KONTEXT.negativesNettovermoegen.anteilGesamt_IW*100)+' aller Haushalte.'
+    : 'ohne Anwartschaften an gesetzliche Rente, Pension und bAV';
+
+  if(unten){
+    $('rang').textContent='unterste 10 %';
+    $('rangsub').innerHTML='unterhalb der niedrigsten belegten Stützstelle (p10 = '+eur(P10)+') — genauer <b>nicht belegt</b>';
+  }else if(oben){
+    $('rang').textContent='oberste 5 %';
+    $('rangsub').innerHTML='oberhalb der höchsten belegten Stützstelle (p95 = '+eur(PTOP.wert)+') — genauer <b>nicht belegt</b>';
+  }else{
+    $('rang').textContent='mehr als '+pct(rangRoh);
+    $('rangsub').innerHTML='der deutschen Haushalte · umgekehrt haben '+pct(obenAnteil)+' mehr'+
+      (rangRoh>=50?' (oberes '+pct(obenAnteil)+')':'')+
+      ' · Perzentil '+rangRoh.toLocaleString('de-DE',{maximumFractionDigits:1})+
+      ((rangRoh>20&&rangRoh<30)||(rangRoh>70&&rangRoh<80)?' <span class=flag>interpolierter Bereich</span>':'');
+  }
+  $('warnrang').className='warnbox'+(unten||oben?' on':'');
+  $('warnrang').innerHTML=unten
+    ? 'Unterhalb von p10 lösen die Quellen die Verteilung nicht weiter auf. Ein genauerer Rang wird hier nicht geschätzt.'
+    : (oben?'Oberhalb von p95 lösen die Quellen die Verteilung nicht weiter auf: Ein p99 je Haushalt weist weder die Bundesbank noch die EZB aus. Zusätzlich untererfassen Haushaltsbefragungen sehr hohe Vermögen strukturell — der reale Abstand zur Spitze ist größer, als diese Kurve zeigt.':'');
+
+  $('agEcho').textContent='('+AGN[gruppe]+')';
+  $('agmed').textContent=eur(e.medianGruppe);
+  $('agmedsub').textContent='Standardfehler ± '+eur(e.standardfehlerMedian);
+  $('agfac').textContent=fac(e.faktorZumGruppenmedian);
+  $('agfacsub').textContent=e.faktorZumGruppenmedian>=1
+    ? 'über dem Median der Gleichaltrigen'
+    : 'unter dem Median der Gleichaltrigen';
+  $('gmfac').textContent=fac(e.faktorZumGesamtmedian);
+  $('mwfac').textContent=fac(net/MW);
+  $('mwsub').innerHTML='Gesamtmittelwert ≈ '+eur(Math.round(MW/100)*100)+' <span class="flag ab">abgeleitet</span> aus Median × '+
+    NETTOVERMOEGEN_KONTEXT.ungleichheit.mittelwertDurchMedian.toLocaleString('de-DE',{minimumFractionDigits:2,maximumFractionDigits:2});
+
+  if(e.p90Gruppe==null){
+    $('agp90').innerHTML='nicht belegt';
+    $('agp90').className='n nb';
+    $('agp90sub').textContent='Für die Altersgruppe '+AGN[gruppe]+' weist keine Primärquelle ein P90 aus. Es wird hier nicht geschätzt.';
+  }else{
+    $('agp90').innerHTML=eur(e.p90Gruppe);
+    $('agp90').className='n';
+    $('agp90sub').innerHTML=(e.ueberP90Gruppe?'<b>erreicht</b> — das eigene Vermögen liegt auf oder über diesem Wert.':'noch nicht erreicht — es fehlen '+eur(e.p90Gruppe-net)+'.')+
+      ' Quelle IW-Kurzbericht 59/2025, Gruppierung nach der ältesten Person im Haushalt und damit nicht deckungsgleich mit der Altersgruppe oben.';
+  }
+
+  $('erw').textContent=eur(net+rbw);
+  const lage=unten?'in den <b>untersten 10 %</b> aller deutschen Haushalte'
+                  :(oben?'in den <b>obersten 5 %</b> aller deutschen Haushalte'
+                        :'im <b>oberen '+pct(obenAnteil)+'</b> aller deutschen Haushalte');
+  $('take').innerHTML= net<=0
+    ? 'Ein Nettovermögen von <b>'+eur(net)+'</b> liegt '+lage+'. Faktoren zum Median sind für null oder negative Werte nicht aussagekräftig; der Median aller Haushalte liegt bei '+eur(MED)+', der Median der Altersgruppe '+AGN[gruppe]+' bei '+eur(e.medianGruppe)+'. <b>Nicht enthalten:</b> Anwartschaften an die gesetzliche Rente, Beamtenpensionen und die betriebliche Altersversorgung — Erhebungsjahr '+VERMOEGEN_ERHEBUNGSJAHR+'.'
+    : 'Ein Nettovermögen von <b>'+eur(net)+'</b> liegt '+lage+
+      ' — das '+facw(e.faktorZumGesamtmedian)+' des Gesamtmedians von '+eur(MED)+' und das '+facw(net/MW)+' des Gesamtmittelwerts. '+
+      'Gegenüber den Gleichaltrigen der Gruppe '+AGN[gruppe]+' (Median '+eur(e.medianGruppe)+') ist es das '+facw(e.faktorZumGruppenmedian)+'. '+
+      '<b>Nicht enthalten:</b> Anwartschaften an die gesetzliche Rente, Beamtenpensionen und die betriebliche Altersversorgung — Erhebungsjahr '+VERMOEGEN_ERHEBUNGSJAHR+'.';
+
+  $('chart1').innerHTML=svgPerz(net,rangRoh,unten,oben);
+  $('chart2').innerHTML=svgAlter(net,gruppe);
+  buildVgl(net,gruppe);
+}
+
+/* --- Ereignisse --- */
+document.querySelectorAll('input.eurin').forEach(el=>el.addEventListener('input',()=>{
+  fmtInput(el); if(el.id==='imm') $('imm_r').value=Math.min(numVal('imm'),+$('imm_r').max); render();}));
+$('imm_r').addEventListener('input',()=>{$('imm').value=(+$('imm_r').value).toLocaleString('de-DE');render();});
+$('alter_r').addEventListener('input',render);
+$('rbw_r').addEventListener('input',render);
+$('htyp').addEventListener('change',render);
+seg('hgr',v=>hgr=v); seg('reg',v=>reg=v); seg('wohn',v=>wohn=v); seg('skala',v=>scale=v);
+buildStatic();
+render();
+</script>
+</body></html>

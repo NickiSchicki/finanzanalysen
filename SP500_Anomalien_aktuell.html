@@ -1,0 +1,78 @@
+<!DOCTYPE html><html lang=de><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1">
+<title>S&P 500 - Statistische Anomalien der letzten Jahre</title>
+<script src="assets/chart.umd.min.js?v=4"></script>
+<link rel=stylesheet href="assets/site.css?v=4">
+<script defer src="assets/site-map.js?v=4"></script>
+<script defer src="assets/datenstand.js?v=4"></script>
+<script defer src="assets/site.js?v=4"></script>
+<style>
+/* seitenspezifisch */
+.chartbox{position:relative;height:400px}
+.tbl{margin:6px 0 4px}
+.tbl tr.hot td{background:var(--accent-soft);font-weight:700}
+ul.take{padding:16px 22px 16px 42px}
+ul.take li{margin:9px 0}
+ul.take li:last-child{margin-bottom:0}
+</style></head><body data-section="Risiko"><div class=wrap>
+<div class=kicker>Risiko &middot; Marktstruktur</div>
+<h1>Was ist an den letzten Jahren statistisch <em>neu</em>?</h1>
+<p class=lead>Zwei Befunde halten der Pr&uuml;fung stand: Die Tagesrenditen haben ihr Vorzeichen gewechselt, und Abst&uuml;rze laufen schneller ab als fr&uuml;her. Alles Weitere ist Beiwerk &mdash; oder Stichprobe.</p>
+<div class=sub>S&amp;P&nbsp;500, t&auml;gliche Renditen 1950&ndash;2026 &middot; die letzten ~10&nbsp;Jahre gegen die ganze Historie</div>
+
+<div class=card>
+<h2>Anomalie 1 &middot; robust</h2>
+<h3>Der Markt hat das Vorzeichen gewechselt: von Momentum zu Mean-Reversion</h3>
+<p>Autokorrelation der Tagesrenditen (Lag&nbsp;1) je Jahr. Positiv bedeutet, dass sich Trends tagesweise fortsetzen (Momentum); negativ, dass Bewegungen umkehren (&bdquo;buy the dip&ldquo;). Das Band &plusmn;0,13 entspricht rund 2&nbsp;Standardfehlern.</p>
+<div class=chartbox><canvas id=ac></canvas></div>
+<div class=take>1950&ndash;1980 war die Autokorrelation <b>durchweg klar positiv</b> (bis +0,37 in 1970) &mdash; der Markt <i>trendete</i>. Seit ~2000 ist sie <b>fast durchgehend negativ</b>; 2020 erreichte mit <b>&minus;0,35</b> den negativsten Wert der gesamten 76&nbsp;Jahre. Das ist kein Rauschen (jeweils ~6&nbsp;Standardfehler), sondern ein echter <b>Regimewechsel</b> &mdash; plausibel durch elektronisches Market-Making, ETFs, Optionsfl&uuml;sse und systematisches Dip-Buying.</div>
+</div>
+
+<div class=card>
+<h2>Anomalie 2 &middot; spektakul&auml;r, aber ein einzelnes Ereignis</h2>
+<h3>Crashs sind schneller &mdash; und die Erholung noch schneller</h3>
+<p>Gr&ouml;&szlig;ere Crashs: <a href="SP500_Drawdown_Pfadrisiko.html">Handelstage vom Hoch bis zum Tiefpunkt</a> (x-Achse, logarithmisch) gegen die Tiefe (y-Achse). Unten links liegt, was schnell und tief fiel.</p>
+<div class=chartbox><canvas id=speed></canvas></div>
+<div class=take>2020 ist ein Ausrei&szlig;er ohne Vergleich: <b>&minus;34&nbsp;% in nur 23&nbsp;Handelstagen</b> (~5&nbsp;Wochen) &mdash; vergleichbare St&uuml;rze brauchten 70 bis 640&nbsp;Tage. Die volle Erholung dauerte <b>103&nbsp;Handelstage</b> (~5&nbsp;Monate) statt 1&ndash;2&nbsp;Jahre wie 2008/2000/1974. Das passt zur Mean-Reversion oben: die <b>V-Form</b> ist das neue Muster (auch 2018-Q4 und 2025 schnappten zur&uuml;ck).</div>
+<p class=note>Einschr&auml;nkung: Das ist statistisch <i>ein</i> Extremereignis &mdash; eine Tendenz, kein Beweis.</p>
+<table class=tbl><thead><tr><th>Crash (Tief)</th><th>Tiefe</th><th>Tage z. Boden</th><th>Tage z. Erholung</th></tr></thead><tbody><tr><td>2009-03</td><td class="v neg">-56.8 %</td><td class=v>355</td><td class=v>1021</td></tr><tr><td>2002-10</td><td class="v neg">-49.1 %</td><td class=v>637</td><td class=v>1166</td></tr><tr><td>1974-10</td><td class="v neg">-48.2 %</td><td class=v>436</td><td class=v>1462</td></tr><tr><td>1970-05</td><td class="v neg">-36.1 %</td><td class=v>369</td><td class=v>451</td></tr><tr class=hot><td>2020-03</td><td class="v neg">-33.9 %</td><td class=v>23</td><td class=v>103</td></tr><tr><td>1987-12</td><td class="v neg">-33.5 %</td><td class=v>71</td><td class=v>414</td></tr><tr><td>1962-06</td><td class="v neg">-28.0 %</td><td class=v>135</td><td class=v>299</td></tr><tr><td>1982-08</td><td class="v neg">-27.1 %</td><td class=v>430</td><td class=v>58</td></tr><tr><td>2022-10</td><td class="v neg">-25.4 %</td><td class=v>195</td><td class=v>318</td></tr><tr><td>1966-10</td><td class="v neg">-22.2 %</td><td class=v>167</td><td class=v>143</td></tr><tr><td>1957-10</td><td class="v neg">-21.5 %</td><td class=v>306</td><td class=v>233</td></tr><tr><td>1990-10</td><td class="v neg">-19.9 %</td><td class=v>62</td><td class=v>86</td></tr></tbody></table>
+</div>
+
+<div class=card>
+<h2>Beweis-Matrix</h2>
+<h3>Dekade f&uuml;r Dekade</h3>
+<p class=note>Die 2020er umfassen erst ~6,5&nbsp;Jahre, sind also eine Teil-Dekade. Die Kurtosis der 1980er ist k&uuml;nstlich hoch &mdash; sie stammt allein aus dem Crash von 1987.</p>
+<table class=tbl><thead><tr><th>Dekade</th><th>&Oslash; Rendite p.a.</th><th>Vol p.a.</th><th>Kurtosis</th><th>% Tage &gt;3%</th><th>gr&ouml;&szlig;ter &minus;Tag</th><th>Autokorr.</th></tr></thead><tbody><tr><td>1950er</td><td class=v>13.7</td><td class=v>11.5</td><td class=v>6</td><td class=v>0.36</td><td class=v>-7</td><td class="v pos">+0.093</td></tr><tr><td>1960er</td><td class=v>4.4</td><td class=v>10.2</td><td class=v>9</td><td class=v>0.32</td><td class=v>-7</td><td class="v pos">+0.153</td></tr><tr><td>1970er</td><td class=v>1.6</td><td class=v>13.6</td><td class=v>2</td><td class=v>0.59</td><td class=v>-4</td><td class="v pos">+0.249</td></tr><tr><td>1980er</td><td class=v>12.5</td><td class=v>17.1</td><td class=v>56</td><td class=v>0.95</td><td class=v>-20</td><td class="v pos">+0.053</td></tr><tr><td>1990er</td><td class=v>15.3</td><td class=v>14.1</td><td class=v>5</td><td class=v>0.71</td><td class=v>-7</td><td class="v pos">+0.017</td></tr><tr><td>2000er</td><td class=v>-2.7</td><td class=v>22.2</td><td class=v>8</td><td class=v>4.21</td><td class=v>-9</td><td class="v neg">-0.088</td></tr><tr><td>2010er</td><td class=v>11.2</td><td class=v>14.8</td><td class=v>4</td><td class=v>1.23</td><td class=v>-7</td><td class="v neg">-0.047</td></tr><tr class=hot><td>2020er</td><td class=v>13.6</td><td class=v>20.5</td><td class=v>14</td><td class=v>2.76</td><td class=v>-12</td><td class="v neg">-0.169</td></tr></tbody></table>
+<div class=callout>Neben dem Vorzeichen-Flip: Die <b>H&auml;ufigkeit gro&szlig;er Tage</b> (&gt;3&nbsp;%) ist seit 2000 strukturell h&ouml;her (0,3&ndash;0,9&nbsp;% bis 1990 &rarr; 1,2&ndash;4,2&nbsp;% danach), und die <b>Volatilit&auml;t</b> der 2020er (20,5&nbsp;%) ist die zweith&ouml;chste aller Dekaden &mdash; bei gleichzeitig <b>hoher Rendite</b> (13,6&nbsp;%). Fr&uuml;her hie&szlig; hohe Volatilit&auml;t meist magere Rendite; diese Kombination ist ungew&ouml;hnlich.</div>
+</div>
+
+<div class=card>
+<h2>Fazit</h2>
+<h3>Was wirklich neu ist</h3>
+<ul class=take>
+<li><b>Echt &amp; robust:</b> Der Wechsel von <b><a href="SP500_Momentum_MeanReversion.html">Momentum zu Mean-Reversion</a></b> auf Tagesebene (Vorzeichen-Flip der Autokorrelation, ~6&nbsp;SE, &uuml;ber drei Dekaden best&auml;tigt). Das gab es vor 2000 so nicht.</li>
+<li><b>Stark, aber d&uuml;nn belegt:</b> Die <b>V-Form</b> &mdash; schnellere, sch&auml;rfere Crashs mit rascher Erholung (2020 als Extrem). Wenige Ereignisse, also als Tendenz zu lesen, nicht als Gesetz.</li>
+<li><b>Sekund&auml;r:</b> <a href="SP500_Taleb_Analyse.html">Mehr Extremtage und h&ouml;here Kurtosis</a> seit 2000; hohe Volatilit&auml;t <i>und</i> hohe Rendite zugleich in den 2020ern.</li>
+<li><b>Einschr&auml;nkung:</b> Die 2020er sind eine halbe Dekade, gepr&auml;gt von COVID, 2022 und 2025 &mdash; eine kleine Stichprobe, getrieben von wenigen Episoden, wie schon <a href="SP500_Statistik_Appendix.html">bei den 10-Jahres-Konfidenzintervallen</a>.</li>
+</ul>
+</div>
+
+<div class=foot>Eigene Berechnung, t&auml;gliche Schlusskurse ^GSPC (Yahoo Finance). Autokorrelation = Lag-1 der Tagesrenditen je Kalenderjahr. Crash-Tage in Handelstagen (Hoch&rarr;Tief bzw. Tief&rarr;neues Hoch). Kursindex ohne Dividenden.</div>
+</div>
+<script>
+const P={"ac": [[1950, 0.02], [1951, 0.151], [1952, 0.218], [1953, 0.072], [1954, 0.196], [1955, 0.052], [1956, 0.059], [1957, 0.08], [1958, 0.12], [1959, 0.077], [1960, 0.202], [1961, -0.112], [1962, 0.133], [1963, -0.062], [1964, 0.137], [1965, 0.18], [1966, 0.261], [1967, 0.127], [1968, 0.198], [1969, 0.36], [1970, 0.366], [1971, 0.288], [1972, 0.299], [1973, 0.238], [1974, 0.256], [1975, 0.239], [1976, 0.147], [1977, 0.208], [1978, 0.127], [1979, 0.162], [1980, 0.114], [1981, 0.099], [1982, 0.111], [1983, 0.004], [1984, 0.114], [1985, 0.068], [1986, 0.103], [1987, 0.04], [1988, -0.033], [1989, -0.07], [1990, 0.11], [1991, 0.037], [1992, -0.039], [1993, 0.038], [1994, -0.004], [1995, -0.002], [1996, 0.144], [1997, -0.04], [1998, -0.034], [1999, 0.0], [2000, 0.004], [2001, 0.012], [2002, -0.027], [2003, -0.138], [2004, 0.002], [2005, -0.099], [2006, 0.01], [2007, -0.175], [2008, -0.156], [2009, -0.118], [2010, -0.048], [2011, -0.116], [2012, 0.027], [2013, -0.094], [2014, -0.007], [2015, 0.053], [2016, -0.098], [2017, -0.122], [2018, -0.002], [2019, -0.092], [2020, -0.354], [2021, -0.078], [2022, 0.006], [2023, 0.028], [2024, 0.037], [2025, -0.114], [2026, -0.056]], "acbg": ["#1d4ed8", "#1d4ed8", "#1d4ed8", "#1d4ed8", "#1d4ed8", "#1d4ed8", "#1d4ed8", "#1d4ed8", "#1d4ed8", "#1d4ed8", "#1d4ed8", "#b91c1c", "#1d4ed8", "#b91c1c", "#1d4ed8", "#1d4ed8", "#1d4ed8", "#1d4ed8", "#1d4ed8", "#1d4ed8", "#1d4ed8", "#1d4ed8", "#1d4ed8", "#1d4ed8", "#1d4ed8", "#1d4ed8", "#1d4ed8", "#1d4ed8", "#1d4ed8", "#1d4ed8", "#1d4ed8", "#1d4ed8", "#1d4ed8", "#1d4ed8", "#1d4ed8", "#1d4ed8", "#1d4ed8", "#1d4ed8", "#b91c1c", "#b91c1c", "#1d4ed8", "#1d4ed8", "#b91c1c", "#1d4ed8", "#b91c1c", "#b91c1c", "#1d4ed8", "#b91c1c", "#b91c1c", "#1d4ed8", "#1d4ed8", "#1d4ed8", "#b91c1c", "#b91c1c", "#1d4ed8", "#b91c1c", "#1d4ed8", "#b91c1c", "#b91c1c", "#b91c1c", "#b91c1c", "#b91c1c", "#1d4ed8", "#b91c1c", "#b91c1c", "#1d4ed8", "#b91c1c", "#b91c1c", "#b91c1c", "#b91c1c", "#b91c1c", "#b91c1c", "#1d4ed8", "#1d4ed8", "#1d4ed8", "#b91c1c", "#b91c1c"], "scatterOld": [{"x": 355, "y": -56.8, "t": "2009-03"}, {"x": 637, "y": -49.1, "t": "2002-10"}, {"x": 436, "y": -48.2, "t": "1974-10"}, {"x": 369, "y": -36.1, "t": "1970-05"}, {"x": 71, "y": -33.5, "t": "1987-12"}, {"x": 135, "y": -28.0, "t": "1962-06"}, {"x": 430, "y": -27.1, "t": "1982-08"}, {"x": 195, "y": -25.4, "t": "2022-10"}, {"x": 167, "y": -22.2, "t": "1966-10"}, {"x": 306, "y": -21.5, "t": "1957-10"}, {"x": 62, "y": -19.9, "t": "1990-10"}], "scatter2020": [{"x": 23, "y": -33.9, "t": "2020-03"}]};
+Chart.defaults.font.family="-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif";
+new Chart(document.getElementById('ac'),{type:'bar',data:{labels:P.ac.map(a=>a[0]),datasets:[
+ {label:'Lag-1-Autokorrelation',data:P.ac.map(a=>a[1]),backgroundColor:P.acbg,borderWidth:0}
+]},options:{maintainAspectRatio:false,scales:{
+ y:{min:-0.4,max:0.4,title:{display:true,text:'Autokorrelation (Lag 1)'},grid:{color:c=>c.tick.value===0?'#d5cec1':'#ece7dd'}},
+ x:{ticks:{maxTicksLimit:14,callback:function(v){const y=this.getLabelForValue(v);return y%10===0?y:''}},grid:{display:false}}},
+ plugins:{legend:{display:false},tooltip:{callbacks:{title:it=>it[0].label,label:it=>'AC = '+it.parsed.y}}}}});
+
+new Chart(document.getElementById('speed'),{type:'scatter',data:{datasets:[
+ {label:'Crashs 1950-2022',data:P.scatterOld,backgroundColor:'#8b857a',pointRadius:6},
+ {label:'2020 (COVID)',data:P.scatter2020,backgroundColor:'#b91c1c',pointRadius:9,pointStyle:'rectRot'}
+]},options:{maintainAspectRatio:false,scales:{
+ x:{type:'logarithmic',title:{display:true,text:'Handelstage vom Hoch bis zum Tiefpunkt (log)'},grid:{color:'#ece7dd'}},
+ y:{max:0,min:-60,title:{display:true,text:'Drawdown-Tiefe (%)'},ticks:{callback:v=>v+'%'},grid:{color:'#ece7dd'}}},
+ plugins:{legend:{labels:{usePointStyle:true,boxWidth:8}},tooltip:{callbacks:{label:it=>it.raw.t+': '+it.raw.y+'% in '+it.raw.x+' Tagen'}}}}});
+</script></body></html>

@@ -1,0 +1,103 @@
+<!DOCTYPE html><html lang=de><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1">
+<title>S&P 500 - Die Diktatur der seltenen Tage</title>
+<script src="assets/chart.umd.min.js?v=4"></script>
+<link rel=stylesheet href="assets/site.css?v=4">
+<script defer src="assets/site-map.js?v=4"></script>
+<script defer src="assets/datenstand.js?v=4"></script>
+<script defer src="assets/site.js?v=4"></script>
+<style>
+/* seitenspezifisch */
+.kpi.red .n{color:var(--bad)}
+.card .chartbox{background:transparent;border:0;border-radius:0;padding:0;margin:0 0 4px;position:relative;height:400px}
+@media(max-width:700px){.card .chartbox{height:320px}}
+.tbl-cap{font-size:12px;color:var(--ink-3);margin:0 0 8px}
+.tbl td.f{color:var(--bad);font-weight:600}
+.take ul{margin:0;padding-left:20px}
+.take li{margin:9px 0}
+.take li:first-child{margin-top:0}
+.take li:last-child{margin-bottom:0}
+</style></head><body data-section="Risiko"><div class=wrap>
+<div class=kicker>Risiko &middot; Fat Tails</div>
+<h1>Die Diktatur der <em>seltenen</em> Tage</h1>
+<p class=lead>76 Jahre S&amp;P&nbsp;500, Tag f&uuml;r Tag ausgez&auml;hlt. Die Rendite entsteht nicht gleichm&auml;&szlig;ig, sondern in einer Handvoll Ausschl&auml;ge &mdash; und genau die h&auml;lt die Glockenkurve f&uuml;r so gut wie unm&ouml;glich.</p>
+<div class=sub>S&amp;P&nbsp;500 (^GSPC) &middot; Tagesrenditen 1950&ndash;2026 &middot; 19.241 Handelstage &middot; Kursindex (ohne Dividenden) &middot; Quelle: Yahoo Finance</div>
+
+<div class=kpis>
+<div class=kpi><div class=l>Rendite p.a.</div><div class=n>+9,7&nbsp;%</div></div>
+<div class=kpi><div class=l>Volatilit&auml;t p.a.</div><div class=n>15,8&nbsp;%</div></div>
+<div class="kpi red"><div class=l>Exzess-Kurtosis</div><div class=n>20,0</div></div>
+<div class="kpi red"><div class=l>schlimmster Tag</div><div class=n>&minus;20,5&nbsp;%</div></div>
+<div class="kpi red"><div class=l>Black Monday &middot; 19.10.1987</div><div class=n>20,7&sigma;</div></div>
+</div>
+
+<section class=card>
+<h2>1 &middot; Verteilung</h2>
+<h3>Die Glockenkurve l&uuml;gt &mdash; an den R&auml;ndern</h3>
+<p>Verteilung der t&auml;glichen Renditen (Punkte) gegen die Normalverteilung mit gleichem Mittel und gleicher Streuung (Linie). Die y-Achse ist logarithmisch; auf linearer Skala blieben die R&auml;nder unsichtbar.</p>
+<div class=chartbox><canvas id=hist></canvas></div>
+<div class=callout>Der 19.&nbsp;Oktober&nbsp;1987 (&minus;20,5&nbsp;%) war ein <b>20,7-Sigma-Ereignis</b>. Unter einer Glockenkurve tritt so etwas etwa <b>einmal in 10<sup>92</sup> Jahren</b> auf &mdash; rund <b>10<sup>82</sup>&times; das Alter des Universums</b>. Eingetreten ist es trotzdem. 2008 und 2020 folgten.</div>
+<p class=tbl-cap>H&auml;ufigkeit der Extremtage in den Daten &mdash; gegen die Erwartung der Normalverteilung (beidseitig, 19.241 Tage):</p>
+<table class=tbl><thead><tr><th>Schwelle</th><th>real beobachtet</th><th>Normal erwartet</th><th>zu viele</th></tr></thead><tbody><tr><td>±3&sigma;</td><td class=o>269</td><td class=e>51.9</td><td class=f>5×</td></tr><tr><td>±4&sigma;</td><td class=o>110</td><td class=e>1.2</td><td class=f>90×</td></tr><tr><td>±5&sigma;</td><td class=o>54</td><td class=e>0.011</td><td class=f>5e+03×</td></tr><tr><td>±6&sigma;</td><td class=o>34</td><td class=e>4e-05</td><td class=f>9e+05×</td></tr><tr><td>±7&sigma;</td><td class=o>17</td><td class=e>5e-08</td><td class=f>3e+08×</td></tr><tr><td>±8&sigma;</td><td class=o>13</td><td class=e>2e-11</td><td class=f>5e+11×</td></tr><tr><td>±10&sigma;</td><td class=o>4</td><td class=e>3e-19</td><td class=f>1e+19×</td></tr></tbody></table>
+</section>
+
+<section class=card>
+<h2>2 &middot; Konzentration</h2>
+<h3>Eine Handvoll Tage entscheidet alles</h3>
+<p>Aus 1&nbsp;$ wurden &uuml;ber 76 Jahre 441&times; (nur Kurs). Fast die gesamte Rendite steckt jedoch in winzig wenigen Tagen. Fehlen sie, bricht der Endwert weg (log-Skala).</p>
+<div class=chartbox><canvas id=days></canvas></div>
+<div class=callout>Ohne die <b>10 besten Tage</b> werden aus 441&times; noch 192&times; (&minus;57&nbsp;%). Die besten 10 Tage stehen f&uuml;r <b>13,7&nbsp;%</b>, die besten 50 f&uuml;r <b>44,9&nbsp;%</b> der gesamten kumulierten Rendite. Der Haken &agrave; la Taleb: <b>11 der 20 besten Tage</b> lagen <b>innerhalb einer Woche</b> eines der 20 schlimmsten Tage &mdash; beste und schlimmste Tage kleben aneinander. Wer einen Crash an der Seitenlinie abwartet, <a href="SP500_MeanReversion_Strategie.html">verpasst fast zwangsl&auml;ufig die Erholung</a>.</div>
+<div class=grid2>
+<div><p class=tbl-cap>Die 12 schlimmsten Tage</p><table class=tbl><thead><tr><th>Datum</th><th>Rendite</th></tr></thead><tbody><tr><td>1987-10-19</td><td class=neg>-20.47%</td></tr><tr><td>2020-03-16</td><td class=neg>-11.98%</td></tr><tr><td>2020-03-12</td><td class=neg>-9.51%</td></tr><tr><td>2008-10-15</td><td class=neg>-9.03%</td></tr><tr><td>2008-12-01</td><td class=neg>-8.93%</td></tr><tr><td>2008-09-29</td><td class=neg>-8.81%</td></tr><tr><td>1987-10-26</td><td class=neg>-8.28%</td></tr><tr><td>2008-10-09</td><td class=neg>-7.62%</td></tr><tr><td>2020-03-09</td><td class=neg>-7.60%</td></tr><tr><td>1997-10-27</td><td class=neg>-6.87%</td></tr><tr><td>1998-08-31</td><td class=neg>-6.80%</td></tr><tr><td>1988-01-08</td><td class=neg>-6.77%</td></tr></tbody></table></div>
+<div><p class=tbl-cap>Die 12 besten Tage</p><table class=tbl><thead><tr><th>Datum</th><th>Rendite</th></tr></thead><tbody><tr><td>2008-10-13</td><td class=pos>+11.58%</td></tr><tr><td>2008-10-28</td><td class=pos>+10.79%</td></tr><tr><td>2025-04-09</td><td class=pos>+9.52%</td></tr><tr><td>2020-03-24</td><td class=pos>+9.38%</td></tr><tr><td>2020-03-13</td><td class=pos>+9.29%</td></tr><tr><td>1987-10-21</td><td class=pos>+9.10%</td></tr><tr><td>2009-03-23</td><td class=pos>+7.08%</td></tr><tr><td>2020-04-06</td><td class=pos>+7.03%</td></tr><tr><td>2008-11-13</td><td class=pos>+6.92%</td></tr><tr><td>2008-11-24</td><td class=pos>+6.47%</td></tr><tr><td>2009-03-10</td><td class=pos>+6.37%</td></tr><tr><td>2008-11-21</td><td class=pos>+6.32%</td></tr></tbody></table></div>
+</div>
+</section>
+
+<section class=card>
+<h2>3 &middot; Kontext</h2>
+<h3>Der lange Lauf</h3>
+<p>S&amp;P&nbsp;500 Kursindex, log-Skala. Der stetige Aufstieg &mdash; und <a href="SP500_Drawdown_Pfadrisiko.html">die seltenen, brutalen Einbr&uuml;che</a>, die ihn formen.</p>
+<div class=chartbox><canvas id=eq></canvas></div>
+</section>
+
+<section class=card>
+<h2>Bilanz</h2>
+<h3>Was bleibt</h3>
+<div class=take>
+<ul>
+<li><b>Risiko wohnt in den Tails.</b> 17 Tage jenseits 7&sigma; in 76 Jahren &mdash; die Normalverteilung erwartet davon praktisch keinen. <a href="SP500_Statistik_Appendix.html">Modelle, die auf der Glockenkurve fu&szlig;en</a> (VaR, Risikoparit&auml;t), untersch&auml;tzen genau das, was wehtut.</li>
+<li><b>Zeit im Markt schl&auml;gt Markttiming.</b> Nicht weil Timing theoretisch schlecht w&auml;re &mdash; sondern weil die entscheidenden Tage so wenige sind und direkt neben den schlimmsten liegen. Selektiv einsammeln l&auml;sst sich das nicht.</li>
+<li><b>Der Durchschnitt t&auml;uscht.</b> Die 9,7&nbsp;%&nbsp;p.a. entstehen nicht gleichm&auml;&szlig;ig, sondern in Spr&uuml;ngen. Crashs geh&ouml;ren <a href="Geschichts_Stresstest.html">als Normalfall in die Planung</a>, nicht als Ausnahme.</li>
+</ul>
+</div>
+</section>
+
+<div class=foot>Eigene Berechnung auf 19.241 t&auml;glichen Schlusskursen (^GSPC, 1950-01-03 bis 2026-06-26). Kursindex ohne Dividenden; reale Gesamtrendite liegt h&ouml;her. Sigma-/H&auml;ufigkeitsangaben gegen eine Normalverteilung mit identischem Mittel/Streuung.</div>
+</div>
+<script>
+const P={"stats": {"start": "1950-01-04", "end": "2026-06-26", "mean": 0.000366, "sd": 0.009925, "annRet": 9.66, "annVol": 15.76, "skew": -0.588, "exKurt": 20.0, "worstSigma": -20.7, "Mfull": 441.4, "cagrFull": 8.3, "near": 11}, "worst": [["1987-10-19", -0.2047], ["2020-03-16", -0.1198], ["2020-03-12", -0.0951], ["2008-10-15", -0.0903], ["2008-12-01", -0.0893], ["2008-09-29", -0.0881], ["1987-10-26", -0.0828], ["2008-10-09", -0.0762], ["2020-03-09", -0.076], ["1997-10-27", -0.0687], ["1998-08-31", -0.068], ["1988-01-08", -0.0677]], "best": [["2008-10-13", 0.1158], ["2008-10-28", 0.1079], ["2025-04-09", 0.0952], ["2020-03-24", 0.0938], ["2020-03-13", 0.0929], ["1987-10-21", 0.091], ["2009-03-23", 0.0708], ["2020-04-06", 0.0703], ["2008-11-13", 0.0692], ["2008-11-24", 0.0647], ["2009-03-10", 0.0637], ["2008-11-21", 0.0632]], "sig": [[3, 269, 51.94677605318934, 145], [4, 110, 1.2187727282221226, 58], [5, 54, 0.011030925789055167, 30], [6, 34, 3.796586575634082e-05, 20], [7, 17, 4.92497463138147e-08, 9], [8, 13, 2.3939500481912816e-11, 7], [10, 4, 2.9322718407574796e-19, 2]], "missBest": [[10, 191.62, 7.13], [20, 109.57, 6.34], [30, 67.68, 5.68], [50, 28.74, 4.5]], "missWorst": [[10, 1265, 9.81], [20, 2465, 10.77], [30, 4293, 11.58], [50, 10938, 12.95]], "pctBest": [[10, 13.7], [20, 22.9], [50, 44.9]], "xlabels": [-12.9, -12.8, -12.7, -12.5, -12.4, -12.3, -12.2, -12.0, -11.9, -11.8, -11.6, -11.5, -11.4, -11.3, -11.1, -11.0, -10.9, -10.7, -10.6, -10.5, -10.3, -10.2, -10.1, -10.0, -9.8, -9.7, -9.6, -9.4, -9.3, -9.2, -9.1, -8.9, -8.8, -8.7, -8.5, -8.4, -8.3, -8.1, -8.0, -7.9, -7.8, -7.6, -7.5, -7.4, -7.2, -7.1, -7.0, -6.9, -6.7, -6.6, -6.5, -6.3, -6.2, -6.1, -6.0, -5.8, -5.7, -5.6, -5.4, -5.3, -5.2, -5.0, -4.9, -4.8, -4.7, -4.5, -4.4, -4.3, -4.1, -4.0, -3.9, -3.8, -3.6, -3.5, -3.4, -3.2, -3.1, -3.0, -2.8, -2.7, -2.6, -2.5, -2.3, -2.2, -2.1, -1.9, -1.8, -1.7, -1.6, -1.4, -1.3, -1.2, -1.0, -0.9, -0.8, -0.6, -0.5, -0.4, -0.3, -0.1, -0.0, 0.1, 0.3, 0.4, 0.5, 0.6, 0.8, 0.9, 1.0, 1.2, 1.3, 1.4, 1.6, 1.7, 1.8, 1.9, 2.1, 2.2, 2.3, 2.5, 2.6, 2.7, 2.8, 3.0, 3.1, 3.2, 3.4, 3.5, 3.6, 3.8, 3.9, 4.0, 4.1, 4.3, 4.4, 4.5, 4.7, 4.8, 4.9, 5.0, 5.2, 5.3, 5.4, 5.6, 5.7, 5.8, 5.9, 6.1, 6.2, 6.3, 6.5, 6.6, 6.7, 6.9, 7.0, 7.1, 7.2, 7.4, 7.5, 7.6, 7.8, 7.9, 8.0, 8.1, 8.3, 8.4, 8.5, 8.7, 8.8, 8.9, 9.1, 9.2, 9.3, 9.4, 9.6, 9.7, 9.8, 10.0, 10.1, 10.2, 10.3, 10.5, 10.6, 10.7, 10.9, 11.0, 11.1, 11.3, 11.4, 11.5, 11.6, 11.8, 11.9, 12.0, 12.2, 12.3, 12.4, 12.5, 12.7, 12.8, 12.9], "emp": [null, null, null, null, null, null, null, 1, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 1, null, null, null, 1, 1, 1, null, null, null, 1, null, null, null, null, 2, null, null, null, null, null, 2, 4, 1, null, null, null, 3, 2, 1, 1, null, 1, 2, 3, 1, 3, 3, 3, 1, 6, 4, 4, 3, 9, 2, 8, 13, 9, 11, 16, 30, 21, 26, 32, 40, 49, 53, 66, 75, 110, 130, 184, 214, 225, 280, 349, 437, 545, 705, 812, 968, 1253, 1454, 1580, 1609, 1357, 1232, 1037, 819, 697, 543, 433, 344, 242, 231, 176, 142, 102, 90, 60, 64, 50, 38, 32, 22, 21, 14, 10, 12, 9, 16, 6, 4, 9, 8, 4, 4, 4, 1, 4, 5, 3, 3, 2, 1, 2, 1, 1, null, 1, null, 1, 2, 1, null, null, null, 2, 1, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 1, null, 1, 1, 1, null, null, null, null, null, null, null, null, 1, null, null, null, null, null, null, 1, null, null, null, null, null, null, null, null, null, null], "normal": [8.059421281168325e-35, 4.389157608594125e-34, 2.3500759377709914e-33, 1.2371034472258973e-32, 6.402558271966632e-32, 3.257800338345188e-31, 1.629741744551662e-30, 8.015608866961961e-30, 3.875945356890838e-29, 1.8426471337028225e-28, 8.612517306780534e-28, 3.957686967680292e-27, 1.7880356579671407e-26, 7.942080992526873e-26, 3.468293558339432e-25, 1.4890894558686608e-24, 6.2856345753344345e-24, 2.608560244569301e-23, 1.0643292920438939e-22, 4.269475835764737e-22, 1.6838232677614749e-21, 6.528927628153522e-21, 2.488918089257744e-20, 9.328305381760373e-20, 3.4373068832649487e-19, 1.2452520397332332e-18, 4.435265449023484e-18, 1.5531212947658063e-17, 5.34705354162129e-17, 1.809868797761222e-16, 6.022863967902529e-16, 1.970527124309433e-15, 6.338480838503369e-15, 2.0045244031463526e-14, 6.232480310743866e-14, 1.905170657584359e-13, 5.72572195486914e-13, 1.6918039182793552e-12, 4.914656848342914e-12, 1.4036530535188244e-11, 3.9413930927870526e-11, 1.0880857660132921e-10, 2.953247931195406e-10, 7.880614605948083e-10, 2.0674912090282345e-09, 5.332743014001769e-09, 1.3523248879029729e-08, 3.37159054749027e-08, 8.264413070649183e-08, 1.991648097155213e-07, 4.718854612545988e-07, 1.0992184006333139e-06, 2.517414816892239e-06, 5.668249779162422e-06, 1.2547770795102272e-05, 2.7309111822459897e-05, 5.843485570802508e-05, 0.00012293053669860842, 0.000254255865694323, 0.0005170179074568835, 0.001033626396700249, 0.0020316317882091276, 0.003925995600796606, 0.00745895555344448, 0.013932518597049859, 0.02558613252762357, 0.046195860390007705, 0.08200208156735851, 0.14311003729521093, 0.24554930796603283, 0.41421968644258056, 0.6869832656816952, 1.120172694965388, 1.7957555103881047, 2.8303023685536104, 4.385729715012863, 6.681504932689449, 10.007604296058613, 14.737009309993157, 21.335950365725093, 30.36952703115936, 42.49985671176586, 58.473663584045305, 79.09636863978761, 105.19041952495729, 137.53689975947356, 176.8013901856453, 223.44751129261346, 277.64430508811773, 339.1762383000812, 407.3666486054936, 481.0264113403704, 558.4390458130267, 637.3911537959486, 715.253000817858, 789.1085461572926, 855.9279467877666, 912.7693911613716, 956.9920518129557, 986.4588992207864, 999.7077545843579, 996.0715322966691, 975.7339065802879, 939.7139352385828, 889.7814325491479, 828.3128753749771, 758.1041723308166, 682.1608059105145, 603.4871689216645, 524.8953433916618, 448.8495567270133, 377.35688894878854, 311.90846862760446, 253.4693502763875, 202.51030988778143, 159.07144505613152, 122.84591401989856, 93.27228301894404, 69.62543149641017, 51.09831671115524, 36.869622361398434, 26.154967602688355, 18.241606579558745, 12.508216365960156, 8.43239780543787, 5.58894955276745, 3.6419392240591932, 2.333235631852478, 1.4696296576521837, 0.9100821923797608, 0.5540854258962165, 0.3316623999588577, 0.19518172524577776, 0.11292899610128981, 0.06423846930273894, 0.0359259533639623, 0.01975353477205998, 0.010678364523140674, 0.005675290080892822, 0.0029654785593418143, 0.0015234384543282868, 0.0007694465214909134, 0.00038208093596913545, 0.00018653301022848, 8.953223586862798e-05, 4.224998537880162e-05, 1.960185161595934e-05, 8.941101665953406e-06, 4.009667592128887e-06, 1.7678650464161732e-06, 7.663254509826769e-07, 3.265884271705809e-07, 1.3683958061033183e-07, 5.6369746170162745e-08, 2.2829890341455258e-08, 9.090441433980312e-09, 3.5586847920810007e-09, 1.369674824084191e-09, 5.182852213062771e-10, 1.9281622636511728e-10, 7.052477903840502e-11, 2.536081995173549e-11, 8.966196427210436e-12, 3.1165680103879264e-12, 1.0650460100489224e-12, 3.5783558953638977e-13, 1.1820125738828207e-13, 3.8386990220975465e-14, 1.2256583524969566e-14, 3.8474961837243435e-15, 1.1874364274194645e-15, 3.603013914790169e-16, 1.074842702986207e-16, 3.1524433209263455e-17, 9.090192139085432e-18, 2.5770464140430733e-18, 7.182817292202846e-19, 1.968297768086802e-19, 5.3028602500664287e-20, 1.4046009748138508e-20, 3.657793218965833e-21, 9.365020597788763e-22, 2.3573372826147456e-22, 5.833888364043417e-23, 1.419442829424751e-23, 3.3954793817004616e-24, 7.985602556605314e-25, 1.8464505742669248e-25, 4.1975036634577706e-26, 9.38140493840196e-27, 2.0614275794689364e-27, 4.453399781268058e-28, 9.458857577072833e-29, 1.97519096627526e-29, 4.0551123994235755e-30, 8.185026763030344e-31, 1.6242793110264824e-31, 3.1690181233544574e-32, 6.078719936306038e-33, 1.1463650790158424e-33, 2.1254806849569888e-34], "eq": [["1950-01-03", 16.66], ["1951-03-29", 21.33], ["1952-06-20", 24.59], ["1953-09-11", 23.14], ["1954-12-06", 34.76], ["1956-02-24", 45.32], ["1957-05-16", 47.02], ["1958-08-05", 47.75], ["1959-10-23", 56.56], ["1961-01-16", 59.58], ["1962-04-06", 68.84], ["1963-06-27", 69.07], ["1964-09-17", 83.79], ["1965-12-08", 91.28], ["1967-02-28", 86.78], ["1968-05-21", 96.93], ["1969-09-19", 95.19], ["1970-12-07", 89.94], ["1972-02-24", 105.45], ["1973-05-17", 105.56], ["1974-08-06", 80.52], ["1975-10-23", 91.24], ["1977-01-12", 103.4], ["1978-04-04", 88.86], ["1979-06-21", 102.09], ["1980-09-09", 124.07], ["1981-11-27", 125.09], ["1983-02-15", 148.3], ["1984-05-04", 159.11], ["1985-07-24", 191.58], ["1986-10-13", 235.91], ["1987-12-31", 247.08], ["1989-03-21", 291.33], ["1990-06-08", 358.71], ["1991-08-27", 393.06], ["1992-11-12", 422.87], ["1994-02-01", 479.62], ["1995-04-24", 512.89], ["1996-07-11", 645.67], ["1997-09-29", 953.34], ["1998-12-17", 1179.98], ["2000-03-09", 1401.69], ["2001-05-30", 1248.08], ["2002-08-23", 940.86], ["2003-11-12", 1058.53], ["2005-02-03", 1189.89], ["2006-04-26", 1305.41], ["2007-07-18", 1546.17], ["2008-10-06", 1056.89], ["2009-12-24", 1126.48], ["2011-03-17", 1273.72], ["2012-06-06", 1315.13], ["2013-08-28", 1634.96], ["2014-11-17", 2041.32], ["2016-02-09", 1852.21], ["2017-05-01", 2388.33], ["2018-07-20", 2801.83], ["2019-10-10", 2938.13], ["2020-12-30", 3732.04], ["2022-03-22", 4511.61], ["2023-06-13", 4369.01], ["2024-09-04", 5520.07], ["2025-11-25", 6765.88]], "rarity": {"log10_years": 92, "log10_ratio": 82, "log10_p": -94.8}, "n": 19241};
+Chart.defaults.color='#57534c';
+Chart.defaults.font.family="-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif";
+new Chart(document.getElementById('hist'),{data:{labels:P.xlabels,datasets:[
+ {type:'line',label:'Normalverteilung (Modell)',data:P.normal,borderColor:'#8b857a',backgroundColor:'#8b857a',borderWidth:2,pointRadius:0,borderDash:[6,4],tension:.3,order:2},
+ {type:'line',label:'tatsächliche Häufigkeit',data:P.emp,borderColor:'#1d4ed8',backgroundColor:'#1d4ed8',borderWidth:0,pointRadius:2.1,showLine:false,order:1,spanGaps:false}
+]},options:{maintainAspectRatio:false,scales:{
+ y:{type:'logarithmic',min:0.1,max:3000,title:{display:true,text:'Anzahl Tage (log)'},grid:{color:'#ece7dd'}},
+ x:{title:{display:true,text:'Tagesrendite (%)'},ticks:{maxTicksLimit:13,callback:function(v){const l=this.getLabelForValue(v);return (l>0?'+':'')+l+'%'}},grid:{display:false}}},
+ plugins:{legend:{labels:{usePointStyle:true,boxWidth:8}},tooltip:{callbacks:{title:function(it){return it[0].label+'%'}}}}}});
+
+new Chart(document.getElementById('days'),{type:'bar',data:{labels:['Voll investiert','ohne 10 beste','ohne 20','ohne 30','ohne 50'],
+ datasets:[
+ {label:'ohne die besten Tage',data:[P.stats.Mfull].concat(P.missBest.map(x=>x[1])),backgroundColor:'#b91c1c',borderRadius:5},
+ {label:'hypothetisch ohne die schlimmsten Tage',data:[P.stats.Mfull].concat(P.missWorst.map(x=>x[1])),backgroundColor:'#047857',borderRadius:5}
+]},options:{maintainAspectRatio:false,scales:{
+ y:{type:'logarithmic',title:{display:true,text:'aus 1 $ wurden ... (log, nur Kurs)'},grid:{color:'#ece7dd'},ticks:{callback:function(v){return v+'×'}}},
+ x:{grid:{display:false}}},plugins:{legend:{labels:{usePointStyle:true,boxWidth:8}},
+ tooltip:{callbacks:{label:function(it){return it.dataset.label+': '+Math.round(it.parsed.y)+'×'}}}}}});
+
+new Chart(document.getElementById('eq'),{type:'line',data:{labels:P.eq.map(x=>x[0]),datasets:[
+ {label:'S&P 500 (Kursindex)',data:P.eq.map(x=>x[1]),borderColor:'#1d4ed8',backgroundColor:'rgba(29,78,216,.08)',borderWidth:2,pointRadius:0,fill:true,tension:.25}
+]},options:{maintainAspectRatio:false,scales:{
+ y:{type:'logarithmic',grid:{color:'#ece7dd'}},
+ x:{ticks:{maxTicksLimit:12,callback:function(v){return this.getLabelForValue(v).slice(0,4)}},grid:{display:false}}},
+ plugins:{legend:{display:false}}}});
+</script></body></html>

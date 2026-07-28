@@ -1,0 +1,584 @@
+<!DOCTYPE html><html lang=de><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1">
+<title>Was Steuern und Kosten vom Depot nehmen</title>
+<link rel=stylesheet href="assets/site.css?v=4">
+<script defer src="assets/site-map.js?v=4"></script>
+<script defer src="assets/datenstand.js?v=4"></script>
+<script src="assets/de-kapitalertrag.js?v=4"></script>
+<script defer src="assets/site.js?v=4"></script>
+<style>
+/* seitenspezifisch */
+.res3{display:grid;grid-template-columns:1fr;gap:12px;margin-bottom:16px}
+.rbox{background:var(--card-2);border:1px solid var(--rule);border-radius:12px;padding:14px 17px;
+  display:flex;align-items:baseline;justify-content:space-between;gap:14px}
+.rbox .l{font-size:12.5px;color:var(--ink-3);line-height:1.4}
+.rbox .n{font-family:var(--serif);font-size:26px;font-weight:700;letter-spacing:-.022em;line-height:1.05;
+  color:var(--ink);font-variant-numeric:tabular-nums;white-space:nowrap}
+.rbox.top{border-left:3px solid var(--ink-3)}
+.rbox.mid{border-left:3px solid var(--s5)}
+.rbox.bot{border-left:3px solid var(--s2)}
+.rbox.bot .n{font-size:32px;color:var(--s2)}
+.dif{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:4px}
+.dbox{border:1px solid var(--rule);border-radius:12px;padding:13px 15px;background:var(--card)}
+.dbox .l{font-size:11.5px;color:var(--ink-3);margin-bottom:3px}
+.dbox .n{font-family:var(--serif);font-size:23px;font-weight:700;letter-spacing:-.02em;
+  font-variant-numeric:tabular-nums;line-height:1.1}
+.dbox .s{font-size:11.5px;color:var(--ink-3);margin-top:3px;line-height:1.45}
+.dbox.k{border-left:3px solid var(--s5)}.dbox.k .n{color:var(--s5)}
+.dbox.s{border-left:3px solid var(--s1)}.dbox.s .n{color:var(--s1)}
+.dbox.i{border-left:3px solid var(--s4);grid-column:1/-1}.dbox.i .n{color:var(--s4)}
+.tscroll{max-height:330px;overflow:auto;border:1px solid var(--rule);border-radius:11px;padding:2px 12px;background:var(--card-2)}
+.tscroll .tbl th{position:sticky;top:0;background:var(--card-2);z-index:1}
+.tscroll .tbl th,.tscroll .tbl td{white-space:nowrap;padding:8px 9px}
+.tbl td.small,.tbl th.small{font-size:12px}
+.sumrow td{border-top:1.5px solid var(--rule);font-weight:700;color:var(--ink)}
+.selrow{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media(max-width:520px){.selrow,.dif{grid-template-columns:1fr}}
+.chartcard h2{margin-bottom:14px}
+.eq td:first-child{color:var(--ink-2)}
+.eq tr.res td{border-top:1.5px solid var(--rule);font-weight:700;color:var(--ink)}
+.eq tr.fin td{color:var(--s1);font-weight:700}
+.warnbox{display:none;background:var(--card-2);border:1px solid var(--rule);border-left:3px solid var(--bad);
+  border-radius:0 10px 10px 0;color:var(--bad);padding:11px 15px;font-size:13.5px;margin-top:14px}
+</style></head><body data-section="Werkzeug"><div class=wrap>
+
+<div class=hero>
+<div class=kicker>Werkzeug · Kapitalertragsteuer</div>
+<h1>Was Steuern und Kosten vom <em>Depot</em> nehmen</h1>
+<p class=lead>Zwischen der Rendite, die ein Index ausweist, und dem Betrag, der am Ende auf dem Konto landet, liegen zwei Abzüge: die laufenden Kosten des Produkts und die deutsche Kapitalertragsbesteuerung. Dieser Rechner zieht beide nacheinander ab — und zeigt in Euro, was jeder einzelne von ihnen kostet.</p>
+</div>
+
+<div class=tip>Alle Regler und Felder rechnen live. Die Steuerlogik stammt vollständig aus der gemeinsamen Bibliothek: Abgeltungsteuer nach § 32d EStG, Teilfreistellung nach § 20 InvStG, Vorabpauschale nach § 18 InvStG, Anrechnung beim Verkauf nach § 19 InvStG.</div>
+
+<div class=take id=take></div>
+
+<div class=grid2>
+
+<div class=card>
+<h2>Eingaben</h2>
+
+<div class=grp>Anlage</div>
+<div class=ctrl><div class=clabel><span>Ihre Einmalanlage heute</span></div>
+<input class=eurin id=einmal type=text inputmode=numeric value="20.000">
+<input type=range id=einmal_r min=0 max=500000 step=1000 value=20000 style="margin-top:8px"></div>
+
+<div class=ctrl><div class=clabel><span>Ihre monatliche Sparrate</span></div>
+<input class=eurin id=rate type=text inputmode=numeric value="500">
+<input type=range id=rate_r min=0 max=3000 step=25 value=500 style="margin-top:8px"></div>
+
+<div class=ctrl><div class=clabel><span>Anlagedauer</span><span class=cval id=jahre_v>25 Jahre</span></div>
+<input type=range id=jahre_r min=1 max=45 step=1 value=25></div>
+
+<div class=ctrl><div class=clabel><span>Erwartete Rendite p.a. (brutto)</span><span class=cval id=rend_v>7,0 %</span></div>
+<input type=range id=rend_r min=0 max=12 step=0.1 value=7></div>
+
+<div class=grp>Kosten</div>
+<div class=ctrl><div class=clabel><span>TER — Szenario A</span><span class=cval id=terA_v>0,20 %</span></div>
+<input type=range id=terA_r min=0 max=2.5 step=0.01 value=0.20></div>
+
+<div class=ctrl><div class=clabel><span>TER — Szenario B (Vergleich)</span><span class=cval id=terB_v>1,50 %</span></div>
+<input type=range id=terB_r min=0 max=2.5 step=0.01 value=1.50>
+<div class=hint>Marktbeobachtung, kein gesetzlicher Wert: breit gestreute Index-ETF liegen meist bei 0,07 bis 0,25 %, aktiv verwaltete Aktienfonds bei 1,2 bis 2,0 %. Die TER erfasst weder fondsinterne Transaktionskosten noch Swap-Gebühren.</div></div>
+
+<div class=ctrl><div class=clabel><span>Ausgabeaufschlag je Einzahlung</span><span class=cval id=aa_v>0,00 %</span></div>
+<input type=range id=aa_r min=0 max=5.5 step=0.05 value=0>
+<div class=hint id=aa_h>Wird vom Einzahlungsbetrag abgezogen; investiert wird der Rest.</div></div>
+
+<div class=grp>Steuer</div>
+<div class=ctrl><div class=clabel><span>Produktart — bestimmt die Teilfreistellung</span></div>
+<select id=art>
+<option value=aktienfonds selected>Aktienfonds / Aktien-ETF — 30 % Teilfreistellung</option>
+<option value=mischfonds>Mischfonds — 15 % Teilfreistellung</option>
+<option value=immobilienInland>Immobilienfonds Inland — 60 % Teilfreistellung</option>
+<option value=immobilienAusland>Immobilienfonds Ausland — 80 % Teilfreistellung</option>
+<option value=einzelaktien>Einzelaktien — keine Teilfreistellung, keine Vorabpauschale</option>
+</select>
+<div class=hint>Die Teilfreistellung setzt voraus, dass die Kapitalbeteiligungsquote laut Anlagebedingungen zugesagt und fortlaufend eingehalten wird (§ 2 InvStG).</div></div>
+
+<div class=ctrl><div class=clabel><span>Kirchensteuer</span></div>
+<div class="seg tone" id=seg_kist>
+<button data-v="0" class=on>keine</button><button data-v="0.08">8 % (BW, BY)</button><button data-v="0.09">9 % (übrige)</button></div></div>
+
+<div class=ctrl><div class=clabel><span>Sparer-Pauschbetrag genutzt</span></div>
+<div class="seg tone" id=seg_frei>
+<button data-v="0">nein</button><button data-v="1000" class=on>ledig — 1.000 €</button><button data-v="2000">zusammen — 2.000 €</button></div>
+<div class=hint>Der Pauschbetrag gilt pro Kalenderjahr und wird hier zuerst gegen die Vorabpauschale gerechnet; nur der Rest steht im Verkaufsjahr noch zur Verfügung.</div></div>
+
+<div class=ctrl><div class=clabel><span>Basiszins für die Vorabpauschale</span></div>
+<select id=bz></select>
+<div class=hint id=bz_h>Der Basiszins wird jährlich vom BMF festgesetzt. Hier wird der gewählte Satz über die gesamte Laufzeit konstant fortgeschrieben — künftige Werte sind unbekannt. Ist der Basiszins negativ, fällt keine Vorabpauschale an.</div></div>
+
+<div class=grp>Anzeige</div>
+<div class=ctrl><div class=clabel><span>Beträge zeigen als</span></div>
+<div class=seg><button id=dNom class=on>nominal (Euro am Ende)</button><button id=dReal>real (heutige Kaufkraft)</button></div></div>
+
+<div class=ctrl id=inflbox style="display:none"><div class=clabel><span>Angenommene Inflation p.a.</span><span class=cval id=infl_v>2,0 %</span></div>
+<input type=range id=infl min=0 max=5 step=0.1 value=2>
+<div class=hint>Nur für die Umrechnung in heutige Kaufkraft: Ein Betrag nach n Jahren wird durch (1 + i)<sup>n</sup> geteilt. Die Simulation selbst rechnet unverändert nominal — Rendite, Kosten und Steuerbeträge bleiben davon unberührt.</div></div>
+
+<div class=warnbox id=warnbox>Bitte mindestens eine Einmalanlage oder eine Sparrate größer null angeben.</div>
+</div>
+
+<div class=card>
+<h2>Endvermögen nach <span id=jEcho>25</span> Jahren<span class=sub id=jSuffix></span></h2>
+<div class=res3>
+<div class="rbox top"><div class=l>Brutto — reine Marktrendite,<br>ohne Kosten, ohne Steuern<span id=e_brutto_s></span></div><div class=n id=e_brutto>–</div></div>
+<div class="rbox mid"><div class=l>Nach Kosten — TER Szenario A<br>und Ausgabeaufschlag abgezogen<span id=e_kosten_s></span></div><div class=n id=e_kosten>–</div></div>
+<div class="rbox bot"><div class=l>Nach Kosten <b>und</b> Steuern —<br>der Betrag, der bleibt<span id=e_netto_s></span></div><div class=n id=e_netto>–</div></div>
+</div>
+
+<div class=dif>
+<div class="dbox k"><div class=l>Kosten kosten</div><div class=n id=d_kosten>–</div><div class=s id=d_kosten_s></div></div>
+<div class="dbox s"><div class=l>Steuern kosten</div><div class=n id=d_steuer>–</div><div class=s id=d_steuer_s></div></div>
+<div class="dbox i" id=d_inflbox style="display:none"><div class=l>Die Inflation nimmt</div><div class=n id=d_infl>–</div><div class=s id=d_infl_s></div></div>
+</div>
+
+<div class=grp>Rendite pro Jahr, geldgewichtet<span id=irr_grp_s></span></div>
+<div class=mrow style="margin-bottom:0">
+<div class=mcard><div class=l>brutto</div><div class=n id=irr_b>–</div></div>
+<div class=mcard><div class=l>nach Kosten</div><div class=n id=irr_k>–</div></div>
+<div class=mcard><div class=l>nach Steuern</div><div class=n id=irr_s>–</div><div class=s id=irr_s_s></div></div>
+</div>
+</div>
+
+</div>
+
+<div class="card chartcard">
+<h2>Wohin das Vermögen wandert — Jahr für Jahr</h2>
+<div id=chart1></div>
+<div class=legend>
+<span><i style="background:var(--s2)"></i>Nettovermögen (nach Kosten und Steuern)</span>
+<span><i style="background:var(--s1)"></i>kumulierte Steuern</span>
+<span><i style="background:var(--s5)"></i>kumulierte Kosten</span>
+</div>
+<div class=figcap>Die Gesamthöhe ist das Bruttovermögen bei reiner Marktrendite. Die Steuerfläche enthält die bereits gezahlte Steuer auf Vorabpauschalen zuzüglich der latenten Steuer, die bei einem Verkauf in diesem Jahr fällig würde — jeweils samt entgangenem Zinseszins. Deshalb wächst sie auch in Jahren, in denen kein Euro an das Finanzamt fließt.<span id=cap1_s></span></div>
+</div>
+
+<div class="card chartcard">
+<h2>Zwei Kostenquoten, dasselbe Depot</h2>
+<div id=chart2></div>
+<div class=win>
+<div class="wbox on" id=w_a><div class=t id=w_a_t>TER 0,20 % — nach Kosten und Steuern</div><div class=v id=w_a_v>–</div><div class=t id=w_a_s></div></div>
+<div class=wbox id=w_b><div class=t id=w_b_t>TER 1,50 % — nach Kosten und Steuern</div><div class=v id=w_b_v>–</div><div class=t id=w_b_s></div></div>
+</div>
+<div class=callout id=terTxt></div>
+</div>
+
+<div class=card>
+<h2>Die Vorabpauschale, Jahr für Jahr</h2>
+<p>Thesaurierende Fonds schütten nichts aus — trotzdem greift der Fiskus jährlich zu. Die Vorabpauschale nach § 18 InvStG setzt einen fiktiven Mindestertrag an: 70 % des Basiszinses auf den Depotwert zu Jahresbeginn, gedeckelt auf den tatsächlichen Wertzuwachs des Jahres. In Verlustjahren fällt sie damit vollständig weg.</p>
+<div class=tscroll>
+<table class=tbl id=vaptab></table>
+</div>
+<div class=note style="margin-top:10px">Der Betrag gilt am ersten Werktag des Folgejahres als zugeflossen (§ 18 Abs. 3 InvStG); die Bank zieht die Steuer dann vom Verrechnungskonto ein. Im Erwerbsjahr wird die Vorabpauschale gezwölftelt (§ 18 Abs. 2 InvStG) — bei einem Sparplan wird deshalb jede Monatsrate einzeln gerechnet.<span id=vap_s></span></div>
+</div>
+
+<div class=card>
+<h2>Anrechnung und Steuer beim Verkauf</h2>
+<div class=grid2>
+<div>
+<h3>Der Gewinn wird zweimal gekürzt</h3>
+<table class="tbl eq" id=verkauf></table>
+</div>
+<div>
+<h3>Was tatsächlich abgeführt wird</h3>
+<table class="tbl eq" id=steuertab></table>
+<div class=note style="margin-top:10px" id=satzNote></div>
+</div>
+</div>
+<div class=callout id=stundung></div>
+</div>
+
+<div class=card>
+<h2>Einordnung</h2>
+<p>Die Reihenfolge der Abzüge ist nicht beliebig. Kosten wirken auf das gesamte Vermögen, jedes Jahr, unabhängig davon, ob der Markt steigt oder fällt. Steuern greifen nur auf den Gewinn zu — und beim Verkauf erst dann, wenn er auch realisiert wird. Deshalb schlägt ein Prozentpunkt mehr TER über lange Zeiträume härter durch als der Unterschied zwischen 25 und 27,99 % Abgeltungsteuer.</p>
+<p>Die Vorabpauschale ist keine zusätzliche Steuer, sondern eine Vorverlagerung: Was jährlich angesetzt wurde, mindert später den Veräußerungsgewinn. Der echte Nachteil ist allein der entgangene Zinseszins auf das früh abgeflossene Geld. Gegenläufig wirkt der Sparer-Pauschbetrag — er gilt pro Kalenderjahr und verfällt ungenutzt, wenn nichts zufließt. Wer den Freibetrag sonst nirgends ausschöpft, steht mit Vorabpauschale am Ende sogar besser da; der Rechner weist beide Richtungen aus. Den jährlichen Liquiditätsbedarf sollte man trotzdem einplanen: Das <a href="Lebenszyklus_Simulator.html">Lebenszyklus-Modell</a> koppelt Ansparen und Entnehmen entlang echter Renditesequenzen und zeigt, wie empfindlich das Ergebnis auf die Reihenfolge der Jahre reagiert.</p>
+<p>Diese Seite rechnet mit einer glatten, jedes Jahr gleichen Rendite. Real ist sie das nie. Wie breit die Ergebnisspanne allein aus der Marktentwicklung wird, zeigt der <a href="Sparplan_Perzentile.html">Sparplan-Simulator</a> über historische Zeitblöcke. Beide Seiten gehören zusammen gelesen: Die eine liefert die Streuung, diese hier den systematischen Abzug, der in jedem Szenario anfällt.</p>
+</div>
+
+<div class=foot>
+<b>Rechenlogik und Quellen.</b> Sämtliche Steuerberechnungen stammen aus <span style="font-family:var(--mono);font-size:11px">assets/de-kapitalertrag.js</span> (Stand 25.07.2026): Abgeltungsteuer 25 % zuzüglich 5,5 % Solidaritätszuschlag und gegebenenfalls Kirchensteuer nach § 32d Abs. 1 EStG — bei Kirchensteuer in der Fassung des Satzes 4, (e − 4q)/(4 + k); Teilfreistellung nach § 20 InvStG; Sparer-Pauschbetrag 1.000 € beziehungsweise 2.000 € nach § 20 Abs. 9 EStG; Vorabpauschale und Zwölftelung nach § 18 InvStG; Anrechnung angesetzter Vorabpauschalen auf den Veräußerungsgewinn nach § 19 Abs. 1 Satz 3 InvStG; Basiszinssätze 2018 bis 2026 laut den jährlichen BMF-Schreiben. Der Basiszins für 2027 ist zum Stand Juli 2026 nicht veröffentlicht und wird hier nicht fortgeschrieben, sondern konstant gehalten.
+<br><br><b>Vereinfachungen.</b> Aufzinsung, Sparplanverlauf und Diagramme sind eigene Darstellungsrechnungen. Angenommen werden konstante Rendite, thesaurierende Anlage ohne Ausschüttungen, Verkauf des gesamten Bestands am Ende, Zahlung der Vorabpauschalensteuer aus dem Depot und ein über die Laufzeit unveränderter Rechtsstand. Nicht abgebildet sind Ordergebühren, Depotentgelte, ausländische Quellensteuer, bestehende Verlustvorträge, die Günstigerprüfung, Altbestände vor 2009 sowie Versicherungs- und Betriebsvermögensmäntel. TER- und Ausgabeaufschlagsangaben sind Marktbeobachtungen, keine gesetzlich fixierten Werte.
+<br><br>Alle Angaben gelten für natürliche Personen mit Wertpapieren im Privatvermögen und unbeschränkter Steuerpflicht in Deutschland. <b>Dies ist keine Steuer-, Rechts- oder Anlageberatung</b>, sondern eine Zusammenstellung öffentlich zugänglicher Rechengrößen zu Informationszwecken. Verbindliche Auskunft erteilen ausschließlich ein Steuerberater oder ein zugelassener Anlageberater.
+</div>
+
+</div>
+
+<script>
+const $=id=>document.getElementById(id);
+
+/* ---------- Darstellungshelfer ---------- */
+const eur=x=>Math.round(x).toLocaleString('de-DE')+' €';
+const eur0=x=>Math.round(x).toLocaleString('de-DE');
+const pc1=x=>(x*100).toLocaleString('de-DE',{minimumFractionDigits:1,maximumFractionDigits:1})+' %';
+const pc2=x=>(x*100).toLocaleString('de-DE',{minimumFractionDigits:2,maximumFractionDigits:2})+' %';
+function kurz(v){
+  if(Math.abs(v)>=1e6) return (v/1e6).toLocaleString('de-DE',{maximumFractionDigits:2})+' Mio';
+  if(Math.abs(v)>=1000) return Math.round(v/1000).toLocaleString('de-DE')+' k';
+  return Math.round(v).toLocaleString('de-DE');
+}
+function eurLese(el){
+  const roh=el.value.replace(/[^0-9]/g,'');
+  const n=roh===''?0:parseInt(roh,10);
+  const atEnd=el.selectionStart===el.value.length;
+  el.value=roh===''?'':n.toLocaleString('de-DE');
+  if(atEnd) try{el.setSelectionRange(el.value.length,el.value.length);}catch(e){}
+  return n;
+}
+
+/* ---------- Darstellung: nominal oder real (heutige Kaufkraft) ----------
+   Reine Umrechnung, keine zweite Rechnung: Ein Betrag des Jahres k wird durch (1+INFL)^k
+   geteilt. Die Simulation unten bleibt davon vollstaendig unberuehrt und rechnet nominal. */
+let disp='nom', INFL=0.02;
+const nf=k=>Math.pow(1+INFL,k);
+const real=(v,k)=>v/nf(k);                       // nominaler Betrag des Jahres k in heutiger Kaufkraft
+const istReal=()=>disp==='real';
+
+/* ---------- Simulation: eigene Sparplan-Aufzinsung, Steuern aus der Bibliothek ---------- */
+function simuliere(o){
+  const aaF=1-o.aa, rNet=o.r-o.ter;
+  let wert=o.einmal*aaF, brutto=o.einmal, nurKosten=o.einmal*aaF;
+  let einzahlungen=o.einmal, kostenAA=o.einmal*o.aa, kostenTER=0;
+  let summeVAP=0, summeStVAP=0, freiRest=o.frei;
+  const hist=[{jahr:0,brutto:brutto,nurKosten:nurKosten,netto:nurKosten}];
+  const zeilen=[];
+  for(let j=1;j<=o.jahre;j++){
+    const A=wert;
+    const bestandEnde=A*(1+rNet);
+    kostenTER+=o.ter*(A+bestandEnde)/2;
+    let ende=bestandEnde;
+    brutto=brutto*(1+o.r);
+    nurKosten=nurKosten*(1+rNet);
+    let vapSum=0;
+    if(o.vapAktiv&&A>0) vapSum+=vorabpauschale(A,bestandEnde,0,o.bz,o.tf,1).vorabpauschale;
+    if(o.rate>0){
+      for(let m=1;m<=12;m++){
+        const netto=o.rate*aaF, mon=12-m+1;
+        const w2=netto*Math.pow(1+rNet,mon/12);
+        ende+=w2;
+        nurKosten+=w2;
+        brutto+=o.rate*Math.pow(1+o.r,mon/12);
+        einzahlungen+=o.rate;
+        kostenAA+=o.rate*o.aa;
+        kostenTER+=o.ter*netto*(mon/12);
+        if(o.vapAktiv) vapSum+=vorabpauschale(netto,w2,0,o.bz,o.tf,m).vorabpauschale;
+      }
+    }
+    const stv=steuerAufVorabpauschale({vorabpauschale:vapSum},o.kiSt,o.tf,o.frei);
+    freiRest=stv.freibetragRestNeu;
+    summeVAP+=vapSum; summeStVAP+=stv.steuerGesamt;
+    wert=ende-stv.steuerGesamt;
+    const gJ=veraeusserungsgewinn(wert,einzahlungen,summeVAP);
+    const svJ=kapESt(gJ,o.kiSt,o.tf,freiRest);
+    hist.push({jahr:j,brutto:brutto,nurKosten:nurKosten,netto:wert-svJ.steuerGesamt});
+    zeilen.push({jahr:j,anfang:A,vap:vapSum,stpfl:vapSum*(1-o.tf),
+                 genutzt:stv.genutzterFreibetrag,steuer:stv.steuerGesamt,kum:summeVAP});
+  }
+  const gewinn=veraeusserungsgewinn(wert,einzahlungen,summeVAP);
+  const sv=kapESt(gewinn,o.kiSt,o.tf,freiRest);
+  const endNetto=wert-sv.steuerGesamt;
+  return {hist,zeilen,einzahlungen,kostenAA,kostenTER,brutto,nurKosten,vorVerkauf:wert,
+          summeVAP,summeStVAP,gewinn,sv,freiRest,endNetto,
+          steuerGesamt:summeStVAP+sv.steuerGesamt,
+          rohertrag:wert+summeStVAP-einzahlungen};
+}
+
+/* interne Zinsfussberechnung (Annuitaetenrechnung) */
+function irr(einmal,rate,jahre,end){
+  const N=jahre*12;
+  function npv(i){
+    const mf=Math.pow(1+i,1/12);
+    let s=einmal;
+    for(let k=0;k<N;k++) s+=rate/Math.pow(mf,k);
+    return s-end/Math.pow(1+i,jahre);
+  }
+  let lo=-0.95,hi=2;
+  if(npv(lo)>0) return lo;
+  for(let k=0;k<120;k++){const mid=(lo+hi)/2; if(npv(mid)>0) hi=mid; else lo=mid;}
+  return (lo+hi)/2;
+}
+
+/* ---------- Diagramm 1: gestapelte Flaechen ---------- */
+function chartFlaechen(h0,jahre){
+  const W=720,H=300,X0=64,X1=690,Y0=16,Y1=248;
+  /* skalierte Kopie der Datenreihen — jeder Jahreswert mit dem Faktor seines Jahres,
+     noch bevor die Achse bestimmt wird. Die Originaldaten bleiben unberuehrt. */
+  const h=istReal()
+    ? h0.map(p=>({jahr:p.jahr,brutto:real(p.brutto,p.jahr),nurKosten:real(p.nurKosten,p.jahr),netto:real(p.netto,p.jahr)}))
+    : h0;
+  const max=Math.max.apply(null,h.map(p=>p.brutto))*1.06||1;
+  const xm=j=>X0+(j/Math.max(jahre,1))*(X1-X0);
+  const ym=v=>Y1-(v/max)*(Y1-Y0);
+  let s='<svg viewBox="0 0 '+W+' '+H+'" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;font-family:inherit">';
+  for(let k=0;k<=4;k++){
+    const v=max*k/4,y=ym(v);
+    s+='<line x1="'+X0+'" y1="'+y.toFixed(1)+'" x2="'+X1+'" y2="'+y.toFixed(1)+'" stroke="#ece7dd"/>';
+    s+='<text x="'+(X0-7)+'" y="'+(y+3.5).toFixed(1)+'" font-size="10" fill="#8b857a" text-anchor="end">'+kurz(v)+'</text>';
+  }
+  function band(lo,hi,farbe,op){
+    let up='',dn='';
+    h.forEach(p=>{up+=xm(p.jahr).toFixed(1)+','+ym(hi(p)).toFixed(1)+' ';});
+    for(let i=h.length-1;i>=0;i--){dn+=xm(h[i].jahr).toFixed(1)+','+ym(lo(h[i])).toFixed(1)+' ';}
+    return '<polygon points="'+up+dn+'" fill="'+farbe+'" fill-opacity="'+op+'" stroke="'+farbe+'" stroke-width="1" stroke-opacity="0.55"/>';
+  }
+  s+=band(p=>0,p=>p.netto,'#1d4ed8',0.16);
+  s+=band(p=>p.netto,p=>p.nurKosten,'#c2410c',0.30);
+  s+=band(p=>p.nurKosten,p=>p.brutto,'#a16207',0.34);
+  const last=h[h.length-1];
+  s+='<polyline points="'+h.map(p=>xm(p.jahr).toFixed(1)+','+ym(p.brutto).toFixed(1)).join(' ')+'" fill="none" stroke="#8b857a" stroke-width="1.4" stroke-dasharray="4 3"/>';
+  s+='<polyline points="'+h.map(p=>xm(p.jahr).toFixed(1)+','+ym(p.netto).toFixed(1)).join(' ')+'" fill="none" stroke="#1d4ed8" stroke-width="2"/>';
+  const schritt=jahre<=10?1:(jahre<=20?5:(jahre<=30?5:10));
+  for(let j=0;j<=jahre;j+=schritt){
+    s+='<text x="'+xm(j).toFixed(1)+'" y="'+(Y1+17)+'" font-size="10.5" fill="#8b857a" text-anchor="middle">'+j+'</text>';
+  }
+  if(jahre%schritt!==0) s+='<text x="'+xm(jahre).toFixed(1)+'" y="'+(Y1+17)+'" font-size="10.5" fill="#8b857a" text-anchor="middle">'+jahre+'</text>';
+  s+='<text x="'+X0+'" y="'+(Y1+33)+'" font-size="10" fill="#8b857a">Jahr</text>';
+  if(istReal()) s+='<text x="'+X1+'" y="'+(Y1+33)+'" font-size="10" fill="#8b857a" text-anchor="end">alle Beträge in heutiger Kaufkraft, abgezinst mit '+pc1(INFL)+' pro Jahr</text>';
+  /* direkte Beschriftung am rechten Rand */
+  function lab(y,txt,farbe){
+    return '<text x="'+(X1-6)+'" y="'+y.toFixed(1)+'" font-size="10.5" font-weight="700" fill="'+farbe+'" text-anchor="end">'+txt+'</text>';
+  }
+  const yNet=(ym(0)+ym(last.netto))/2, ySt=(ym(last.netto)+ym(last.nurKosten))/2, yKo=(ym(last.nurKosten)+ym(last.brutto))/2;
+  s+=lab(yNet+4,'Nettovermögen '+eur0(last.netto)+' €','#1d4ed8');
+  if(ym(last.netto)-ym(last.nurKosten)>13) s+=lab(ySt+4,'Steuern '+eur0(last.nurKosten-last.netto)+' €','#c2410c');
+  if(ym(last.nurKosten)-ym(last.brutto)>13) s+=lab(yKo+4,'Kosten '+eur0(last.brutto-last.nurKosten)+' €','#a16207');
+  else s+='<text x="'+(X1-6)+'" y="'+(ym(last.brutto)-7).toFixed(1)+'" font-size="10.5" font-weight="700" fill="#a16207" text-anchor="end">Kosten '+eur0(last.brutto-last.nurKosten)+' €</text>';
+  s+='<line x1="'+X0+'" y1="'+Y1+'" x2="'+X1+'" y2="'+Y1+'" stroke="#ece7dd"/>';
+  return s+'</svg>';
+}
+
+/* ---------- Diagramm 2: Vergleichsbalken zweier TER-Szenarien ---------- */
+function chartBalken(A0,B0,terA,terB,jahre){
+  const W=720,H=222,X0=118,X1=690,Y0=38;
+  /* skalierte Kopien: alle Groessen liegen im Endjahr, also derselbe Faktor fuer beide Szenarien */
+  const f=istReal()?1/nf(jahre):1;
+  const sk=R=>({brutto:R.brutto*f,nurKosten:R.nurKosten*f,endNetto:R.endNetto*f});
+  const A=sk(A0), B=sk(B0);
+  const max=Math.max(A.brutto,B.brutto)||1;
+  const bw=X1-X0, bh=52;
+  let s='<svg viewBox="0 0 '+W+' '+H+'" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;font-family:inherit">';
+  s+='<text x="'+X0+'" y="16" font-size="10.5" fill="#8b857a">Bruttovermögen bei reiner Marktrendite, aufgeteilt in Netto, Steuern und Kosten'+(istReal()?' — in heutiger Kaufkraft':'')+'</text>';
+  function bar(R,y,titel,aktiv){
+    const wN=bw*R.endNetto/max, wS=bw*(R.nurKosten-R.endNetto)/max, wK=bw*(R.brutto-R.nurKosten)/max;
+    let t='';
+    t+='<text x="'+(X0-10)+'" y="'+(y+bh/2-3)+'" font-size="12" font-weight="700" fill="'+(aktiv?'#c2410c':'#57534c')+'" text-anchor="end">'+titel+'</text>';
+    t+='<text x="'+(X0-10)+'" y="'+(y+bh/2+12)+'" font-size="10.5" fill="#8b857a" text-anchor="end">netto '+eur0(R.endNetto)+' €</text>';
+    t+='<rect x="'+X0+'" y="'+y+'" width="'+wN.toFixed(1)+'" height="'+bh+'" fill="#1d4ed8" fill-opacity="'+(aktiv?0.85:0.6)+'"/>';
+    t+='<rect x="'+(X0+wN).toFixed(1)+'" y="'+y+'" width="'+wS.toFixed(1)+'" height="'+bh+'" fill="#c2410c" fill-opacity="'+(aktiv?0.8:0.55)+'"/>';
+    t+='<rect x="'+(X0+wN+wS).toFixed(1)+'" y="'+y+'" width="'+wK.toFixed(1)+'" height="'+bh+'" fill="#a16207" fill-opacity="'+(aktiv?0.8:0.55)+'"/>';
+    if(wN>78) t+='<text x="'+(X0+8)+'" y="'+(y+bh/2+4)+'" font-size="11.5" font-weight="700" fill="#fff">'+eur0(R.endNetto)+' €</text>';
+    const aussen=[];
+    if(wS>62) t+='<text x="'+(X0+wN+wS/2).toFixed(1)+'" y="'+(y+bh/2+4)+'" font-size="11" font-weight="700" fill="#fff" text-anchor="middle">'+eur0(R.nurKosten-R.endNetto)+'</text>';
+    else if(wS>1) aussen.push('<tspan fill="#c2410c">Steuern '+eur0(R.nurKosten-R.endNetto)+'</tspan>');
+    if(wK>62) t+='<text x="'+(X0+wN+wS+wK/2).toFixed(1)+'" y="'+(y+bh/2+4)+'" font-size="11" font-weight="700" fill="#fff" text-anchor="middle">'+eur0(R.brutto-R.nurKosten)+'</text>';
+    else if(wK>1) aussen.push('<tspan fill="#a16207">Kosten '+eur0(R.brutto-R.nurKosten)+'</tspan>');
+    if(aussen.length) t+='<text x="'+X1+'" y="'+(y-6)+'" font-size="10.5" font-weight="700" text-anchor="end">'+aussen.join('<tspan fill="#8b857a"> · </tspan>')+'</text>';
+    return t;
+  }
+  s+=bar(A,Y0,'TER '+pc2(terA),true);
+  s+=bar(B,Y0+bh+26,'TER '+pc2(terB),false);
+  const yl=Y0+2*bh+26+30;
+  const diff=A.endNetto-B.endNetto;
+  s+='<line x1="'+X0+'" y1="'+(yl-14)+'" x2="'+X1+'" y2="'+(yl-14)+'" stroke="#ece7dd"/>';
+  s+='<text x="'+X0+'" y="'+yl+'" font-size="12" fill="#57534c">Unterschied im Endvermögen nach Kosten und Steuern: <tspan font-weight="700" fill="#c2410c">'+eur0(Math.abs(diff))+' €</tspan></text>';
+  return s+'</svg>';
+}
+
+/* ---------- Steuerung ---------- */
+const einmal=$('einmal'),einmal_r=$('einmal_r'),rate=$('rate'),rate_r=$('rate_r');
+const jahre_r=$('jahre_r'),rend_r=$('rend_r'),terA_r=$('terA_r'),terB_r=$('terB_r'),aa_r=$('aa_r');
+const art=$('art'),bz=$('bz');
+let kiSt=0, frei=KAP.sparerPauschbetrag.ledig;
+
+(function initBz(){
+  const jahreListe=Object.keys(KAP.basiszins).sort();
+  jahreListe.forEach(j=>{
+    const o=document.createElement('option');
+    o.value=j; o.textContent=j+' — '+pc2(KAP.basiszins[j]);
+    if(j==='2026') o.selected=true;
+    bz.appendChild(o);
+  });
+})();
+
+function segInit(id,cb){
+  const box=$(id);
+  box.addEventListener('click',e=>{
+    const b=e.target.closest('button'); if(!b) return;
+    Array.prototype.forEach.call(box.querySelectorAll('button'),x=>x.classList.remove('on'));
+    b.classList.add('on'); cb(parseFloat(b.dataset.v)); upd();
+  });
+}
+segInit('seg_kist',v=>{kiSt=v;});
+segInit('seg_frei',v=>{frei=v;});
+
+function upd(){
+  /* Anzeigemodus zuerst — er gilt auch fuer den Abbruch bei fehlender Einzahlung */
+  INFL=(+$('infl').value)/100;
+  const REAL=istReal();
+  $('dNom').classList.toggle('on',!REAL);
+  $('dReal').classList.toggle('on',REAL);
+  $('inflbox').style.display=REAL?'':'none';
+  $('infl_v').textContent=(INFL*100).toLocaleString('de-DE',{minimumFractionDigits:1,maximumFractionDigits:1})+' %';
+
+  const E=eurLese(einmal), S=eurLese(rate);
+  const J=+jahre_r.value, r=+rend_r.value/100;
+  const D=v=>REAL?real(v,J):v;                    // Endwert im gewaehlten Massstab
+  const z2=v=>REAL?'<br>nominal '+eur(v):'';      // Zweitzeile: derselbe Betrag im anderen Massstab
+  const tA=+terA_r.value/100, tB=+terB_r.value/100, aa=+aa_r.value/100;
+  const artK=art.value, tf=KAP.teilfreistellung[artK], vapAktiv=(artK!=='einzelaktien');
+  const basis=KAP.basiszins[bz.value];
+
+  $('jahre_v').textContent=J+' Jahre'; $('jEcho').textContent=J;
+  $('jSuffix').textContent=REAL?' — in heutiger Kaufkraft':'';
+  $('rend_v').textContent=pc1(r);
+  $('terA_v').textContent=pc2(tA); $('terB_v').textContent=pc2(tB);
+  $('aa_v').textContent=pc2(aa);
+  $('aa_h').textContent=aa>0
+    ? 'Von jeder Einzahlung werden '+pc2(aa)+' abgezogen. Bezogen auf das tatsächlich investierte Kapital sind das '+pc2(ausgabeaufschlagEffektiv(aa))+'.'
+    : 'Wird vom Einzahlungsbetrag abgezogen; investiert wird der Rest.';
+
+  if(E<=0&&S<=0){ $('warnbox').style.display='block'; return; }
+  $('warnbox').style.display='none';
+
+  const basisO={einmal:E,rate:S,jahre:J,r:r,aa:aa,kiSt:kiSt,tf:tf,frei:frei,bz:basis,vapAktiv:vapAktiv};
+  const A=simuliere(Object.assign({},basisO,{ter:tA}));
+  const B=simuliere(Object.assign({},basisO,{ter:tB}));
+  const ohneVAP=simuliere(Object.assign({},basisO,{ter:tA,vapAktiv:false}));
+
+  const kostenDiff=A.brutto-A.nurKosten, steuerDiff=A.nurKosten-A.endNetto;
+  /* dritter Abzug: was die Inflation vom Nachsteuer-Vermoegen nimmt */
+  const inflDiff=A.endNetto-real(A.endNetto,J);
+
+  $('e_brutto').textContent=eur(D(A.brutto));
+  $('e_kosten').textContent=eur(D(A.nurKosten));
+  $('e_netto').textContent=eur(D(A.endNetto));
+  $('e_brutto_s').innerHTML=z2(A.brutto);
+  $('e_kosten_s').innerHTML=z2(A.nurKosten);
+  $('e_netto_s').innerHTML=z2(A.endNetto);
+  $('d_kosten').textContent='− '+eur(D(kostenDiff));
+  $('d_kosten_s').innerHTML=pc1(kostenDiff/A.brutto)+' des Bruttovermögens.<br>'+
+    (REAL?'Nominal − '+eur(kostenDiff)+', davon Gebühren ':'Gebühren nominal ')+eur(A.kostenTER+A.kostenAA)+
+    (aa>0?' (davon Ausgabeaufschlag '+eur(A.kostenAA)+')':'')+', entgangener Zinseszins '+eur(Math.max(0,kostenDiff-A.kostenTER-A.kostenAA))+'.';
+  $('d_steuer').textContent='− '+eur(D(steuerDiff));
+  $('d_steuer_s').innerHTML=pc1(steuerDiff/A.brutto)+' des Bruttovermögens.<br>'+
+    (REAL?'Nominal − '+eur(steuerDiff)+', davon abgeführt ':'Abgeführt ')+eur(A.steuerGesamt)+
+    ', entgangener Zinseszins auf früh gezahlte Vorabpauschalen '+eur(Math.max(0,steuerDiff-A.steuerGesamt))+'.';
+  $('d_inflbox').style.display=REAL?'':'none';
+  $('d_infl').textContent='− '+eur(inflDiff);
+  $('d_infl_s').innerHTML=pc1(inflDiff/A.brutto)+' des Bruttovermögens — der Kaufkraftverlust auf den Betrag, der nach Kosten und Steuern bleibt.<br>'+
+    'Nominal '+eur(A.endNetto)+' nach '+J+' Jahren entsprechen bei '+pc1(INFL)+' Inflation heutigen '+eur(D(A.endNetto))+'.';
+
+  const iB=irr(E,S,J,A.brutto), iK=irr(E,S,J,A.nurKosten), iS=irr(E,S,J,A.endNetto);
+  const iSreal=(1+iS)/(1+INFL)-1;
+  $('irr_b').textContent=pc2(iB); $('irr_k').textContent=pc2(iK); $('irr_s').textContent=pc2(iS);
+  $('irr_grp_s').textContent=REAL?' · nominal':'';
+  $('irr_s_s').innerHTML=(REAL?'Real, also nach '+pc1(INFL)+' Inflation: <b>'+pc2(iSreal)+'</b> pro Jahr — (1 + '+pc2(iS)+') ÷ (1 + '+pc1(INFL)+') − 1.<br>':'')+
+    'Kosten und Steuern zusammen kosten '+((iB-iS)*100).toLocaleString('de-DE',{minimumFractionDigits:2,maximumFractionDigits:2})+' Prozentpunkte pro Jahr.';
+
+  $('take').innerHTML=REAL
+    ? 'Aus '+eur(A.einzahlungen)+' Einzahlungen werden bei '+pc1(r)+' Marktrendite über '+J+
+      ' Jahre brutto <b>'+eur(A.brutto)+'</b> — nominal, also in Euro von morgen. Die Kosten nehmen davon <b>'+eur(kostenDiff)+
+      '</b>, die Steuern <b>'+eur(steuerDiff)+'</b> — und die Inflation nimmt bei '+pc1(INFL)+' pro Jahr noch einmal <b>'+eur(inflDiff)+
+      '</b>. Es bleiben <b>'+eur(D(A.endNetto))+'</b>, gemessen in heutiger Kaufkraft — eine reale Nachsteuer-Rendite von <b>'+pc2(iSreal)+
+      '</b> pro Jahr statt nominal '+pc2(iS)+'.'
+    : 'Aus '+eur(A.einzahlungen)+' Einzahlungen werden bei '+pc1(r)+
+      ' Marktrendite über '+J+' Jahre brutto <b>'+eur(A.brutto)+'</b>. Die Kosten nehmen davon <b>'+eur(kostenDiff)+
+      '</b> ('+pc1(kostenDiff/A.brutto)+'), die Steuern <b>'+eur(steuerDiff)+'</b> ('+pc1(steuerDiff/A.brutto)+
+      '). Es bleiben <b>'+eur(A.endNetto)+'</b> — eine Nachsteuer-Rendite von <b>'+pc2(iS)+'</b> pro Jahr statt '+pc2(iB)+'.';
+
+  $('chart1').innerHTML=chartFlaechen(A.hist,J);
+  $('cap1_s').textContent=REAL?' In dieser Ansicht ist jeder Jahreswert durch (1 + '+pc1(INFL)+')^Jahr geteilt; die Flächen zeigen also, was das Vermögen des jeweiligen Jahres heute wert wäre.':'';
+  $('chart2').innerHTML=chartBalken(A,B,tA,tB,J);
+  $('w_a_t').textContent='TER '+pc2(tA)+' — nach Kosten und Steuern';
+  $('w_b_t').textContent='TER '+pc2(tB)+' — nach Kosten und Steuern';
+  $('w_a_v').textContent=eur(D(A.endNetto));
+  $('w_b_v').textContent=eur(D(B.endNetto));
+  $('w_a_s').textContent=REAL?'nominal '+eur(A.endNetto):'';
+  $('w_b_s').textContent=REAL?'nominal '+eur(B.endNetto):'';
+  $('w_a').classList.toggle('on',A.endNetto>=B.endNetto);
+  $('w_b').classList.toggle('on',B.endNetto>A.endNetto);
+  const dTer=A.endNetto-B.endNetto, dPp=Math.abs(tA-tB);
+  $('terTxt').innerHTML='Ein Unterschied von <b>'+pc2(dPp)+'</b> in der jährlichen Kostenquote verändert das Endvermögen nach Steuern um <b>'+
+    eur(D(Math.abs(dTer)))+'</b> — das sind '+pc1(Math.abs(dTer)/Math.max(A.endNetto,B.endNetto))+
+    ' des größeren Ergebnisses, aufgebaut allein aus einer Gebühr, die in jedem einzelnen Jahr anfällt.'+
+    (REAL?' Nominal sind es '+eur(Math.abs(dTer))+'.':'');
+
+  /* Vorabpauschale-Tabelle */
+  let t='<thead><tr><th>Jahr</th><th>Depot am 1.1.</th><th>Vorabpauschale</th><th class=small>nach Teilfreistellung</th><th class=small>Pauschbetrag genutzt</th><th>Steuer</th><th class=small>Σ Vorabpauschalen</th></tr></thead><tbody>';
+  if(!vapAktiv){
+    t+='<tr><td colspan=7 style="text-align:left;color:var(--ink-3)">Für Einzelaktien gilt § 18 InvStG nicht — es fällt keine Vorabpauschale an. Besteuert wird erst beim Verkauf.</td></tr>';
+  } else {
+    const erstesSteuerjahr=(A.zeilen.filter(x=>x.steuer>0.5)[0]||{}).jahr;
+    A.zeilen.forEach(z=>{
+      t+='<tr'+(z.jahr===erstesSteuerjahr?' class=me':'')+'><td>'+z.jahr+'</td><td>'+eur0(z.anfang)+' €</td><td>'+eur0(z.vap)+' €</td><td>'+
+         eur0(z.stpfl)+' €</td><td>'+eur0(z.genutzt)+' €</td><td>'+eur0(z.steuer)+' €</td><td>'+eur0(z.kum)+' €</td></tr>';
+    });
+    t+='<tr class=sumrow><td>Summe</td><td>—</td><td>'+eur0(A.summeVAP)+' €</td><td>'+eur0(A.summeVAP*(1-tf))+
+       ' €</td><td>—</td><td>'+eur0(A.summeStVAP)+' €</td><td>'+eur0(A.summeVAP)+' €</td></tr>';
+  }
+  $('vaptab').innerHTML=t+'</tbody>';
+  $('vap_s').textContent=(REAL&&vapAktiv)
+    ? ' Diese Tabelle bleibt bewusst nominal: Vorabpauschale, Pauschbetrag und Steuer setzt das Finanzamt in Euro des jeweiligen Jahres an. Die Umrechnung in heutige Kaufkraft betrifft nur die Ergebnisgrößen oben.'
+    : '';
+
+  /* Anrechnung beim Verkauf */
+  const bmg=A.sv.bemessungsgrundlage;
+  let v='<tbody>';
+  v+='<tr><td>Depotwert beim Verkauf</td><td>'+eur(A.vorVerkauf)+'</td></tr>';
+  v+='<tr><td>− Anschaffungskosten (Summe Einzahlungen)</td><td>− '+eur(A.einzahlungen)+'</td></tr>';
+  v+='<tr><td>− bereits angesetzte Vorabpauschalen <span class=muted>(§ 19 InvStG)</span></td><td>− '+eur(A.summeVAP)+'</td></tr>';
+  v+='<tr class=res><td>= Veräußerungsgewinn</td><td>'+eur(A.gewinn)+'</td></tr>';
+  v+='<tr><td>− Teilfreistellung '+pc1(tf)+' <span class=muted>(§ 20 InvStG)</span></td><td>− '+eur(A.sv.teilfreistellungsbetrag)+'</td></tr>';
+  v+='<tr><td>− Sparer-Pauschbetrag, Restbetrag des Jahres</td><td>− '+eur(A.sv.genutzterFreibetrag)+'</td></tr>';
+  v+='<tr class=res><td>= Bemessungsgrundlage</td><td>'+eur(bmg)+'</td></tr>';
+  $('verkauf').innerHTML=v+'</tbody>';
+
+  let st='<tbody>';
+  st+='<tr><td>Kapitalertragsteuer 25 %</td><td>'+eur(A.sv.kapitalertragsteuer)+'</td></tr>';
+  st+='<tr><td>Solidaritätszuschlag 5,5 %</td><td>'+eur(A.sv.solidaritaetszuschlag)+'</td></tr>';
+  st+='<tr><td>Kirchensteuer '+(kiSt>0?pc1(kiSt):'—')+'</td><td>'+eur(A.sv.kirchensteuer)+'</td></tr>';
+  st+='<tr class=res><td>= Steuer beim Verkauf</td><td>'+eur(A.sv.steuerGesamt)+'</td></tr>';
+  st+='<tr><td>+ Steuer auf Vorabpauschalen (kumuliert)</td><td>'+eur(A.summeStVAP)+'</td></tr>';
+  st+='<tr class=fin><td>= Steuerzahlungen insgesamt</td><td>'+eur(A.steuerGesamt)+'</td></tr>';
+  $('steuertab').innerHTML=st+'</tbody>';
+
+  const effektiv=A.rohertrag>0?A.steuerGesamt/A.rohertrag:0;
+  const nominal=gesamtsatz(kiSt), nachTF=nominal*(1-tf);
+  $('satzNote').innerHTML='Nomineller Gesamtsatz: <b>'+pc2(nominal)+'</b>; nach '+pc1(tf)+' Teilfreistellung <b>'+pc2(nachTF)+
+    '</b>. Auf den gesamten Ertrag von '+eur(A.rohertrag)+' gerechnet, liegt die tatsächliche Belastung bei <b>'+pc2(effektiv)+
+    '</b> — die Differenz ist der Sparer-Pauschbetrag'+(frei>0?' von '+eur(frei)+' pro Jahr.':', der hier nicht genutzt wird.')+
+    (REAL?' Die beiden Aufstellungen dieses Abschnitts sind nominal — Anschaffungskosten und angesetzte Vorabpauschalen stammen aus verschiedenen Jahren und lassen sich nicht auf einen Stichtag abzinsen.':'');
+
+  const stundDiff=ohneVAP.endNetto-A.endNetto;
+  let stTxt;
+  if(!vapAktiv){
+    stTxt='Für Einzelaktien gilt § 18 InvStG nicht — eine Vorabpauschale fällt nicht an. Besteuert wird ausschließlich der realisierte Veräußerungsgewinn.';
+  } else if(stundDiff>1){
+    stTxt='Ohne sie — also bei Besteuerung ausschließlich beim Verkauf — läge das Endvermögen bei '+eur(D(ohneVAP.endNetto))+
+      '. Die Vorverlagerung kostet hier <b>'+eur(D(stundDiff))+'</b> oder '+pc2(stundDiff/Math.max(A.endNetto,1))+
+      ' des Endvermögens. Das ist ausschließlich entgangener Zinseszins: Insgesamt wurden '+eur(A.summeVAP)+
+      ' als Vorabpauschale angesetzt, und genau dieser Betrag mindert oben den Veräußerungsgewinn. Vorgezogen wird die Zahlung, nicht die Bemessungsgrundlage.';
+  } else if(stundDiff<-1){
+    stTxt='Hier dreht sich das Vorzeichen: Ohne Vorabpauschale läge das Endvermögen bei '+eur(D(ohneVAP.endNetto))+
+      ' und damit <b>'+eur(D(-stundDiff))+'</b> niedriger. Der Grund ist der Sparer-Pauschbetrag. Er gilt pro Kalenderjahr und verfällt, wenn er nicht genutzt wird. Die Vorabpauschale füllt ihn Jahr für Jahr — die so steuerfrei angesetzten Beträge mindern über § 19 Abs. 1 Satz 3 InvStG trotzdem den späteren Veräußerungsgewinn. '+
+      'Über die Laufzeit wurden '+eur(A.summeVAP)+' angesetzt, davon '+eur(A.summeVAP*(1-tf))+
+      ' nach Teilfreistellung steuerpflichtig; tatsächlich abgeführt wurden nur '+eur(A.summeStVAP)+
+      '. Der reine Stundungsnachteil bleibt bestehen — der gewonnene Freibetrag überkompensiert ihn.';
+  } else {
+    stTxt='Ohne Vorabpauschale läge das Endvermögen bei '+eur(D(ohneVAP.endNetto))+' — praktisch gleichauf. Entgangener Zinseszins auf der einen und jährlich genutzter Sparer-Pauschbetrag auf der anderen Seite heben sich hier nahezu auf. Angesetzt wurden '+
+      eur(A.summeVAP)+'; genau dieser Betrag mindert oben den Veräußerungsgewinn.';
+  }
+  $('stundung').innerHTML='<b>Was die Vorabpauschale wirklich kostet.</b> '+stTxt;
+}
+
+einmal.addEventListener('input',()=>{const n=eurLese(einmal); einmal_r.value=Math.min(n,+einmal_r.max); upd();});
+einmal_r.addEventListener('input',()=>{einmal.value=(+einmal_r.value).toLocaleString('de-DE'); upd();});
+rate.addEventListener('input',()=>{const n=eurLese(rate); rate_r.value=Math.min(n,+rate_r.max); upd();});
+rate_r.addEventListener('input',()=>{rate.value=(+rate_r.value).toLocaleString('de-DE'); upd();});
+[jahre_r,rend_r,terA_r,terB_r,aa_r].forEach(el=>el.addEventListener('input',upd));
+[art,bz].forEach(el=>el.addEventListener('change',upd));
+$('dNom').addEventListener('click',()=>{disp='nom';upd();});
+$('dReal').addEventListener('click',()=>{disp='real';upd();});
+$('infl').addEventListener('input',upd);
+upd();
+</script>
+</body></html>

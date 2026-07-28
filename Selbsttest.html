@@ -1,0 +1,221 @@
+<!DOCTYPE html><html lang=de><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1">
+<title>Selbsttest — Rechenkerne und Seitenintegrität</title>
+<link rel=stylesheet href="assets/site.css?v=4">
+<script defer src="assets/site-map.js?v=4"></script>
+<script defer src="assets/datenstand.js?v=4"></script>
+<script defer src="assets/site.js?v=4"></script>
+<script defer src="assets/de-rente.js?v=4"></script>
+<script defer src="assets/de-kapitalertrag.js?v=4"></script>
+<script defer src="assets/de-vermoegen.js?v=4"></script>
+<style>
+.sum{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:12px;margin-bottom:22px}
+.sc{background:var(--card);border:1px solid var(--rule);border-radius:12px;padding:15px 17px}
+.sc .l{font-size:11.5px;color:var(--ink-3)}
+.sc .v{font-family:var(--serif);font-size:29px;font-weight:700;line-height:1.1;font-variant-numeric:tabular-nums}
+.sc.ok .v{color:var(--good)}.sc.bad .v{color:var(--bad)}
+.grp2{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.14em;color:var(--ink-3);
+  margin:26px 0 10px;padding-bottom:8px;border-bottom:1px solid var(--rule)}
+.t{width:100%;border-collapse:collapse;font-size:13px}
+.t td{padding:7px 9px;border-bottom:1px solid var(--rule-soft);vertical-align:top}
+.t td.st{width:34px;font-weight:700}
+.t td.num{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+.t tr.f{background:#fdf1ef}
+.pass{color:var(--good)}.fail{color:var(--bad)}
+.t td.n{color:var(--ink-2)}
+@media(max-width:700px){.t{display:block;overflow-x:auto;white-space:nowrap}}
+</style>
+</head><body data-section="Werkzeug"><div class=wrap>
+
+<div class=kicker>Werkzeug · Qualitätssicherung</div>
+<h1>Selbsttest der <em>Rechenkerne</em></h1>
+<p class=lead>Diese Seite prüft die gemeinsamen Rechenbibliotheken gegen bekannte Sollwerte und kontrolliert, ob alle Seiten des Projekts erreichbar und korrekt eingebunden sind. Sie ist nach jedem Umbau aufzurufen: Was hier rot wird, ist eine Regression.</p>
+
+<div class=sum id=sum></div>
+<div id=out></div>
+
+<div class=foot>Sollwerte aus amtlichen Quellen und aus der Verifikation beim Aufbau der Bibliotheken: Rentenwert und Eckrente nach Rentenwertbestimmungsverordnung 2026 und §§ 64 ff. SGB VI, Abgeltungsteuer nach § 32d EStG, Vorabpauschale nach § 18 InvStG, Vermögensverteilung nach Bundesbank PHF Welle 5 (Erhebung 2023). Keine Steuer-, Rechts- oder Anlageberatung.</div>
+
+<script>
+const T=[];                 // {gruppe, name, ist, soll, ok, hinweis}
+const nz=(x,n=2)=>Number(x).toFixed(n);
+function chk(gruppe,name,ist,soll,tol=0.005,hinweis=''){
+  const ok = (typeof soll==='number') ? (isFinite(ist) && Math.abs(ist-soll)<=tol) : (String(ist)===String(soll));
+  T.push({gruppe,name,ist,soll,ok,hinweis});
+}
+function chkTrue(gruppe,name,bed,hinweis=''){ T.push({gruppe,name,ist:bed?'ja':'nein',soll:'ja',ok:!!bed,hinweis}); }
+
+function run(){
+  // ---------- Gesetzliche Rente ----------
+  const G1='Gesetzliche Rente (de-rente.js)';
+  chk(G1,'Aktueller Rentenwert je Entgeltpunkt', RV.aktuellerRentenwert, 42.52, 0.001,'Rentenwertbestimmungsverordnung 2026, gültig bis 30.06.2027');
+  chk(G1,'Eckrente 45 Entgeltpunkte, brutto', bruttoRente(45,1.0,42.52), 1913.40, 0.01,'45 × 42,52 €');
+  chk(G1,'Entgeltpunkte bei Durchschnittsentgelt 2026', entgeltpunkte(51944,2026), 1.0000, 0.0005,'Definitionsgemäß genau 1,0');
+  chk(G1,'Entgeltpunkte bei 60.000 € Brutto 2026', entgeltpunkte(60000,2026), 1.1551, 0.0005,'60.000 ÷ 51.944');
+  chk(G1,'Beitragsbemessungsgrenze deckelt Entgeltpunkte', entgeltpunkte(500000,2026), maxEntgeltpunkteJahr(2026), 0.0005,'Über der Grenze steigen die Punkte nicht weiter');
+  chk(G1,'Maximale Entgeltpunkte 2026', maxEntgeltpunkteJahr(2026), 1.9521, 0.001,'101.400 ÷ 51.944');
+  chk(G1,'Regelaltersgrenze Jahrgang 1990 (Monate)', regelaltersgrenzeMonate(1990), 804, 0,'67 Jahre');
+  chk(G1,'Regelaltersgrenze Jahrgang 1958 (Monate)', regelaltersgrenzeMonate(1958), 792, 0,'66 Jahre');
+  chk(G1,'Zugangsfaktor bei Rente mit 63 (Jg. 1985)', zugangsfaktor(63*12,1985), 0.8560, 0.001,'48 Monate × 0,3 % Abschlag');
+  chk(G1,'Zugangsfaktor zur Regelaltersgrenze', zugangsfaktor(regelaltersgrenzeMonate(1985),1985), 1.0, 0.0001,'Kein Ab- oder Zuschlag');
+  chk(G1,'Zahlbetrag der Eckrente nach KV und Pflege', nettoRente(1913.40,2026,false), 1677.10, 0.05,'Abzüge nach § 249a SGB V, § 59 SGB XI');
+  chkTrue(G1,'Kinderlosenzuschlag mindert den Zahlbetrag', nettoRente(1913.40,2026,true) < nettoRente(1913.40,2026,false),'Pflegeversicherung');
+  chk(G1,'Kapitalbedarf: 24.000 € über 25 Jahre bei 3 %', kapitalbedarfBarwert(24000,25,0.03), 417915.54, 1,'Nachschüssiger Rentenbarwert');
+  // Die Erbe-Simulation in Mein_Vermoegensbild.html muss zur Barwertformel passen:
+  // startet man mit dem Kapitalbedarf, ist das Kapital am Ende genau aufgebraucht.
+  (function(){
+    const jl=24000, n=25, r=0.03;
+    let k=kapitalbedarfBarwert(jl,n,r);
+    for(let t=0;t<n;t++) k=k*(1+r)-jl;
+    chk(G1,'Entnahmesimulation endet exakt bei null', k, 0, 0.01,'Verzinsung vor Entnahme, wie in der Barwertformel');
+    let k2=kapitalbedarfBarwert(jl,n,r)+100000/Math.pow(1+r,n);
+    for(let t=0;t<n;t++) k2=k2*(1+r)-jl;
+    chk(G1,'Sicherheitspuffer bleibt am Ende exakt stehen', k2, 100000, 0.01,'Abgezinster Puffer im Kapitalbedarf');
+  })();
+
+  // ---------- Kapitalertragsteuer ----------
+  const G2='Kapitalerträge (de-kapitalertrag.js)';
+  chk(G2,'Abgeltungsteuer inkl. Soli, ohne Kirchensteuer', gesamtsatz(0), 0.26375, 0.000001,'25 % + 5,5 % Soli');
+  chk(G2,'Gesamtsatz mit 9 % Kirchensteuer', gesamtsatz(0.09), 0.2799511, 0.000005,'§ 32d Abs. 1 Satz 4 EStG');
+  chk(G2,'Gesamtsatz mit 8 % Kirchensteuer', gesamtsatz(0.08), 0.2781863, 0.000005,'Bayern und Baden-Württemberg');
+  chk(G2,'Sparer-Pauschbetrag ledig', KAP.sparerPauschbetrag.ledig, 1000, 0,'§ 20 Abs. 9 EStG');
+  chk(G2,'Sparer-Pauschbetrag zusammenveranlagt', KAP.sparerPauschbetrag.zusammen, 2000, 0);
+  chk(G2,'Teilfreistellung Aktienfonds', KAP.teilfreistellung.aktienfonds, 0.30, 0.0001,'§ 20 InvStG');
+  const v=vorabpauschale(10000,11000,0,0.0253,0.30);
+  chk(G2,'Vorabpauschale (10.000 → 11.000, Basiszins 2,53 %)', v.vorabpauschale, 177.10, 0.05,'10.000 × 2,53 % × 70 %');
+  chk(G2,'davon steuerpflichtig nach Teilfreistellung', v.steuerpflichtigerBetrag, 123.97, 0.05,'177,10 × 70 %');
+  const v2=vorabpauschale(10000,10100,0,0.0253,0.30);
+  chkTrue(G2,'Vorabpauschale ist auf den Wertzuwachs gedeckelt', v2.vorabpauschale <= 100.0001,'Deckelung nach § 18 Abs. 1 Satz 4 InvStG');
+  const v3=vorabpauschale(10000,9000,0,0.0253,0.30);
+  chk(G2,'Keine Vorabpauschale bei Wertverlust', v3.vorabpauschale, 0, 0.0001);
+  chk(G2,'Steuer auf 2.000 € Gewinn, Freibetrag genutzt', kapESt(2000,0,0,1000).steuerGesamt, 263.75, 0.01,'1.000 € steuerfrei, Rest zu 26,375 %');
+  chk(G2,'Dieselben 2.000 € ohne Freibetrag', kapESt(2000,0,0,0).steuerGesamt, 527.50, 0.01,'Voller Betrag steuerpflichtig');
+  chk(G2,'Effektivsatz ohne Freibetrag entspricht dem Gesamtsatz', kapESt(2000,0,0,0).effektivsatz, 0.26375, 0.000001);
+  chk(G2,'Teilfreistellung senkt die Bemessungsgrundlage', kapESt(2000,0,0.30,0).bemessungsgrundlage, 1400, 0.01,'30 % des Ertrags bleiben frei');
+
+  // ---------- Vermögensverteilung ----------
+  const G3='Vermögensverteilung (de-vermoegen.js)';
+  chk(G3,'Erhebungsjahr der Datenbasis', VERMOEGEN_ERHEBUNGSJAHR, 2023, 0,'Bundesbank PHF Welle 5');
+  chk(G3,'Perzentilrang bei 250.000 €', perzentilrang(250000), 64.25, 0.1,'oberes 35,8 %');
+  chkTrue(G3,'Perzentilrang steigt monoton', perzentilrang(50000) < perzentilrang(250000) && perzentilrang(250000) < perzentilrang(900000));
+  chk(G3,'Altersgruppe für 40-Jährige', altersgruppeFuer(40), '35-44', 0);
+  const e=einordnungNachAlter(250000,40);
+  chk(G3,'Median der Altersgruppe 35–44', e.medianGruppe, 75900, 1,'belegter Wert');
+  chkTrue(G3,'Nicht belegte Werte liefern null statt Schätzung', e.p90Gruppe===null,'Keine erfundenen Perzentile');
+  chkTrue(G3,'Quellenangabe vorhanden', typeof VERMOEGEN_QUELLE==='string' && VERMOEGEN_QUELLE.length>10);
+
+  render();
+  pruefeSeiten();
+}
+
+// ---------- Seitenintegrität ----------
+async function pruefeSeiten(){
+  const G4='Seiten und Einbindung';
+  const M=window.SITEMAP||[];
+  chkTrue(G4,'Sitemap geladen', M.length>0, M.length+' Einträge');
+  let fehlend=[], ohneAssets=[];
+  await Promise.all(M.map(async p=>{
+    try{
+      const r=await fetch(p.f,{cache:'no-store'});
+      if(!r.ok){fehlend.push(p.f);return;}
+      const t=await r.text();
+      if(!t.includes('assets/site.css')||!t.includes('assets/site.js')||!t.includes('assets/site-map.js')) ohneAssets.push(p.f);
+    }catch(err){fehlend.push(p.f);}
+  }));
+  chkTrue(G4,'Alle Seiten der Sitemap erreichbar', fehlend.length===0, fehlend.length?('fehlt: '+fehlend.join(', ')):M.length+' Seiten geprüft');
+  chkTrue(G4,'Alle Seiten binden das Design-System ein', ohneAssets.length===0, ohneAssets.length?('ohne: '+ohneAssets.join(', ')):'Stylesheet, Navigation und Sitemap');
+
+  // Datenstände: nichts darf abgelaufen sein
+  const R=window.DATENSTAND||{}, heute=new Date().toISOString().slice(0,10);
+  const keys=Object.keys(R).filter(k=>k[0]!=='_');
+  const abgelaufen=keys.filter(k=>R[k].gueltigBis && heute>R[k].gueltigBis);
+  const faellig=keys.filter(k=>R[k].pruefen && heute>=R[k].pruefen && !(R[k].gueltigBis && heute>R[k].gueltigBis));
+  chkTrue(G4,'Kein Datenstand abgelaufen', abgelaufen.length===0, abgelaufen.length?abgelaufen.join(', '):keys.length+' Einträge im Register');
+  chkTrue(G4,'Keine Aktualisierung überfällig', faellig.length===0, faellig.length?('fällig: '+faellig.join(', ')):'nächste Prüfung '+ (keys.map(k=>R[k].pruefen).filter(Boolean).sort()[0]||'—'));
+
+  // Startseite: sie steht nicht in der Sitemap, verlinkt aber quer durchs Projekt
+  try{
+    const r=await fetch('00_Start.html',{cache:'no-store'});
+    chkTrue(G4,'Startseite erreichbar', r.ok);
+    const t=await r.text();
+    const ziele=[...new Set((t.match(/href="([A-Za-z0-9_]+\.html)"/g)||[]).map(h=>h.slice(6,-1)))];
+    const tot=[];
+    await Promise.all(ziele.map(async f=>{
+      if(f==='00_Start.html') return;
+      try{ const x=await fetch(f,{cache:'no-store'}); if(!x.ok) tot.push(f); }catch(e){ tot.push(f); }
+    }));
+    chkTrue(G4,'Alle Verweise der Startseite führen irgendwohin', tot.length===0,
+      tot.length?('tot: '+tot.join(', ')):ziele.length+' Ziele geprüft');
+    // Alles, was verlinkt wird, sollte auch im Sprungmenü stehen
+    const nichtInMap=ziele.filter(f=>f!=='00_Start.html' && !M.some(p=>p.f===f));
+    chkTrue(G4,'Startseite verlinkt nur Seiten aus der Sitemap', nichtInMap.length===0,
+      nichtInMap.length?('nicht gelistet: '+nichtInMap.join(', ')):'Navigation und Startseite decken sich');
+    // und umgekehrt: keine Analyse darf nur über das Sprungmenü erreichbar sein
+    const unerreichbar=M.filter(p=>p.f!=='Selbsttest.html' && ziele.indexOf(p.f)<0).map(p=>p.f);
+    chkTrue(G4,'Jede Analyse ist von der Startseite aus verlinkt', unerreichbar.length===0,
+      unerreichbar.length?('nur im Menü: '+unerreichbar.join(', ')):(M.length-1)+' Analysen im Fließtext erreichbar');
+    // Die Entnahmesimulation der Startseite gegen ihre eigenen Rohreihen gegenrechnen
+    const m=t.match(/const SEQ = (\{[\s\S]*?\});\n/);
+    if(m){
+      const Q=JSON.parse(m[1]);
+      const med=a=>{const v=[...a].sort((x,y)=>x-y),n=v.length;return n%2?v[(n-1)/2]:(v[n/2-1]+v[n/2])/2;};
+      const us=Q.us.map(p=>p[1]), de=Q.de.map(p=>p[1]);
+      chk(G4,'Startseite: US-Median der Entnahmesimulation', med(us), Q.statUs.med, 0.005,'Median mit Mittelung bei gerader Anzahl');
+      chk(G4,'Startseite: Zahl der deutschen Ausfälle', de.filter(v=>v===0).length, Q.statDe.pleite, 0,'Startjahre, in denen das Kapital auf null lief');
+      const ohne=Q.de.filter(p=>p[1]===0 && !(p[0]<=1923&&p[0]+Q.H>=1923) && !(p[0]<=1948&&p[0]+Q.H>=1948)).map(p=>p[0]);
+      chk(G4,'Startseite: Ausfälle ohne 1923/1948', ohne.join(','), (Q.ohne1923||[]).join(','), 0,'im Text als Ausnahme benannt');
+      chkTrue(G4,'Startseite nennt die Ausnahme im Text', ohne.every(j=>t.includes(String(j))), ohne.length?ohne.join(' und '):'keine');
+    } else chkTrue(G4,'Startseite: Entnahmesimulation gefunden', false);
+
+    chkTrue(G4,'Startseite bindet die Rechenkerne ein',
+      t.includes('assets/de-rente.js') && t.includes('assets/de-vermoegen.js') && t.includes('assets/profil.js'),
+      'für den personalisierten Block');
+  }catch(err){ chkTrue(G4,'Startseite erreichbar', false, String(err)); }
+
+  render(); zeigeDatenstaende();
+}
+
+function zeigeDatenstaende(){
+  const R=window.DATENSTAND||{}, heute=new Date().toISOString().slice(0,10);
+  const keys=Object.keys(R).filter(k=>k[0]!=='_')
+    .sort((a,b)=>(R[a].pruefen||R[a].gueltigBis||'9')<(R[b].pruefen||R[b].gueltigBis||'9')?-1:1);
+  let h='<div class=grp2>Datenstände im Register</div><table class=t><tbody>';
+  keys.forEach(k=>{
+    const e=R[k]; let st='aktuell', cls='';
+    if(e.gueltigBis && heute>e.gueltigBis){st='abgelaufen';cls='f';}
+    else if(e.pruefen && heute>=e.pruefen){st='zu prüfen';cls='f';}
+    h+='<tr class="'+cls+'"><td class=st><span class="'+(cls?'fail':'pass')+'">'+(cls?'!':'✓')+'</span></td>'+
+       '<td>'+k.replace('.html','')+'<br><span class=n style="font-size:11.5px">'+e.stand+'</span></td>'+
+       '<td class="num n">'+(e.gueltigBis?'gültig bis '+e.gueltigBis.split('-').reverse().join('.'):(e.pruefen?'prüfen ab '+e.pruefen.split('-').reverse().join('.'):'—'))+'</td>'+
+       '<td class=num>'+st+'</td></tr>';
+  });
+  document.getElementById('out').insertAdjacentHTML('beforeend', h+'</tbody></table>');
+}
+
+function render(){
+  const gruppen=[...new Set(T.map(t=>t.gruppe))];
+  const ok=T.filter(t=>t.ok).length, bad=T.length-ok;
+  document.getElementById('sum').innerHTML=
+    '<div class="sc '+(bad?'bad':'ok')+'"><div class=l>Ergebnis</div><div class=v>'+(bad?bad+' Fehler':'bestanden')+'</div></div>'+
+    '<div class=sc><div class=l>Prüfungen gesamt</div><div class=v>'+T.length+'</div></div>'+
+    '<div class="sc ok"><div class=l>bestanden</div><div class=v>'+ok+'</div></div>';
+  let h='';
+  gruppen.forEach(g=>{
+    const rows=T.filter(t=>t.gruppe===g);
+    h+='<div class=grp2>'+g+'</div><table class=t><tbody>';
+    rows.forEach(r=>{
+      const istT = typeof r.ist==='number' ? (Math.abs(r.ist)>=1000?Math.round(r.ist).toLocaleString('de-DE'):nz(r.ist,4)) : r.ist;
+      const sollT= typeof r.soll==='number'? (Math.abs(r.soll)>=1000?Math.round(r.soll).toLocaleString('de-DE'):nz(r.soll,4)) : r.soll;
+      h+='<tr class="'+(r.ok?'':'f')+'"><td class=st><span class="'+(r.ok?'pass':'fail')+'">'+(r.ok?'✓':'✕')+'</span></td>'+
+         '<td>'+r.name+(r.hinweis?'<br><span class=n style="font-size:11.5px">'+r.hinweis+'</span>':'')+'</td>'+
+         '<td class=num>'+istT+'</td><td class="num n">Soll '+sollT+'</td></tr>';
+    });
+    h+='</tbody></table>';
+  });
+  document.getElementById('out').innerHTML=h;
+}
+
+window.addEventListener('load',()=>{ try{ run(); }catch(e){
+  document.getElementById('out').innerHTML='<div class=callout><b>Selbsttest abgebrochen.</b> '+e.message+'</div>';
+}});
+</script>
+</div></body></html>

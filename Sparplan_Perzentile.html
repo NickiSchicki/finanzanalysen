@@ -1,0 +1,151 @@
+<!DOCTYPE html><html lang=de><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1">
+<title>Sparplan-Simulator — 10-Jahres-Blöcke der Geschichte</title>
+<link rel=stylesheet href="assets/site.css?v=4">
+<script defer src="assets/site-map.js?v=4"></script>
+<script defer src="assets/datenstand.js?v=4"></script>
+<script defer src="assets/site.js?v=4"></script>
+<style>
+/* seitenspezifisch */
+.lock{font-size:12px;color:var(--ink-3);background:var(--card-2);border:1px solid var(--rule-soft);border-radius:10px;padding:9px 12px}
+.pcards{margin-bottom:16px}
+.pc{padding:13px 8px}
+.pc .n{font-size:16.5px;white-space:nowrap;letter-spacing:-.015em}
+.pc .x{font-size:11.5px;color:var(--ink-3);margin-top:1px;font-variant-numeric:tabular-nums}
+.pc.low .n{color:var(--s5)}
+.clabel .qual{font-weight:400;font-size:.9em;color:var(--ink-3)}
+.note{text-align:center}
+</style></head><body data-section="Werkzeug"><div class=wrap>
+<div class=hero>
+<div class=kicker>Werkzeug · Vermögensaufbau</div>
+<h1>Sparplan-Simulator · 10-Jahres-Blöcke der <em>Geschichte</em></h1>
+<p class=lead>Was aus einer monatlichen Sparrate in zehn Jahren wird, hängt weniger von der unterstellten Rendite ab als vom Startjahr. Statt einer einzelnen Annahme rechnet dieses Werkzeug <b>jeden historischen 10-Jahres-Block seit 1871</b> durch (realer S&amp;P-Total-Return) und zeigt die volle Bandbreite in <b>Perzentilen</b> — durchgehend in heutiger Kaufkraft.</p>
+</div>
+<div class=tip>Sparrate und Startkapital sind frei einstellbar; Fächer, Perzentile und Verteilung rechnen unmittelbar nach.</div>
+
+<div class=grid2>
+<div class=card>
+<h2>Dein Sparplan</h2>
+<div class=grp>Einzahlung</div>
+<div class=ctrl><div class=clabel><span>Sparrate pro Monat <span class=qual>(real konstant)</span></span></div>
+<input type=number id=rate value=500 step=50 min=0>
+<input type=range id=rate_r min=50 max=3000 step=50 value=500 style="margin-top:8px"></div>
+<div class=ctrl><div class=clabel><span>Startkapital heute <span class=qual>(optional)</span></span><span class=cval id=lump_v>0 €</span></div><input type=range id=lump min=0 max=500000 step=5000 value=0></div>
+<div class=lock>Fest: <b>10-Jahres-Blöcke</b> · 146 Startjahre (1871–2016) · 100 % Aktien, real</div>
+<div class=grp>Anzeige</div>
+<div class=ctrl><div class=clabel><span>Beträge zeigen als</span></div>
+<div class=seg><button id=dReal class=on>real (heutige Kaufkraft)</button><button id=dNom>nominal (künftige Euro)</button></div></div>
+<div class=ctrl id=inflbox style="display:none"><div class=clabel><span>Angenommene Inflation p.a.</span><span class=cval id=infl_v>2,0 %</span></div>
+<input type=range id=infl min=0 max=5 step=0.1 value=2>
+<div class=hint>Nur für die Umrechnung in künftige Euro. Die Simulation selbst rechnet unverändert real — an der Kaufkraft des Ergebnisses ändert sich dadurch nichts.</div></div>
+</div>
+<div class=card>
+<h2 id=reslab>Ergebnis in heutiger Kaufkraft</h2>
+<div class=summary id=summary>Eingezahlt werden real <b>60.000 €</b>. Median-Ergebnis: <b>91.296 €</b> (1.5×). In 10 % der Startjahre &le; 60.304 €, in 10 % &ge; 126.301 €. <span style="color:var(--ink-3)">Nominal bei 2,0 % Inflation: 111.289 € gegenüber 67.012 € Einzahlung.</span></div>
+<div style="margin-top:14px" class=pcards>
+<div class="pc low"><div class=l>P10 (schlecht)</div><div class=n id=p10>60.304 €</div><div class=x id=p10x>1.01×</div><div class=x id=p10n>nominal 73.510 €</div></div>
+<div class=pc><div class=l>P25</div><div class=n id=p25>73.610 €</div><div class=x id=p25x>1.23×</div><div class=x id=p25n>nominal 89.730 €</div></div>
+<div class="pc med"><div class=l>Median</div><div class=n id=p50>91.296 €</div><div class=x id=p50x>1.52×</div><div class=x id=p50n>nominal 111.289 €</div></div>
+<div class=pc><div class=l>P75</div><div class=n id=p75>109.562 €</div><div class=x id=p75x>1.83×</div><div class=x id=p75n>nominal 133.555 €</div></div>
+<div class=pc><div class=l>P90 (gut)</div><div class=n id=p90>126.301 €</div><div class=x id=p90x>2.11×</div><div class=x id=p90n>nominal 153.960 €</div></div>
+</div>
+</div>
+</div>
+
+<div class=card>
+<h2>Der Fächer — Spannweite aller Startjahre</h2>
+<div id=fan><svg viewBox="0 0 720 320" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;font-family:inherit"><line x1="58" y1="272.0" x2="624" y2="272.0" stroke="#ece7dd"/><text x="52" y="275.0" font-size="10" fill="#8b857a" text-anchor="end">0</text><line x1="58" y1="219.7" x2="624" y2="219.7" stroke="#ece7dd"/><text x="52" y="222.7" font-size="10" fill="#8b857a" text-anchor="end">30 k</text><line x1="58" y1="167.5" x2="624" y2="167.5" stroke="#ece7dd"/><text x="52" y="170.5" font-size="10" fill="#8b857a" text-anchor="end">60 k</text><line x1="58" y1="115.2" x2="624" y2="115.2" stroke="#ece7dd"/><text x="52" y="118.2" font-size="10" fill="#8b857a" text-anchor="end">90 k</text><line x1="58" y1="63.0" x2="624" y2="63.0" stroke="#ece7dd"/><text x="52" y="66.0" font-size="10" fill="#8b857a" text-anchor="end">120 k</text><text x="58.0" y="288" font-size="10" fill="#8b857a" text-anchor="middle">0</text><text x="171.2" y="288" font-size="10" fill="#8b857a" text-anchor="middle">2</text><text x="284.4" y="288" font-size="10" fill="#8b857a" text-anchor="middle">4</text><text x="397.6" y="288" font-size="10" fill="#8b857a" text-anchor="middle">6</text><text x="510.8" y="288" font-size="10" fill="#8b857a" text-anchor="middle">8</text><text x="624.0" y="288" font-size="10" fill="#8b857a" text-anchor="middle">10</text><polygon points="58.0,272.0 114.6,258.6 171.2,243.1 227.8,227.1 284.4,207.2 341.0,185.5 397.6,164.0 454.2,140.2 510.8,114.1 567.4,87.3 624.0,52.0 624.0,167.0 567.4,178.6 510.8,189.3 454.2,200.9 397.6,212.5 341.0,222.6 284.4,232.9 227.8,243.0 171.2,253.6 114.6,262.9 58.0,272.0" fill="#dcf2ea"/><polygon points="58.0,272.0 114.6,259.4 171.2,245.8 227.8,231.2 284.4,215.2 341.0,198.3 397.6,177.4 454.2,156.7 510.8,132.0 567.4,108.8 624.0,81.2 624.0,143.8 567.4,160.3 510.8,176.8 454.2,190.2 397.6,202.7 341.0,215.8 284.4,227.8 227.8,239.8 171.2,250.7 114.6,261.9 58.0,272.0" fill="#b9e6d5"/><polyline points="58.0,272.0 114.6,260.7 171.2,248.6 227.8,235.4 284.4,222.2 341.0,207.2 397.6,190.8 454.2,174.5 510.8,157.3 567.4,134.6 624.0,113.0" fill="none" stroke="#059669" stroke-width="2.6"/><polyline points="58.0,272.0 114.6,261.5 171.2,251.1 227.8,240.6 284.4,230.2 341.0,219.7 397.6,209.3 454.2,198.8 510.8,188.4 567.4,177.9 624.0,167.5" fill="none" stroke="#8b857a" stroke-width="1.6" stroke-dasharray="4 3"/><text x="628.0" y="55.0" font-size="9.5" font-weight="700" fill="#047857">P90</text><text x="628.0" y="84.2" font-size="9.5" font-weight="700" fill="#047857">P75</text><text x="628.0" y="116.0" font-size="9.5" font-weight="700" fill="#059669">Median</text><text x="628.0" y="146.8" font-size="9.5" font-weight="700" fill="#047857">P25</text><text x="628.0" y="170.0" font-size="9.5" font-weight="700" fill="#047857">P10</text><text x="628.0" y="181.5" font-size="9.5" fill="#8b857a">Einzahlung</text><text x="341.0" y="316" font-size="11.5" fill="#57534c" text-anchor="middle">Reales Depot (heutiges Geld) über 10 Jahre · Band = Spannweite aller Startjahre seit 1871</text></svg></div>
+</div>
+
+<div class=card>
+<h2>Verteilung der End-Ergebnisse</h2>
+<div id=hist><svg viewBox="0 0 720 180" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;font-family:inherit"><rect x="55.0" y="105.0" width="38.4" height="35.0" fill="#b91c1c"/><rect x="95.4" y="95.0" width="38.4" height="45.0" fill="#b91c1c"/><rect x="135.8" y="45.0" width="38.4" height="95.0" fill="#059669"/><rect x="176.1" y="20.0" width="38.4" height="120.0" fill="#059669"/><rect x="216.5" y="40.0" width="38.4" height="100.0" fill="#059669"/><rect x="256.9" y="45.0" width="38.4" height="95.0" fill="#059669"/><rect x="297.2" y="40.0" width="38.4" height="100.0" fill="#059669"/><rect x="337.6" y="70.0" width="38.4" height="70.0" fill="#059669"/><rect x="378.0" y="125.0" width="38.4" height="15.0" fill="#059669"/><rect x="418.4" y="125.0" width="38.4" height="15.0" fill="#059669"/><rect x="458.8" y="130.0" width="38.4" height="10.0" fill="#059669"/><rect x="499.1" y="120.0" width="38.4" height="20.0" fill="#059669"/><rect x="539.5" y="135.0" width="38.4" height="5.0" fill="#059669"/><rect x="579.9" y="140.0" width="38.4" height="0.0" fill="#059669"/><rect x="620.2" y="140.0" width="38.4" height="0.0" fill="#059669"/><rect x="660.6" y="135.0" width="38.4" height="5.0" fill="#059669"/><line x1="126.2" y1="18" x2="126.2" y2="140" stroke="#57534c" stroke-width="1.6" stroke-dasharray="4 2"/><text x="126.2" y="15" font-size="9.5" font-weight="700" fill="#57534c" text-anchor="middle">Einzahlung</text><line x1="243.6" y1="18" x2="243.6" y2="140" stroke="#059669" stroke-width="1.6" stroke-dasharray="4 2"/><text x="243.6" y="15" font-size="9.5" font-weight="700" fill="#059669" text-anchor="middle">Median</text><text x="54.0" y="155" font-size="10" fill="#8b857a" text-anchor="middle">41 k</text><text x="377.0" y="155" font-size="10" fill="#8b857a" text-anchor="middle">127 k</text><text x="700.0" y="155" font-size="10" fill="#8b857a" text-anchor="middle">213 k</text><text x="377.0" y="177" font-size="11" fill="#57534c" text-anchor="middle">Verteilung der 146 End-Depotwerte (real). Rot = unter Einzahlung (realer Verlust).</text></svg></div>
+</div>
+
+<div class=take><b>Real, nicht nominal — darauf kommt es an.</b> Selbst über 10 Jahre bleibt das Band weit: der <b>schwächste Block 1965–1975 endete real bei 40.759 € (0.68× — Kaufkraftverlust bei hoher Startbewertung)</b>, der stärkste 1919–1929 bei real 212.952 € (3.5×). Die schwachen Blöcke begannen durchweg bei hoher Bewertung — dieselbe CAPE-Logik wie in den übrigen Analysen; heute steht das CAPE bei ~40. Ein 10-Jahres-Sparplan endet meist gut, ist aber <b>kein garantierter Gewinn nach Inflation</b>.</div>
+
+<div class=note>Realer S&amp;P-500-Total-Return (Shiller, inflationsbereinigt) 1871–2025. Sparrate real konstant, jährlich investiert, 100 % Aktien, ohne Steuern/Gebühren. Perzentile über 146 überlappende 10-Jahres-Blöcke (→ autokorreliert). Keine Anlageberatung.</div>
+</div>
+
+<script>
+const R=[0.1330,0.0871,0.0287,0.1197,0.1107,-0.1268,0.1436,0.2802,0.2237,0.3291,-0.0618,0.0549,0.0268,-0.0162,0.3171,0.1121,-0.0442,0.0785,0.1194,-0.0745,0.2521,-0.0117,-0.0552,0.0745,0.0351,0.0600,0.1613,0.2628,-0.1066,0.2312,0.1612,-0.0086,-0.1209,0.2713,0.2054,-0.0323,-0.2008,0.3255,0.0474,0.0383,0.0462,0.0012,-0.0583,-0.0581,0.2567,-0.0311,-0.2689,-0.0040,0.0210,-0.1071,0.2172,0.2845,0.0254,0.2523,0.2038,0.1346,0.3674,0.4714,-0.0814,-0.1452,-0.3253,0.0202,0.4969,-0.0987,0.5004,0.2933,-0.2889,0.1612,0.0412,-0.0908,-0.1587,0.1117,0.1938,0.1617,0.3445,-0.2386,-0.0596,0.0840,0.1912,0.2369,0.1534,0.1323,0.0200,0.4528,0.2716,0.0367,-0.0821,0.3667,0.0637,0.0462,0.1770,-0.0364,0.1867,0.1455,0.0929,-0.0900,0.1164,0.0568,-0.1314,0.0181,0.1010,0.1326,-0.2222,-0.2710,0.2924,0.0572,-0.1364,0.0638,0.0288,0.1186,-0.1327,0.2355,0.1499,0.0419,0.2060,0.2854,-0.0532,0.1238,0.1640,-0.0570,0.2773,0.0414,0.0870,-0.0143,0.3079,0.2302,0.2539,0.2886,0.1229,-0.0846,-0.1423,-0.2163,0.2564,0.0293,0.0585,0.1087,-0.0529,-0.3401,0.2850,0.1415,0.0065,0.1424,0.2313,0.1331,-0.0457,0.1772,0.2197,-0.0588,0.2451,0.1571,0.1346,-0.1691,0.1917,0.2207,0.1433];
+const $=id=>document.getElementById(id);
+const fmt=x=>Math.round(x).toLocaleString('de-DE');
+const kfmt=v=>v>=1000?Math.round(v/1000)+' k':'0';
+const X0=58,X1=624,Y0=30,Y1=272;
+// Anzeige-Maßstab: real (heutige Kaufkraft) oder nominal (Euro des jeweiligen Jahres).
+// Reine Umrechnung — die Simulation unten rechnet unveraendert mit realen Renditen.
+let disp='real', INFL=0.02;
+const nf=k=>Math.pow(1+INFL,k);                 // Aufzinsungsfaktor fuer Jahr k
+const nv=(v,k)=>disp==='nom'?v*nf(k):v;         // Wert im aktuell gewaehlten Massstab
+const alt=(v,k)=>disp==='nom'?v:v*nf(k);        // derselbe Wert im jeweils anderen Massstab
+const altLab=()=>disp==='nom'?'real':'nominal';
+const inflTxt=()=>(INFL*100).toLocaleString('de-DE',{minimumFractionDigits:1,maximumFractionDigits:1})+' %';
+// Kumulierte Einzahlung nominal: die real konstante Rate waechst mit der Inflation mit
+function contribNom(L,C,n){const a=[L];let v=L;for(let j=1;j<=n;j++){v+=C*nf(j);a.push(v);}return a;}
+function pct(v,p){v=v.slice().sort((a,b)=>a-b);const k=(v.length-1)*p/100,f=Math.floor(k),c=Math.min(f+1,v.length-1);return v[f]+(v[c]-v[f])*(k-f);}
+function runSpar(L,C){
+  const blocks=[],traj={};
+  for(let s=1871;s<=2016;s++){let V=L;const t=[L];for(let k=0;k<10;k++){V+=C;V*=(1+R[s-1871+k]);t.push(V);}blocks.push(s);traj[s]=t;}
+  const ptab={};[10,25,50,75,90].forEach(p=>{ptab[p]=[];for(let k=0;k<=10;k++)ptab[p].push(pct(blocks.map(s=>traj[s][k]),p));});
+  const ends={};blocks.forEach(s=>ends[s]=traj[s][10]);
+  const contrib=[];for(let k=0;k<=10;k++)contrib.push(L+C*k);
+  return {blocks,traj,ptab,ends,contrib};
+}
+function fan(ptab0,contrib0,contribN){
+  // Skalierte Kopie der Datenreihen VOR der Achsenbestimmung — Rohdaten bleiben unangetastet
+  const NOM=disp==='nom';let ptab=ptab0,contrib=contrib0;
+  if(NOM){ptab={};[10,25,50,75,90].forEach(q=>ptab[q]=ptab0[q].map((v,k)=>v*nf(k)));contrib=contribN;}
+  const ymax=Math.max(...ptab[90])*1.1,xm=k=>X0+k/10*(X1-X0),ym=v=>Y1-v/ymax*(Y1-Y0);
+  let s=`<svg viewBox="0 0 720 320" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;font-family:inherit">`;
+  for(let gv=0;gv<=ymax;gv+=30000){const y=ym(gv);s+=`<line x1="${X0}" y1="${y}" x2="${X1}" y2="${y}" stroke="#ece7dd"/><text x="${X0-6}" y="${y+3}" font-size="10" fill="#8b857a" text-anchor="end">${kfmt(gv)}</text>`;}
+  for(let k=0;k<=10;k+=2)s+=`<text x="${xm(k)}" y="${Y1+16}" font-size="10" fill="#8b857a" text-anchor="middle">${k}</text>`;
+  const poly=(hi,lo,fill)=>{let p='';for(let k=0;k<=10;k++)p+=xm(k).toFixed(1)+','+ym(ptab[hi][k]).toFixed(1)+' ';for(let k=10;k>=0;k--)p+=xm(k).toFixed(1)+','+ym(ptab[lo][k]).toFixed(1)+' ';s+=`<polygon points="${p}" fill="${fill}"/>`;};
+  poly(90,10,'#dcf2ea');poly(75,25,'#b9e6d5');
+  s+=`<polyline points="${ptab[50].map((v,k)=>xm(k).toFixed(1)+','+ym(v).toFixed(1)).join(' ')}" fill="none" stroke="#059669" stroke-width="2.6"/>`;
+  s+=`<polyline points="${contrib.map((v,k)=>xm(k).toFixed(1)+','+ym(v).toFixed(1)).join(' ')}" fill="none" stroke="#8b857a" stroke-width="1.6" stroke-dasharray="4 3"/>`;
+  [[90,'P90'],[75,'P75'],[50,'Median'],[25,'P25'],[10,'P10']].forEach(q=>{s+=`<text x="${X1+4}" y="${ym(ptab[q[0]][10])+3}" font-size="9.5" font-weight="700" fill="${q[0]==50?'#059669':'#047857'}">${q[1]}</text>`;});
+  s+=`<text x="${X1+4}" y="${ym(contrib[10])+14}" font-size="9.5" fill="#8b857a">Einzahlung</text>`;
+  s+=`<text x="${(X0+X1)/2}" y="316" font-size="11.5" fill="#57534c" text-anchor="middle">${NOM?'Depot in Euro des jeweiligen Jahres ('+inflTxt()+' Inflation)':'Reales Depot (heutiges Geld)'} über 10 Jahre · Band = Spannweite aller Startjahre seit 1871</text>`;
+  return s+'</svg>';
+}
+function hist(ends,totR,totN){
+  const NOM=disp==='nom',sc=NOM?nf(10):1;
+  const W=720,hX0=54,hX1=700,hY0=20,hY1=140,vals=Object.values(ends).map(v=>v*sc);
+  const lo=Math.min(...vals),hi=Math.max(...vals),nb=16,bw=(hi-lo)/nb,cnt=new Array(nb).fill(0);
+  vals.forEach(v=>{cnt[Math.min(Math.floor((v-lo)/bw),nb-1)]++;});
+  const mc=Math.max(...cnt),tot=NOM?totN:totR,xm=v=>hX0+(v-lo)/(hi-lo)*(hX1-hX0),cw=(hX1-hX0)/nb;
+  let s=`<svg viewBox="0 0 720 180" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;font-family:inherit">`;
+  for(let b=0;b<nb;b++){const h=cnt[b]/mc*(hY1-hY0),x=hX0+b*cw,mid=lo+(b+0.5)*bw,col=mid<tot?'#b91c1c':'#059669';s+=`<rect x="${(x+1).toFixed(1)}" y="${(hY1-h).toFixed(1)}" width="${(cw-2).toFixed(1)}" height="${h.toFixed(1)}" fill="${col}"/>`;}
+  [[tot,'Einzahlung','#57534c'],[pct(vals,50),'Median','#059669']].forEach(m=>{const x=xm(m[0]);s+=`<line x1="${x.toFixed(1)}" y1="${hY0-2}" x2="${x.toFixed(1)}" y2="${hY1}" stroke="${m[2]}" stroke-width="1.6" stroke-dasharray="4 2"/><text x="${x.toFixed(1)}" y="${hY0-5}" font-size="9.5" font-weight="700" fill="${m[2]}" text-anchor="middle">${m[1]}</text>`;});
+  [lo,(lo+hi)/2,hi].forEach(gx=>{s+=`<text x="${xm(gx).toFixed(1)}" y="${hY1+15}" font-size="10" fill="#8b857a" text-anchor="middle">${kfmt(gx)}</text>`;});
+  s+=`<text x="${(hX0+hX1)/2}" y="177" font-size="11" fill="#57534c" text-anchor="middle">Verteilung der ${vals.length} End-Depotwerte (${NOM?'nominal, Euro in 10 Jahren':'real'}). Rot = unter Einzahlung (${NOM?'nominaler':'realer'} Verlust).</text>`;
+  return s+'</svg>';
+}
+function render(){
+  INFL=(+$('infl').value)/100;
+  $('dReal').classList.toggle('on',disp==='real');$('dNom').classList.toggle('on',disp==='nom');
+  $('inflbox').style.display=disp==='nom'?'':'none';
+  $('infl_v').textContent=inflTxt();
+  const C=(+$('rate').value)*12, L=+$('lump').value;
+  $('lump_v').textContent=fmt(L)+' €';
+  const A=runSpar(L,C), tot=L+C*10, cN=contribNom(L,C,10), totN=cN[10];
+  const NOM=disp==='nom', ein=NOM?totN:tot, einAlt=NOM?tot:totN;
+  $('reslab').textContent=NOM?'Ergebnis in künftigen Euro (nach 10 Jahren)':'Ergebnis in heutiger Kaufkraft';
+  // Endwerte liegen im Jahr 10 — Vielfaches immer Endwert/Einzahlung im selben Massstab
+  const setc=(id,p)=>{const v=pct(Object.values(A.ends),p);$(id).textContent=fmt(nv(v,10))+' €';$(id+'x').textContent=(nv(v,10)/ein).toFixed(2)+'×';$(id+'n').textContent=altLab()+' '+fmt(alt(v,10))+' €';};
+  setc('p10',10);setc('p25',25);setc('p50',50);setc('p75',75);setc('p90',90);
+  const m=pct(Object.values(A.ends),50),lo=pct(Object.values(A.ends),10),hi=pct(Object.values(A.ends),90);
+  $('summary').innerHTML='Eingezahlt werden '+(NOM?'nominal':'real')+' <b>'+fmt(ein)+' €</b>. Median-Ergebnis: <b>'+fmt(nv(m,10))+' €</b> ('+(nv(m,10)/ein).toFixed(1)+'×). In 10 % der Startjahre &le; '+fmt(nv(lo,10))+' €, in 10 % &ge; '+fmt(nv(hi,10))+' €. <span style="color:var(--ink-3)">'+(NOM
+    ?'In heutiger Kaufkraft sind das '+fmt(m)+' € gegenüber '+fmt(einAlt)+' € Einzahlung.'
+    :'Nominal bei '+inflTxt()+' Inflation: '+fmt(alt(m,10))+' € gegenüber '+fmt(einAlt)+' € Einzahlung.')+'</span>';
+  $('fan').innerHTML=fan(A.ptab,A.contrib,cN);$('hist').innerHTML=hist(A.ends,tot,totN);
+}
+$('rate').addEventListener('input',()=>{$('rate_r').value=$('rate').value;render();});
+$('rate_r').addEventListener('input',()=>{$('rate').value=$('rate_r').value;render();});
+$('lump').addEventListener('input',render);
+$('dReal').addEventListener('click',()=>{disp='real';render();});
+$('dNom').addEventListener('click',()=>{disp='nom';render();});
+$('infl').addEventListener('input',render);
+render();
+</script>
+</body></html>

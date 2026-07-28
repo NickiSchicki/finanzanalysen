@@ -1,0 +1,72 @@
+<!DOCTYPE html><html lang=de><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1">
+<title>Call-im-Dip verbessern</title>
+<script src="assets/chart.umd.min.js?v=4"></script>
+<link rel=stylesheet href="assets/site.css?v=4">
+<script defer src="assets/site-map.js?v=4"></script>
+<script defer src="assets/datenstand.js?v=4"></script>
+<script defer src="assets/site.js?v=4"></script>
+<style>
+/* seitenspezifisch */
+.chartbox{position:relative;height:340px}
+.tbl{margin:6px 0 4px}
+.tbl th:last-child,.tbl td:last-child{text-align:left}
+.tbl td.v{font-weight:600}
+.tbl td.muted{font-size:12px;color:var(--ink-3)}
+.tbl tr.hot td{background:var(--accent-soft)}
+.callout.g{border-left:3px solid var(--good)}
+.callout.r{border-left:3px solid var(--bad)}
+ul.take{padding:16px 22px 16px 42px}
+ul.take li{margin:9px 0}
+ul.take li:last-child{margin-bottom:0}
+</style></head><body data-section="Strategien"><div class=wrap>
+<div class=kicker>Strategien &middot; Optionen</div>
+<h1>Was die Call-im-Dip-Strategie wirklich <em>verbessert</em></h1>
+<p class=lead>Zwei Stellschrauben entscheiden &uuml;ber das Ergebnis: der Zeitwertverfall und der Preis der impliziten Volatilit&auml;t. Sechs Varianten im direkten Vergleich &mdash; fair gerechnet als Anteil am Index-Notional, netto nach Kosten.</p>
+<div class=sub>Varianten netto nach Kosten (3 %/Trade), als % des Index-Notionals &middot; letzte 5 Jahre, &minus;5%-Dips</div>
+
+<div class=card>
+<h2>Mechanik</h2>
+<h3>Die zwei Stellschrauben: Theta und implizite Vola</h3>
+<p><a href="SP500_Call_im_Dip.html">Die Basis-Strategie</a> verliert an <b>Theta</b> (Zeitwert) und daran, dass Calls gekauft werden, wenn die <b>IV teuer</b> ist. Daraus folgen zwei Wege: Theta senken (mehr Intrinsik &mdash; also ITM, l&auml;ngere Laufzeit) &mdash; oder die Vola gleich <b>verkaufen</b> statt kaufen. Das Ergebnis, fair als % des Notionals und netto:</p>
+<div class=chartbox><canvas id=cmp></canvas></div>
+<div class=take>Die ern&uuml;chternde Wahrheit zuerst: <b>einfach den Index im Dip kaufen (+44,5&nbsp;%) schl&auml;gt jede Options-Variante.</b> Auf Notional-Basis sind Pr&auml;mie, Theta und Kosten ein Netto-Minus. Der Vorteil von Optionen ist <b>Hebel auf wenig Kapital</b> &mdash; nicht mehr Rendite pro Markt-Exposure.</div>
+</div>
+
+<div class=card>
+<h2>Varianten</h2>
+<h3>Welche Hebel ziehen &mdash; und welche nicht</h3>
+<table class=tbl><thead><tr><th>Variante</th><th>Gesamt (netto)</th><th>2022er-B&auml;r</th><th>Gewinner</th><th>Idee</th></tr></thead><tbody><tr><td><b>Index im Dip kaufen</b></td><td class='v pos'>+44.5&nbsp;%</td><td class='v pos'>+6.8&nbsp;%</td><td class=v>7/7</td><td class=muted>Benchmark &ndash; keine Optionskosten</td></tr><tr><td><b>ATM-Call 3M (Basis)</b></td><td class='v pos'>+5.0&nbsp;%</td><td class='v neg'>-3.3&nbsp;%</td><td class=v>5/7</td><td class=muted>viel Theta, teure IV gekauft</td></tr><tr><td><b>ATM-LEAP 12M</b></td><td class='v neg'>-1.0&nbsp;%</td><td class='v neg'>-1.1&nbsp;%</td><td class=v>3/7</td><td class=muted>hohe Pr&auml;mie &ndash; hilft nicht</td></tr><tr><td><b>ITM-Call 6M (K=0,85&middot;S)</b></td><td class='v pos'>+17.8&nbsp;%</td><td class='v neg'>-4.6&nbsp;%</td><td class=v>6/7</td><td class=muted>weniger Theta, mehr Delta</td></tr><tr><td><b>Deep-ITM-LEAP (0,80&middot;S, 12M)</b></td><td class='v pos'>+15.7&nbsp;%</td><td class='v neg'>-2.6&nbsp;%</td><td class=v>6/7</td><td class=muted>Stock-Replacement, robust</td></tr><tr class=hot><td><b>Put VERKAUFEN 3M (short Vol)</b></td><td class='v pos'>+24.9&nbsp;%</td><td class='v pos'>+0.9&nbsp;%</td><td class=v>7/7</td><td class=muted>kassiert die teure IV</td></tr></tbody></table>
+<div class="callout g">Klare Verbesserungen: <b>(1) ITM statt ATM</b> &mdash; mehr Intrinsik, weniger Theta: +18&nbsp;% statt +5&nbsp;%. <b>(2) Puts verkaufen statt Calls kaufen</b> (short Vola): <b>+25&nbsp;%, 7/7 Gewinner</b>, &uuml;berlebt sogar 2022 (+0,9&nbsp;%) &mdash; weil die teure IV <i>vereinnahmt</i> wird und Theta f&uuml;r die Position arbeitet. Was <b>nicht</b> hilft: einfach l&auml;ngere ATM-LEAPS (&minus;1&nbsp;%, hohe Pr&auml;mie ohne Nutzen).</div>
+</div>
+
+<div class=card>
+<h2>Risiko</h2>
+<h3>Der Haken am Put-Verkaufen &mdash; und die saubere L&ouml;sung</h3>
+<p>Puts verkaufen war hier am besten, <b>aber</b> es dreht das Risikoprofil um: die Position ist damit <b><a href="SP500_Taleb_Analyse.html">short den Crash</a></b>. Im betrachteten 5-Jahres-Fenster gab es <a href="SP500_Drawdown_Pfadrisiko.html">keinen echten langen B&auml;renmarkt</a> &mdash; in einem 2008er-Szenario w&uuml;rde die nackte Short-Put-Position gro&szlig;e Verluste machen.</p>
+<div class=callout><b>Die vern&uuml;nftige Synthese: Put-Credit-Spread.</b> Den ATM-Put verkaufen (die teure IV kassieren) und einen tieferen Put als Versicherung kaufen. Das beh&auml;lt den gr&ouml;&szlig;ten Teil des Short-Vol-Vorteils, aber mit <b>definiertem, begrenztem Risiko</b> &mdash; genau das, was die nackte Variante gef&auml;hrlich macht, wird gekappt.</div>
+</div>
+
+<div class=card>
+<h2>Ausblick</h2>
+<h3>Weitere Verbesserungen &mdash; Logik, nicht hier gebacktestet</h3>
+<ul class=take>
+<li><b>IV-Filter / Timing:</b> <a href="SP500_MeanReversion_Strategie.html">nicht in den fallenden Markt kaufen</a>, sondern warten, bis die Vola <i>dreht</i> (VIX f&auml;llt) &mdash; das vermeidet das &bdquo;fallende Messer&ldquo; und das teuerste IV-Niveau.</li>
+<li><b>Zeit-Stop:</b> nach z.&nbsp;B. 3&ndash;4&nbsp;Monaten ohne neues Hoch aussteigen &mdash; kappt die Theta-Blutung im Schleichb&auml;r (2022) statt 7&times; zu rollen.</li>
+<li><b>Tiefe statt Breite:</b> ITM-Strikes (Delta ~0,7&ndash;0,8) als &bdquo;Stock Replacement&ldquo; &mdash; fast wie gehebelte Aktien, kaum Theta.</li>
+<li><b>Sizing:</b> Optionsgewinne sind extrem schief &mdash; klein &amp; gleichgewichtet sizen (kein All-in), sonst ruiniert ein einziger Totalverlust die Serie.</li>
+</ul>
+</div>
+
+<div class=note><b>Kein Anlageratschlag.</b> Vereinfachte Black-Scholes-N&auml;herung (VIX als IV), Kosten pauschal 3&nbsp;%/Transaktion, keine echten Optionsquotes/Spreads/Steuern; 7 Episoden in einem Bullenfenster. Zur Veranschaulichung der Mechanik, nicht handelbar.</div>
+<div class=foot>Eigene Berechnung, ^GSPC &amp; ^VIX 2021&ndash;2026 (Yahoo Finance). Werte = Summe der Episoden-P&amp;L als % des Index-Notionals beim Einstieg, netto nach 3&nbsp;% Kosten je Trade/Roll.</div>
+</div>
+<script>
+const P={"labels": ["Index\n(Dip)", "ATM-Call\n3M", "ATM-LEAP\n12M", "ITM-Call\n6M", "Deep-ITM\nLEAP", "Put\nverkaufen"], "tot": [44.5, 5.0, -1.0, 17.8, 15.7, 24.9], "cols": ["#8b857a", "#b91c1c", "#b91c1c", "#047857", "#047857", "#047857"]};
+Chart.defaults.font.family="-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif";
+Chart.defaults.color="#57534c";
+new Chart(document.getElementById('cmp'),{type:'bar',data:{labels:P.labels,datasets:[
+ {label:'Gesamt-P&L (netto, % Notional)',data:P.tot,backgroundColor:P.cols,borderRadius:5}
+]},options:{maintainAspectRatio:false,scales:{
+ y:{title:{display:true,text:'% des Index-Notionals (netto)'},ticks:{callback:v=>v+'%'},grid:{color:c=>c.tick.value===0?'#d5cec1':'#ece7dd'}},
+ x:{grid:{display:false},ticks:{font:{size:11}}}},plugins:{legend:{display:false},tooltip:{callbacks:{label:it=>it.parsed.y+'% (netto)'}}}}});
+</script></body></html>

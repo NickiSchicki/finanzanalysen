@@ -1,0 +1,141 @@
+<!DOCTYPE html><html lang=de><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1">
+<title>Altersvorsorge-Rechner — reale Monatsrente</title>
+<link rel=stylesheet href="assets/site.css?v=4">
+<script defer src="assets/site-map.js?v=4"></script>
+<script defer src="assets/datenstand.js?v=4"></script>
+<script defer src="assets/site.js?v=4"></script>
+<style>
+/* seitenspezifisch */
+.res{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.rbox{background:var(--card-2);border:1px solid var(--rule);border-radius:12px;padding:14px 16px}
+.rbox .l{font-size:11.5px;color:var(--ink-3);margin-bottom:4px;line-height:1.45}
+.rbox .n{font-family:var(--serif);font-size:23px;font-weight:700;letter-spacing:-.02em;line-height:1.1;color:var(--ink);font-variant-numeric:tabular-nums}
+.rbox.big,.rbox.bigp,.rbox.wide{grid-column:1/3}
+.rbox.big .n{font-size:38px;color:var(--s2)}
+.rbox.bigp .n{font-size:32px;color:var(--s4)}
+.rbox.big .l,.rbox.bigp .l{font-size:12.5px}
+.vlabel{font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.15em;color:var(--s3);margin:22px 0 10px;padding-top:16px;border-top:1px solid var(--rule)}
+.vlabel:first-of-type{border-top:none;margin-top:0;padding-top:0}
+.vlabel.pur{color:var(--s4)}
+#amt{font-size:19px}
+#swr_r{accent-color:var(--s4)}
+.warn{display:none;background:var(--card-2);border:1px solid var(--rule);border-left:3px solid var(--bad);border-radius:0 10px 10px 0;color:var(--bad);padding:11px 15px;font-size:13.5px;margin-top:14px}
+.chartcard{margin-top:0}
+.note{margin-top:6px;max-width:78ch}
+</style></head><body data-section="Werkzeug"><div class=wrap>
+<div class=hero>
+<div class=kicker>Werkzeug · Altersvorsorge</div>
+<h1>Altersvorsorge-<em>Rechner</em></h1>
+<p class=lead>Eine Einmalanlage von heute, umgerechnet in eine reale — also inflationsbereinigte — Monatsrente. Zwei Varianten stehen nebeneinander: das Kapital bis zu einem Zielalter aufbrauchen, oder dauerhaft von den Erträgen leben.</p>
+</div>
+<div class=tip>Regler und Eingabefeld rechnen live: Ergebniswerte und Kurve folgen jeder Änderung unmittelbar.</div>
+
+<div class=grid2>
+<div class=card>
+<h2>Eingaben</h2>
+<div class=ctrl><div class=clabel><span>Startbetrag heute</span></div>
+<input type=number id=amt value=300000 step=5000 min=0>
+<input type=range id=amt_r min=10000 max=2000000 step=5000 value=300000 style="margin-top:8px"></div>
+<div class=ctrl><div class=clabel><span>Aktuelles Alter</span><span class=cval id=cage_v>25</span></div><input type=range id=cage_r min=18 max=70 step=1 value=25></div>
+<div class=ctrl><div class=clabel><span>Renteneintritt mit Alter</span><span class=cval id=rage_v>65</span></div><input type=range id=rage_r min=40 max=75 step=1 value=65></div>
+<div class=ctrl><div class=clabel><span>Geld soll reichen bis Alter <span style="font-weight:400;color:var(--ink-3)">(Variante A)</span></span><span class=cval id=eage_v>90</span></div><input type=range id=eage_r min=70 max=110 step=1 value=90></div>
+<div class=ctrl><div class=clabel><span style="color:var(--s4)">Entnahmequote ewige Rente <span style="font-weight:400;color:var(--ink-3)">(Variante B)</span></span><span class=cval id=swr_v style="color:var(--s4)">3,5 %</span></div><input type=range id=swr_r min=2 max=6 step=0.1 value=3.5></div>
+<div class=ctrl><div class=clabel><span>Rendite p.a. (nominal)</span><span class=cval id=ret_v>7,0 %</span></div><input type=range id=ret_r min=0 max=12 step=0.1 value=7></div>
+<div class=ctrl><div class=clabel><span>Inflation p.a.</span><span class=cval id=infl_v>2,5 %</span></div><input type=range id=infl_r min=0 max=6 step=0.1 value=2.5></div>
+<div class=ctrl><div class=clabel><span>Steuer auf Erträge (effektiv)</span><span class=cval id=tax_v>18,5 %</span></div><input type=range id=tax_r min=0 max=35 step=0.5 value=18.5></div>
+<div class=warn id=warn>Renteneintritt muss zwischen aktuellem Alter und Endalter liegen.</div>
+</div>
+
+<div class=card>
+<h2>Ergebnis (real, heutige Kaufkraft)</h2>
+<div class=vlabel>Variante A · Kapital bis Alter <span id=eageEchoA>90</span> aufbrauchen</div>
+<div class=res>
+<div class="rbox big"><div class=l>Netto-Monatsrente</div><div class=n id=netto>6.624 €</div></div>
+<div class=rbox><div class=l>Brutto-Monatsrente</div><div class=n id=brutto>9.115 €</div></div>
+<div class=rbox><div class=l>Reales Kapital bei Rente</div><div class=n id=kap>1.384.233 €</div></div>
+<div class="rbox wide"><div class=l>Faustregel: je 1.000 € heute → Netto-Rente/Monat</div><div class=n id=p1000 style="font-size:18px">22,08 €</div></div>
+</div>
+<div class="vlabel pur">Variante B · Ewige Rente — Kapital bleibt erhalten</div>
+<div class=res>
+<div class="rbox bigp"><div class=l>Netto-Monatsrente (ewig)</div><div class=n id=ewnetto>3.977 €</div></div>
+<div class=rbox><div class=l>Brutto-Monatsrente (ewig)</div><div class=n id=ewbrutto>4.880 €</div></div>
+<div class="rbox" style="display:flex;align-items:center"><div class=l id=ewstatus style="margin:0;font-weight:600;color:var(--good)">Kapital wächst real um +0,9 %/Jahr, damit dauerhaft tragfähig.</div></div>
+</div>
+<div class=summary id=summary>Mit <b>300.000 €</b> heute ab Alter <b>65</b>: entweder <b>6.624 €/Monat</b> bis Alter 90 (Kapital aufgebraucht) — oder <b>3.977 €/Monat</b> dauerhaft (Kapital bleibt erhalten).</div>
+</div>
+</div>
+
+<div class="card chartcard">
+<h2>Reales Kapital über die Zeit — aufbrauchen (bis 0) oder ewig behalten</h2>
+<div id=chart><svg viewBox="0 0 720 306" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;font-family:inherit"><rect x="58.0" y="18.0" width="395.1" height="232.0" fill="#1d4ed8" fill-opacity="0.05"/><rect x="453.1" y="18.0" width="246.9" height="232.0" fill="#059669" fill-opacity="0.04"/><line x1="58.0" y1="250.0" x2="700.0" y2="250.0" stroke="#ece7dd"/><text x="52.0" y="253.0" font-size="10" fill="#8b857a" text-anchor="end">0</text><line x1="58.0" y1="192.0" x2="700.0" y2="192.0" stroke="#ece7dd"/><text x="52.0" y="195.0" font-size="10" fill="#8b857a" text-anchor="end">628 k</text><line x1="58.0" y1="134.0" x2="700.0" y2="134.0" stroke="#ece7dd"/><text x="52.0" y="137.0" font-size="10" fill="#8b857a" text-anchor="end">1,26 Mio</text><line x1="58.0" y1="76.0" x2="700.0" y2="76.0" stroke="#ece7dd"/><text x="52.0" y="79.0" font-size="10" fill="#8b857a" text-anchor="end">1,88 Mio</text><line x1="58.0" y1="18.0" x2="700.0" y2="18.0" stroke="#ece7dd"/><text x="52.0" y="21.0" font-size="10" fill="#8b857a" text-anchor="end">2,51 Mio</text><text x="58.0" y="266.0" font-size="10.5" fill="#8b857a" text-anchor="middle">25</text><text x="453.1" y="266.0" font-size="10.5" fill="#8b857a" text-anchor="middle">65</text><text x="700.0" y="266.0" font-size="10.5" fill="#8b857a" text-anchor="middle">90</text><polyline points="58.0,222.3 67.9,221.1 77.8,219.8 87.6,218.5 97.5,217.1 107.4,215.7 117.3,214.2 127.1,212.6 137.0,210.9 146.9,209.2 156.8,207.4 166.6,205.6 176.5,203.6 186.4,201.6 196.3,199.5 206.2,197.2 216.0,194.9 225.9,192.5 235.8,190.0 245.7,187.3 255.5,184.6 265.4,181.7 275.3,178.7 285.2,175.6 295.0,172.3 304.9,168.9 314.8,165.4 324.7,161.7 334.6,157.8 344.4,153.7 354.3,149.5 364.2,145.1 374.1,140.5 383.9,135.7 393.8,130.6 403.7,125.4 413.6,119.9 423.4,114.2 433.3,108.3 443.2,102.0 453.1,95.6" fill="none" stroke="#1d4ed8" stroke-width="2.4"/><polyline points="453.1,95.6 463.0,94.2 472.8,92.7 482.7,91.2 492.6,89.7 502.5,88.0 512.3,86.3 522.2,84.6 532.1,82.7 542.0,80.8 551.8,78.7 561.7,76.6 571.6,74.4 581.5,72.1 591.4,69.7 601.2,67.2 611.1,64.6 621.0,61.9 630.9,59.0 640.7,56.0 650.6,52.9 660.5,49.7 670.4,46.3 680.2,42.7 690.1,39.0 700.0,35.2" fill="none" stroke="#6d28d9" stroke-width="2.2" stroke-dasharray="5 3"/><polyline points="453.1,122.2 463.0,125.6 472.8,129.0 482.7,132.6 492.6,136.2 502.5,140.0 512.3,143.9 522.2,147.9 532.1,152.1 542.0,156.3 551.8,160.8 561.7,165.3 571.6,170.0 581.5,174.8 591.4,179.8 601.2,185.0 611.1,190.3 621.0,195.7 630.9,201.4 640.7,207.2 650.6,213.2 660.5,219.4 670.4,225.8 680.2,232.3 690.1,239.1 700.0,246.1" fill="none" stroke="#059669" stroke-width="2.4"/><line x1="453.1" y1="95.6" x2="453.1" y2="122.2" stroke="#a16207" stroke-width="1.3" stroke-dasharray="3 2"/><circle cx="453.1" cy="95.6" r="4" fill="#1d4ed8"/><text x="453.1" y="88.6" font-size="10" font-weight="700" fill="#1d4ed8" text-anchor="middle">Rente mit 65</text><text x="255.5" y="31.0" font-size="10.5" fill="#1d4ed8" text-anchor="middle">Ansparen</text><line x1="64.0" y1="248.0" x2="82.0" y2="248.0" stroke="#059669" stroke-width="2.4"/><text x="86.0" y="251.0" font-size="9.5" fill="#57534c">Kapitalverzehr bis 0</text><line x1="214.0" y1="248.0" x2="232.0" y2="248.0" stroke="#6d28d9" stroke-width="2.2" stroke-dasharray="5 3"/><text x="236.0" y="251.0" font-size="9.5" fill="#57534c">ewige Rente (Kapital bleibt)</text></svg></div>
+</div>
+
+<div class=note>Realrechnung via Fisher (Realzins = (1+Rendite)/(1+Inflation)−1). Variante A: Rente monatlich, real konstant, Endkapital 0. Variante B: feste reale Entnahme (Quote × Realkapital); Kapital bleibt/wächst, solange Quote ≤ Realrendite. Steuer vereinfacht. Ohne Markt-/Reihenfolgerisiko, Gebühren, gesetzliche Rente. Keine Anlageberatung.</div>
+</div>
+
+<script>
+const $=id=>document.getElementById(id);
+const amt=$('amt'),amt_r=$('amt_r'),cage_r=$('cage_r'),rage_r=$('rage_r'),eage_r=$('eage_r'),swr_r=$('swr_r'),ret_r=$('ret_r'),infl_r=$('infl_r'),tax_r=$('tax_r');
+const fmt=x=>Math.round(x).toLocaleString('de-DE');
+const fmt2=x=>x.toLocaleString('de-DE',{minimumFractionDigits:2,maximumFractionDigits:2});
+const pc=x=>(+x).toLocaleString('de-DE',{minimumFractionDigits:1,maximumFractionDigits:1})+' %';
+function calc(P,cage,rage,eage,i,pi,t,swr){
+  const n=rage-cage,m=eage-rage;
+  const rg=(1+i)/(1+pi)-1, rn=(1+i*(1-t))/(1+pi)-1;
+  const gross=P*Math.pow(1+rg,n);
+  const K=P*(1+(Math.pow(1+i,n)-1)*(1-t))/Math.pow(1+pi,n);
+  const netM=K*(Math.pow(1+rn,1/12)-1)/(1-Math.pow(1+rn,-m));
+  const grossM=gross*(Math.pow(1+rg,1/12)-1)/(1-Math.pow(1+rg,-m));
+  const ewBrutto=swr*gross/12, ewNetto=ewBrutto*(1-t), grow=rg-swr;
+  return {n,m,rg,rn,gross,K,netM,grossM,per1000:netM/P*1000,ewBrutto,ewNetto,grow};
+}
+function ewStatus(grow){const g=grow*100;
+  if(grow>0.0005) return ['Kapital wächst real um +'+g.toLocaleString('de-DE',{minimumFractionDigits:1,maximumFractionDigits:1})+' %/Jahr, damit dauerhaft tragfähig.','#047857'];
+  if(grow>-0.0005) return ['Kapital bleibt real etwa konstant — die Entnahme liegt an der Tragfähigkeitsgrenze.','#a16207'];
+  return ['Entnahme über der Realrendite — das Kapital schrumpft, die Rente ist nicht dauerhaft tragfähig.','#b91c1c'];}
+function buildSvg(P,cage,rage,eage,i,pi,t,swr){
+  const d=calc(P,cage,rage,eage,i,pi,t,swr);
+  let acc=[]; for(let k=0;k<=d.n;k++) acc.push([cage+k,P*Math.pow(1+d.rg,k)]);
+  let dd=[[rage,d.K]],B=d.K,Wd=d.netM*12;
+  for(let j=1;j<=d.m;j++){B=B*(1+d.rn)-Wd; dd.push([rage+j,Math.max(B,0)]);}
+  let ew=[[rage,d.gross]],C=d.gross,Ws=swr*d.gross;
+  for(let j=1;j<=d.m;j++){C=C*(1+d.rg)-Ws; ew.push([rage+j,Math.max(C,0)]);}
+  const W=720,H=306,X0=58,X1=700,Y0=18,Y1=250,mx=Math.max(d.gross,Math.max(...ew.map(p=>p[1])),1);
+  const xm=a=>X0+(a-cage)/Math.max(eage-cage,1)*(X1-X0), ym=v=>Y1-v/(mx*1.08)*(Y1-Y0);
+  let s=`<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;font-family:inherit">`;
+  s+=`<rect x="${xm(cage)}" y="${Y0}" width="${xm(rage)-xm(cage)}" height="${Y1-Y0}" fill="#1d4ed8" fill-opacity="0.05"/>`;
+  s+=`<rect x="${xm(rage)}" y="${Y0}" width="${xm(eage)-xm(rage)}" height="${Y1-Y0}" fill="#059669" fill-opacity="0.04"/>`;
+  [0,.25,.5,.75,1].forEach(f=>{const v=mx*1.08*f,y=ym(v);const lab=v>=1e6?(v/1e6).toLocaleString('de-DE',{maximumFractionDigits:2})+' Mio':(v>=1000?Math.round(v/1e3)+' k':'0');s+=`<line x1="${X0}" y1="${y}" x2="${X1}" y2="${y}" stroke="#ece7dd"/><text x="${X0-6}" y="${y+3}" font-size="10" fill="#8b857a" text-anchor="end">${lab}</text>`;});
+  [cage,rage,eage].forEach(a=>{s+=`<text x="${xm(a)}" y="${Y1+16}" font-size="10.5" fill="#8b857a" text-anchor="middle">${a}</text>`;});
+  s+=`<polyline points="${acc.map(p=>xm(p[0]).toFixed(1)+','+ym(p[1]).toFixed(1)).join(' ')}" fill="none" stroke="#1d4ed8" stroke-width="2.4"/>`;
+  s+=`<polyline points="${ew.map(p=>xm(p[0]).toFixed(1)+','+ym(p[1]).toFixed(1)).join(' ')}" fill="none" stroke="#6d28d9" stroke-width="2.2" stroke-dasharray="5 3"/>`;
+  s+=`<polyline points="${dd.map(p=>xm(p[0]).toFixed(1)+','+ym(p[1]).toFixed(1)).join(' ')}" fill="none" stroke="#059669" stroke-width="2.4"/>`;
+  s+=`<line x1="${xm(rage)}" y1="${ym(d.gross)}" x2="${xm(rage)}" y2="${ym(d.K)}" stroke="#a16207" stroke-width="1.3" stroke-dasharray="3 2"/>`;
+  s+=`<circle cx="${xm(rage)}" cy="${ym(d.gross)}" r="4" fill="#1d4ed8"/>`;
+  s+=`<text x="${xm(rage)}" y="${ym(d.gross)-7}" font-size="10" font-weight="700" fill="#1d4ed8" text-anchor="middle">Rente mit ${rage}</text>`;
+  s+=`<text x="${(xm(cage)+xm(rage))/2}" y="${Y0+13}" font-size="10.5" fill="#1d4ed8" text-anchor="middle">Ansparen</text>`;
+  const lx=X0+6,ly=Y1-2;
+  s+=`<line x1="${lx}" y1="${ly}" x2="${lx+18}" y2="${ly}" stroke="#059669" stroke-width="2.4"/><text x="${lx+22}" y="${ly+3}" font-size="9.5" fill="#57534c">Kapitalverzehr bis 0</text>`;
+  s+=`<line x1="${lx+150}" y1="${ly}" x2="${lx+168}" y2="${ly}" stroke="#6d28d9" stroke-width="2.2" stroke-dasharray="5 3"/><text x="${lx+172}" y="${ly+3}" font-size="9.5" fill="#57534c">ewige Rente (Kapital bleibt)</text>`;
+  return s+'</svg>';
+}
+function upd(){
+  const P=+amt.value,cage=+cage_r.value,rage=+rage_r.value,eage=+eage_r.value,swr=+swr_r.value/100;
+  const i=+ret_r.value/100,pi=+infl_r.value/100,t=+tax_r.value/100;
+  $('cage_v').textContent=cage;$('rage_v').textContent=rage;$('eage_v').textContent=eage;$('eageEchoA').textContent=eage;
+  $('swr_v').textContent=pc(swr_r.value);$('ret_v').textContent=pc(ret_r.value);$('infl_v').textContent=pc(infl_r.value);$('tax_v').textContent=pc(tax_r.value);
+  if(rage<=cage||eage<=rage||P<=0){$('warn').style.display='block';return;}
+  $('warn').style.display='none';
+  const d=calc(P,cage,rage,eage,i,pi,t,swr);
+  $('netto').textContent=fmt(d.netM)+' €';$('brutto').textContent=fmt(d.grossM)+' €';$('kap').textContent=fmt(d.K)+' €';$('p1000').textContent=fmt2(d.per1000)+' €';
+  $('ewnetto').textContent=fmt(d.ewNetto)+' €';$('ewbrutto').textContent=fmt(d.ewBrutto)+' €';
+  const st=ewStatus(d.grow);$('ewstatus').textContent=st[0];$('ewstatus').style.color=st[1];
+  $('summary').innerHTML='Mit <b>'+fmt(P)+' €</b> heute ab Alter <b>'+rage+'</b>: entweder <b>'+fmt(d.netM)+' €/Monat</b> bis Alter '+eage+' (Kapital aufgebraucht) — oder <b>'+fmt(d.ewNetto)+' €/Monat</b> dauerhaft (Kapital bleibt erhalten).';
+  $('chart').innerHTML=buildSvg(P,cage,rage,eage,i,pi,t,swr);
+}
+amt.addEventListener('input',()=>{amt_r.value=amt.value;upd();});
+amt_r.addEventListener('input',()=>{amt.value=amt_r.value;upd();});
+[cage_r,rage_r,eage_r,swr_r,ret_r,infl_r,tax_r].forEach(el=>el.addEventListener('input',upd));
+upd();
+</script>
+</body></html>

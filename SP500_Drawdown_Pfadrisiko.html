@@ -1,0 +1,82 @@
+<!DOCTYPE html><html lang=de><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1">
+<title>S&P 500 - Drawdown & Pfadrisiko</title>
+<script src="assets/chart.umd.min.js?v=4"></script>
+<link rel=stylesheet href="assets/site.css?v=4">
+<script defer src="assets/site-map.js?v=4"></script>
+<script defer src="assets/datenstand.js?v=4"></script>
+<script defer src="assets/site.js?v=4"></script>
+<style>
+/* seitenspezifisch */
+.card .chartbox{background:none;border:0;border-radius:0;padding:0;margin:0 0 16px;position:relative;height:360px}
+.card h3{margin-bottom:6px}
+.card ul{margin:0;padding-left:20px}
+.card li{margin:9px 0}
+.kpi.r .n{color:var(--bad)}
+.kpi .l{margin:4px 0 0}
+.tbl th:nth-child(3),.tbl td:nth-child(3){text-align:left}
+.tbl td.neg{font-weight:700}
+</style></head><body data-section="Risiko"><div class=wrap>
+<div class=kicker>S&amp;P&nbsp;500 &middot; Kursindex 1950&ndash;2026</div>
+<h1>Drawdown und Pfadrisiko: der <em>Weg</em> zur Rendite</h1>
+<p class=lead>Ma&szlig;geblich ist nicht, wo eine Anlage endet, sondern was auf dem Weg dorthin auszuhalten war. Die Auswertung t&auml;glicher Schlusskurse zeigt, wie tief und wie lange der amerikanische Aktienmarkt unter seinem jeweils letzten Allzeithoch liegt.</p>
+
+<div class=take><b>Der Pfad ist das Risiko, nicht der Endpunkt.</b> Der Index notiert rund 92&nbsp;% aller Handelstage unterhalb eines fr&uuml;heren H&ouml;chststands. Wer die langfristige Aktienrendite vereinnahmen will, bezahlt sie mit zwischenzeitlichen Kursverlusten bis &uuml;ber die H&auml;lfte des Depotwerts &mdash; und mit Wartezeiten von mehreren Jahren, bis das alte Hoch zur&uuml;ck ist.</div>
+
+<div class=kpis>
+<div class="kpi r"><div class=n>&minus;56,8&nbsp;%</div><div class=l>tiefster Drawdown (2009)</div></div>
+<div class="kpi r"><div class=n>92&nbsp;%</div><div class=l>der Zeit unter Wasser</div></div>
+<div class="kpi r"><div class=n>&minus;34&nbsp;%</div><div class=l>Median im 10-J-Halt</div></div>
+<div class=kpi><div class=n>7,5&nbsp;J</div><div class=l>l&auml;ngste Erholung</div></div>
+</div>
+
+<section class=card>
+<h2>Underwater-Kurve</h2>
+<h3>Neue H&ouml;chstst&auml;nde sind die Ausnahme</h3>
+<p>Abstand zum jeweils letzten Allzeithoch (tiefster Punkt je Periode). Der Normalzustand des Marktes ist &bdquo;unter Wasser&ldquo;.</p>
+<div class=chartbox><canvas id=uw></canvas></div>
+<div class=callout>Der Markt steht <b>~92&nbsp;% der Tage unter einem fr&uuml;heren Hoch</b>. Um die langfristigen ~9&ndash;11&nbsp;%/Jahr zu kassieren, waren ein Einbruch von <b>&minus;57&nbsp;%</b> (2008&ndash;09), zwei von rund <b>&minus;49&nbsp;%</b> (1973&ndash;74 und Dotcom) und etliche &minus;20- bis &minus;36-%-R&uuml;ckschl&auml;ge durchzusitzen &mdash; teils <b>5 bis 7,5&nbsp;Jahre</b> lang, bis das alte Hoch zur&uuml;ck war.</div>
+</section>
+
+<section class=card>
+<h2>Historische Tiefpunkte</h2>
+<h3>Die zehn schmerzhaftesten Episoden</h3>
+<p>Von 679 Drawdown-Episoden die zehn tiefsten &mdash; mit Dauer bis zur vollst&auml;ndigen Erholung (neues Hoch).</p>
+<table class=tbl><thead><tr><th>Tiefpunkt</th><th>Tiefe</th><th>vom Hoch</th><th>unter Wasser</th></tr></thead><tbody><tr><td>2009-03</td><td class="v neg">-56.8 %</td><td>2007-10</td><td class=v>5.5 J</td></tr><tr><td>2002-10</td><td class="v neg">-49.1 %</td><td>2000-03</td><td class=v>7.2 J</td></tr><tr><td>1974-10</td><td class="v neg">-48.2 %</td><td>1973-01</td><td class=v>7.5 J</td></tr><tr><td>1970-05</td><td class="v neg">-36.1 %</td><td>1968-11</td><td class=v>3.3 J</td></tr><tr><td>2020-03</td><td class="v neg">-33.9 %</td><td>2020-02</td><td class=v>0.5 J</td></tr><tr><td>1987-12</td><td class="v neg">-33.5 %</td><td>1987-08</td><td class=v>1.9 J</td></tr><tr><td>1962-06</td><td class="v neg">-28.0 %</td><td>1961-12</td><td class=v>1.7 J</td></tr><tr><td>1982-08</td><td class="v neg">-27.1 %</td><td>1980-11</td><td class=v>1.9 J</td></tr><tr><td>2022-10</td><td class="v neg">-25.4 %</td><td>2022-01</td><td class=v>2.0 J</td></tr><tr><td>1966-10</td><td class="v neg">-22.2 %</td><td>1966-02</td><td class=v>1.2 J</td></tr></tbody></table>
+</section>
+
+<section class=card>
+<h2>Zehnjahresfenster</h2>
+<h3>Auch ein 10-Jahres-Halt sch&uuml;tzt nicht vor dem Sturm</h3>
+<p>F&uuml;r jedes der 16.722 <a href="SP500_Statistik_Appendix.html">&uuml;berlappenden 10-Jahres-Fenster</a>: der schlimmste Drawdown, den ein Buy-&amp;-Hold-Anleger in dieser Zeit durchlebte. Wahrscheinlichkeit, mindestens X&nbsp;% Verlust zu erleben:</p>
+<div class=chartbox style=height:300px><canvas id=bars></canvas></div>
+<div class=callout><b>Selbst das ruhigste Jahrzehnt</b> hatte einen Einbruch von <b>&minus;19&nbsp;%</b>. In <b>93&nbsp;%</b> der 10-Jahres-Halte gab es &ge;&minus;20&nbsp;%, in <b>72&nbsp;%</b> &ge;&minus;30&nbsp;%, in <b>38&nbsp;%</b> &ge;&minus;40&nbsp;% und in <b>14&nbsp;%</b> sogar &ge;&minus;50&nbsp;%. Ein gro&szlig;er Drawdown ist nicht das Risiko &mdash; er ist die <b>Eintrittskarte</b>.</div>
+</section>
+
+<section class=card>
+<h2>Einordnung</h2>
+<ul>
+<li><b>Pfad &gt; Endpunkt.</b> Zwei Anleger <a href="SP500_10Jahres_Renditeverteilung.html">mit identischer 10-Jahres-Rendite</a> k&ouml;nnen v&ouml;llig verschiedene N&auml;chte gehabt haben. Wer bei &minus;50&nbsp;% verkauft, realisiert genau den Teil, den die Statistik &bdquo;im Schnitt&ldquo; wegmittelt.</li>
+<li><b>Erholung dauert.</b> <a href="Lebenszyklus_Simulator.html">Nicht der Absturz ruiniert Pl&auml;ne</a>, sondern die Jahre darunter &mdash; vor allem <a href="Geschichts_Stresstest.html">in der Entnahmephase (Sequence Risk)</a>, wenn in einen &minus;50-%-Markt hinein verkauft werden muss.</li>
+<li><b>Real ist es schlimmer.</b> Diese Drawdowns sind nominal. Inflationsbereinigt war das Hoch von 1968 erst Mitte der 1980er, das von 2000 erst ~2013 dauerhaft zur&uuml;ck &mdash; reale &bdquo;unter Wasser&ldquo;-Phasen von 10&ndash;15&nbsp;Jahren.</li>
+</ul>
+</section>
+
+<div class=foot>Eigene Berechnung auf t&auml;glichen Schlusskursen (^GSPC, 1950&ndash;2026, Yahoo Finance). Drawdown = Abstand zum laufenden Allzeithoch. Underwater-Kurve: tiefster Punkt je ~8-Monats-Periode (Troughs exakt). Kursindex ohne Dividenden &mdash; mit reinvestierten Dividenden sind Tiefen etwas geringer, Erholungen etwas schneller.</div>
+</div>
+<script>
+const P={"uw": [["1950-08", -14.0], ["1951-04", -6.5], ["1951-12", -8.1], ["1952-07", -6.4], ["1953-03", -6.8], ["1953-11", -14.8], ["1954-07", -9.0], ["1955-02", -5.9], ["1955-10", -10.6], ["1956-06", -9.8], ["1957-01", -10.6], ["1957-09", -14.6], ["1958-05", -21.5], ["1958-12", -13.1], ["1959-08", -4.4], ["1960-04", -11.9], ["1960-11", -14.0], ["1961-07", -8.9], ["1962-03", -6.5], ["1962-10", -28.0], ["1963-06", -24.9], ["1964-02", -6.5], ["1964-09", -3.2], ["1965-05", -3.5], ["1966-01", -9.6], ["1966-08", -17.0], ["1967-04", -22.2], ["1967-12", -6.6], ["1968-08", -10.1], ["1969-04", -9.6], ["1969-12", -17.7], ["1970-08", -36.1], ["1971-03", -31.0], ["1971-11", -15.0], ["1972-07", -16.8], ["1973-02", -6.7], ["1973-10", -16.4], ["1974-06", -27.7], ["1975-01", -48.2], ["1975-09", -39.3], ["1976-05", -31.7], ["1976-12", -18.0], ["1977-08", -20.1], ["1978-04", -27.7], ["1978-11", -26.1], ["1979-07", -22.3], ["1980-02", -16.9], ["1980-10", -18.3], ["1981-06", -9.9], ["1982-01", -19.7], ["1982-09", -27.1], ["1983-05", -14.3], ["1983-12", -6.9], ["1984-08", -14.4], ["1985-04", -6.4], ["1985-11", -7.7], ["1986-07", -5.8], ["1987-03", -9.4], ["1987-10", -33.2], ["1988-06", -33.5], ["1989-01", -23.7], ["1989-09", -14.7], ["1990-05", -10.2], ["1990-12", -19.9], ["1991-08", -15.6], ["1992-04", -5.6], ["1992-11", -6.2], ["1993-07", -5.0], ["1994-03", -3.7], ["1994-10", -8.9], ["1995-06", -7.6], ["1996-01", -3.7], ["1996-09", -7.6], ["1997-05", -9.6], ["1997-12", -10.8], ["1998-08", -10.4], ["1999-04", -19.3], ["1999-11", -12.1], ["2000-07", -11.2], ["2001-03", -19.2], ["2001-10", -36.8], ["2002-06", -35.2], ["2003-02", -49.1], ["2003-10", -47.6], ["2004-05", -32.6], ["2005-01", -30.4], ["2005-09", -25.5], ["2006-04", -23.0], ["2006-12", -19.9], ["2007-08", -10.0], ["2008-03", -18.6], ["2008-11", -45.8], ["2009-07", -56.8], ["2010-02", -43.8], ["2010-10", -34.7], ["2011-06", -25.5], ["2012-01", -29.8], ["2012-09", -18.3], ["2013-05", -13.5], ["2013-12", -5.8], ["2014-08", -5.8], ["2015-04", -7.4], ["2015-11", -12.4], ["2016-07", -14.2], ["2017-03", -4.8], ["2017-10", -2.8], ["2018-06", -10.2], ["2019-02", -19.8], ["2019-09", -7.5], ["2020-05", -33.9], ["2021-01", -12.9], ["2021-08", -4.2], ["2022-04", -13.0], ["2022-12", -25.4], ["2023-08", -21.1], ["2024-03", -14.2], ["2024-11", -8.5], ["2025-07", -18.9], ["2026-02", -5.1], ["2026-06", -9.1]], "bars": [93, 72, 38, 14]};
+Chart.defaults.font.family="-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif";
+Chart.defaults.color="#57534c";
+Chart.defaults.borderColor="#ece7dd";
+new Chart(document.getElementById('uw'),{type:'line',data:{labels:P.uw.map(p=>p[0]),datasets:[
+ {label:'Drawdown',data:P.uw.map(p=>p[1]),borderColor:'#b91c1c',backgroundColor:'rgba(185,28,28,.12)',borderWidth:1.5,pointRadius:0,fill:true,tension:.1}
+]},options:{maintainAspectRatio:false,scales:{
+ y:{max:0,min:-60,title:{display:true,text:'Abstand zum Allzeithoch (%)'},ticks:{callback:v=>v+'%'},grid:{color:'#ece7dd'}},
+ x:{ticks:{maxTicksLimit:12,callback:function(v){return this.getLabelForValue(v).slice(0,4)}},grid:{display:false}}},
+ plugins:{legend:{display:false},tooltip:{callbacks:{label:it=>'Drawdown: '+it.parsed.y+'%'}}}}});
+new Chart(document.getElementById('bars'),{type:'bar',data:{labels:['mind. -20%','mind. -30%','mind. -40%','mind. -50%'],datasets:[
+ {label:'Wahrscheinlichkeit im 10-J-Halt',data:P.bars,backgroundColor:['#e1a7a2','#d47c79','#c85150','#b91c1c'],borderRadius:5}
+]},options:{maintainAspectRatio:false,scales:{
+ y:{min:0,max:100,title:{display:true,text:'% der 10-Jahres-Fenster'},ticks:{callback:v=>v+'%'},grid:{color:'#ece7dd'}},x:{grid:{display:false}}},
+ plugins:{legend:{display:false},tooltip:{callbacks:{label:it=>it.parsed.y+'% der Fenster'}}}}});
+</script></body></html>
