@@ -77,11 +77,20 @@ window.Profil = (function () {
       return hat ? n : null;
     },
 
-    /* Zahl aus einem Feld lesen, das Tausenderpunkte enthalten kann */
+    /* Zahl aus einem Feld lesen, das Tausenderpunkte enthalten kann.
+       WICHTIG: <input type=number> und type=range liefern laut HTML-Standard
+       immer einen Punkt als DEZIMALtrenner ("20.5"). Die deutsche Lesart, die
+       Punkte als Tausendertrenner entfernt, machte daraus 205 — aus 20,5
+       Entgeltpunkten wurden so 205. Deshalb erst der Feldtyp, dann die Sprache. */
     zahl: function (el) {
       if (!el) return null;
       var s = String(el.value == null ? '' : el.value).trim();
       if (s === '') return null;
+      var typ = (el.type || '').toLowerCase();
+      if (typ === 'number' || typ === 'range') {
+        var n = parseFloat(s.replace(',', '.'));
+        return isFinite(n) ? n : null;
+      }
       s = s.replace(/\./g, '').replace(',', '.').replace(/[^\d.-]/g, '');
       var v = parseFloat(s);
       return isFinite(v) ? v : null;

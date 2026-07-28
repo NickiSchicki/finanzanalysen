@@ -1,10 +1,19 @@
 <!DOCTYPE html><html lang=de><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1">
 <title>Tilgen oder investieren — Sondertilgung gegen Depot</title>
-<link rel=stylesheet href="assets/site.css?v=26">
-<script defer src="assets/site-map.js?v=26"></script>
-<script defer src="assets/datenstand.js?v=26"></script>
-<script defer src="assets/site.js?v=26"></script>
-<script src="assets/de-kapitalertrag.js?v=26"></script>
+<meta name=description content="Der Kredit läuft, und am Monatsende bleibt Geld übrig. In die Sondertilgung damit — oder ins Depot? Die Tilgung wirkt bescheiden: sie bringt nur den Sollzins. Aber sie bringt ihn garantiert und…">
+<meta property=og:type content=article>
+<meta property=og:site_name content=Finanzanalysen>
+<meta property=og:locale content=de_DE>
+<meta property=og:title content="Tilgen oder investieren">
+<meta property=og:description content="Der Kredit läuft, und am Monatsende bleibt Geld übrig. In die Sondertilgung damit — oder ins Depot? Die Tilgung wirkt bescheiden: sie bringt nur den Sollzins. Aber sie bringt ihn garantiert und…">
+<meta property=og:url content="https://nickischicki.github.io/finanzanalysen/Tilgen_oder_Investieren.html">
+<meta name=twitter:card content=summary>
+<link rel=stylesheet href="assets/site.css?v=31">
+<script defer src="assets/site-map.js?v=31"></script>
+<script defer src="assets/datenstand.js?v=31"></script>
+<script defer src="assets/site.js?v=31"></script>
+<script defer src="assets/profil.js?v=31"></script>
+<script src="assets/de-kapitalertrag.js?v=31"></script>
 <style>
 /* seitenspezifisch */
 .wbox .sub2{font-size:11.5px;color:var(--ink-3);margin-top:6px;line-height:1.45}
@@ -364,5 +373,31 @@ function FOOT(tf,pausch,kiSt){
   el.addEventListener('input',function(){fmtInput(el);render();});});
 ['zins_r','jahre_r','rend_r','ter_r'].forEach(function(id){$(id).addEventListener('input',render);});
 render();
+
+
+/* ============ Gemeinsames Profil ============
+   Übernimmt, was im Vermögensbild eingetragen wurde. Bewusst eigenständig:
+   $ und render() der Seiten liegen in IIFEs und sind hier nicht sichtbar —
+   deshalb eigene Helfer und Auslösen der seiteneigenen input-Listener.      */
+(function () {
+  function g(id) { return document.getElementById(id); }
+  function feuer(el, typ) { el.dispatchEvent(new Event(typ, { bubbles: true })); }
+  function setz(id, wert) {
+    var el = g(id); if (!el) return;
+    el.value = (el.classList && el.classList.contains('eurin'))
+      ? Math.round(wert).toLocaleString('de-DE') : wert;
+    feuer(el, 'input'); feuer(el, 'change');
+  }
+  function los() {
+    if (!window.Profil || !Profil.gefuellt()) return;
+    try {
+  /* sparrateMonat gehört auf 'zus' (freies Geld), NICHT auf 'rate' —
+     'rate' ist die Kreditannuität: gleiche Einheit, anderer Sachverhalt. */
+  Profil.vorbelegen({ immoSchuld:'rest', sparrateMonat:'zus' });
+    } catch (e) { /* Vorbelegung darf die Seite nie lahmlegen */ }
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', los);
+  else los();
+})();
 </script>
 </body></html>

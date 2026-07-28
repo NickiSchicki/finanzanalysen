@@ -1,14 +1,22 @@
 <!DOCTYPE html><html lang=de><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1">
 <title>Mein Vermögensbild — alles auf einen Blick</title>
-<link rel=stylesheet href="assets/site.css?v=26">
-<script defer src="assets/site-map.js?v=26"></script>
-<script defer src="assets/datenstand.js?v=26"></script>
-<script defer src="assets/site.js?v=26"></script>
-<script defer src="assets/profil.js?v=26"></script>
-<script defer src="assets/de-rente.js?v=26"></script>
-<script defer src="assets/de-kapitalertrag.js?v=26"></script>
-<script defer src="assets/de-vermoegen.js?v=26"></script>
-<script defer src="assets/reihen.js?v=26"></script>
+<meta name=description content="Einmal eintragen, überall verwenden. Diese Seite führt zusammen, was die einzelnen Rechner getrennt betrachten: die gesetzliche Rente als Fundament, das angesparte Vermögen darauf, die Einordnung…">
+<meta property=og:type content=article>
+<meta property=og:site_name content=Finanzanalysen>
+<meta property=og:locale content=de_DE>
+<meta property=og:title content="Mein Vermögensbild">
+<meta property=og:description content="Einmal eintragen, überall verwenden. Diese Seite führt zusammen, was die einzelnen Rechner getrennt betrachten: die gesetzliche Rente als Fundament, das angesparte Vermögen darauf, die Einordnung…">
+<meta property=og:url content="https://nickischicki.github.io/finanzanalysen/Mein_Vermoegensbild.html">
+<meta name=twitter:card content=summary>
+<link rel=stylesheet href="assets/site.css?v=31">
+<script defer src="assets/site-map.js?v=31"></script>
+<script defer src="assets/datenstand.js?v=31"></script>
+<script defer src="assets/site.js?v=31"></script>
+<script defer src="assets/profil.js?v=31"></script>
+<script defer src="assets/de-rente.js?v=31"></script>
+<script defer src="assets/de-kapitalertrag.js?v=31"></script>
+<script defer src="assets/de-vermoegen.js?v=31"></script>
+<script defer src="assets/reihen.js?v=31"></script>
 <style>
 .two{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 @media(max-width:820px){.two{grid-template-columns:1fr}}
@@ -647,7 +655,36 @@ function zrChart(e,o,ohneEntnahme){
     '<span><i style="background:#059669"></i>am Ende</span>'+
     '<span><i style="background:#c2410c"></i>Projektion aus ② — '+nf1(o.rReal*100)+' % real in <b>jedem</b> Jahr</span>'+
     (e.n-e.durchgehalten>0?'<span><i style="background:#b91c1c"></i>vorzeitig aufgebraucht</span>':'')+
-    '<span class=zrachs>Beachte: beide Felder haben eine <b>eigene</b> Wertachse</span></div>';
+    '<span class=zrachs>Beachte: beide Felder haben eine <b>eigene</b> Wertachse</span></div>'+
+    zrTabelle(e,o);
+}
+
+/* Zahlen-Zwilling zum Diagramm: jeder Wert bleibt ohne Grafik erreichbar.
+   Nach Jahrzehnten des Startjahrs zusammengefasst, sonst wären es 100+ Zeilen. */
+function zrTabelle(e,o){
+  const med=a=>{const v=[...a].sort((x,y)=>x-y),n=v.length;
+    return n===0?null:(n%2?v[(n-1)/2]:(v[n/2-1]+v[n/2])/2);};
+  const d0=Math.floor(e.erstesStartjahr/10)*10, d1=Math.floor(e.letztesStartjahr/10)*10;
+  let zeilen='';
+  for(let d=d0; d<=d1; d+=10){
+    const g=e.laeufe.filter(l=>l.jahr>=d && l.jahr<d+10);
+    if(!g.length) continue;
+    const aus=g.filter(l=>l.pleiteNach!==null).length;
+    zeilen+='<tr><td>'+d+'–'+(d+9)+'</td><td>'+g.length+'</td>'+
+      '<td>'+eur(med(g.map(l=>l.beiRente)))+'</td>'+
+      '<td>'+eur(med(g.map(l=>l.ende)))+'</td>'+
+      '<td'+(aus?' style="color:var(--bad)"':'')+'>'+aus+'</td></tr>';
+  }
+  return '<details class=aufk style="margin-top:10px"><summary>Zahlen zum Diagramm</summary>'+
+    '<div style="overflow-x:auto;margin-top:11px"><table class=tbl>'+
+    '<thead><tr><th>Startjahre</th><th>Läufe</th><th>bei Renteneintritt, Median</th>'+
+    '<th>am Ende, Median</th><th>vorzeitig aufgebraucht</th></tr></thead><tbody>'+zeilen+
+    '<tr class=me><td>alle '+e.erstesStartjahr+'–'+e.letztesStartjahr+'</td><td>'+e.n+'</td>'+
+    '<td>'+eur(e.medianBeiRente)+'</td><td>'+eur(e.median)+'</td>'+
+    '<td>'+(e.n-e.durchgehalten)+'</td></tr>'+
+    '</tbody></table></div>'+
+    '<div class=hlf>Median je Jahrzehnt des <b>Startjahrs</b>, nicht des Kalenderjahrs. '+
+    'Alle Beträge real, in heutiger Kaufkraft; Entnahmen brutto vor Abgeltungsteuer.</div></details>';
 }
 
 /* Woher der Kapitalbedarf kommt — offengelegt statt behauptet, inklusive der

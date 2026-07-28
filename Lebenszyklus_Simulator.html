@@ -1,9 +1,18 @@
 <!DOCTYPE html><html lang=de><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1">
 <title>Lebenszyklus-Simulator — sparen & entnehmen durch die Geschichte</title>
-<link rel=stylesheet href="assets/site.css?v=26">
-<script defer src="assets/site-map.js?v=26"></script>
-<script defer src="assets/datenstand.js?v=26"></script>
-<script defer src="assets/site.js?v=26"></script>
+<meta name=description content="Ansparphase und Entnahmephase gekoppelt, gerechnet auf tatsächlichen realen Renditesequenzen. Datenbasis wahlweise USA (S&amp;P 500, mit CAPE-Startfilter) oder Deutschland mit der langen Historie…">
+<meta property=og:type content=article>
+<meta property=og:site_name content=Finanzanalysen>
+<meta property=og:locale content=de_DE>
+<meta property=og:title content="Ein ganzes Finanzleben, durchgerechnet">
+<meta property=og:description content="Ansparphase und Entnahmephase gekoppelt, gerechnet auf tatsächlichen realen Renditesequenzen. Datenbasis wahlweise USA (S&amp;P 500, mit CAPE-Startfilter) oder Deutschland mit der langen Historie…">
+<meta property=og:url content="https://nickischicki.github.io/finanzanalysen/Lebenszyklus_Simulator.html">
+<meta name=twitter:card content=summary>
+<link rel=stylesheet href="assets/site.css?v=31">
+<script defer src="assets/site-map.js?v=31"></script>
+<script defer src="assets/datenstand.js?v=31"></script>
+<script defer src="assets/site.js?v=31"></script>
+<script defer src="assets/profil.js?v=31"></script>
 <style>
 /* seitenspezifisch */
 .sub{font-weight:400;color:var(--ink-3);font-size:.92em}
@@ -322,5 +331,32 @@ $('sPerp').addEventListener('click',()=>{strat='perp';$('sPerp').classList.add('
 $('bWorst').addEventListener('click',()=>{const d=lastD;if(!d||!d.starts.length)return;let wi=0;d.ends.forEach((e,i)=>{if(e<d.ends[wi])wi=i;});if(d.starts[wi]){$('hy').value=d.starts[wi];render();}});
 $('bBest').addEventListener('click',()=>{const d=lastD;if(!d||!d.starts.length)return;let bi=0;d.ends.forEach((e,i)=>{if(e>d.ends[bi])bi=i;});if(d.starts[bi]){$('hy').value=d.starts[bi];render();}});
 render();
+
+
+/* ============ Gemeinsames Profil ============
+   Übernimmt, was im Vermögensbild eingetragen wurde. Bewusst eigenständig:
+   $ und render() der Seiten liegen in IIFEs und sind hier nicht sichtbar —
+   deshalb eigene Helfer und Auslösen der seiteneigenen input-Listener.      */
+(function () {
+  function g(id) { return document.getElementById(id); }
+  function feuer(el, typ) { el.dispatchEvent(new Event(typ, { bubbles: true })); }
+  function setz(id, wert) {
+    var el = g(id); if (!el) return;
+    el.value = (el.classList && el.classList.contains('eurin'))
+      ? Math.round(wert).toLocaleString('de-DE') : wert;
+    feuer(el, 'input'); feuer(el, 'change');
+  }
+  function los() {
+    if (!window.Profil || !Profil.gefuellt()) return;
+    try {
+  Profil.vorbelegen({ alter:'age', sparrateMonat:'rate', depotWert:'lump' });
+  /* 'ns' sind Sparjahre — im Profil steht ein Renteneintritts-ALTER */
+  var pA = Profil.alter(), pR = +Profil.get('renteAlter'), ns = g('ns');
+  if (pA && pR > pA && ns) setz('ns', Math.min(+ns.max || 50, pR - pA));
+    } catch (e) { /* Vorbelegung darf die Seite nie lahmlegen */ }
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', los);
+  else los();
+})();
 </script>
 </body></html>

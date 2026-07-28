@@ -1,9 +1,18 @@
 <!DOCTYPE html><html lang=de><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1">
 <title>Sparplan-Simulator — 10-Jahres-Blöcke der Geschichte</title>
-<link rel=stylesheet href="assets/site.css?v=26">
-<script defer src="assets/site-map.js?v=26"></script>
-<script defer src="assets/datenstand.js?v=26"></script>
-<script defer src="assets/site.js?v=26"></script>
+<meta name=description content="Was aus einer monatlichen Sparrate in zehn Jahren wird, hängt weniger von der unterstellten Rendite ab als vom Startjahr. Statt einer einzelnen Annahme rechnet dieses Werkzeug jeden historischen…">
+<meta property=og:type content=article>
+<meta property=og:site_name content=Finanzanalysen>
+<meta property=og:locale content=de_DE>
+<meta property=og:title content="Sparplan-Simulator">
+<meta property=og:description content="Was aus einer monatlichen Sparrate in zehn Jahren wird, hängt weniger von der unterstellten Rendite ab als vom Startjahr. Statt einer einzelnen Annahme rechnet dieses Werkzeug jeden historischen…">
+<meta property=og:url content="https://nickischicki.github.io/finanzanalysen/Sparplan_Perzentile.html">
+<meta name=twitter:card content=summary>
+<link rel=stylesheet href="assets/site.css?v=31">
+<script defer src="assets/site-map.js?v=31"></script>
+<script defer src="assets/datenstand.js?v=31"></script>
+<script defer src="assets/site.js?v=31"></script>
+<script defer src="assets/profil.js?v=31"></script>
 <style>
 /* seitenspezifisch */
 .lock{font-size:12px;color:var(--ink-3);background:var(--card-2);border:1px solid var(--rule-soft);border-radius:10px;padding:9px 12px}
@@ -147,5 +156,36 @@ $('dReal').addEventListener('click',()=>{disp='real';render();});
 $('dNom').addEventListener('click',()=>{disp='nom';render();});
 $('infl').addEventListener('input',render);
 render();
+
+
+/* ============ Gemeinsames Profil ============
+   Übernimmt, was im Vermögensbild eingetragen wurde. Bewusst eigenständig:
+   $ und render() der Seiten liegen in IIFEs und sind hier nicht sichtbar —
+   deshalb eigene Helfer und Auslösen der seiteneigenen input-Listener.      */
+(function () {
+  function g(id) { return document.getElementById(id); }
+  function feuer(el, typ) { el.dispatchEvent(new Event(typ, { bubbles: true })); }
+  function setz(id, wert) {
+    var el = g(id); if (!el) return;
+    el.value = (el.classList && el.classList.contains('eurin'))
+      ? Math.round(wert).toLocaleString('de-DE') : wert;
+    feuer(el, 'input'); feuer(el, 'change');
+  }
+  function los() {
+    if (!window.Profil || !Profil.gefuellt()) return;
+    try {
+  Profil.vorbelegen({ sparrateMonat:'rate' });
+  /* 'lump' ist ein Regler mit step=5000 — sonst würde der Depotwert gerundet */
+  var pD = +Profil.get('depotWert'), l = g('lump');
+  if (pD > 0 && l) {
+    l.step = 1;
+    if (pD > +l.max) l.max = Math.ceil(pD / 100000) * 100000;
+    setz('lump', Math.round(pD));
+  }
+    } catch (e) { /* Vorbelegung darf die Seite nie lahmlegen */ }
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', los);
+  else los();
+})();
 </script>
 </body></html>

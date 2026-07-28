@@ -1,14 +1,21 @@
 <!DOCTYPE html><html lang=de><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1">
 <title>Finanzanalysen — was 150 Jahre Marktdaten für dein Geld bedeuten</title>
 <meta name=description content="Ertrag, Preis und Pfad: was Aktien real lieferten, wie teuer der Markt heute steht und was daraus für die eigene Altersvorsorge folgt. Alles nachgerechnet, alles im Browser.">
-<link rel=stylesheet href="assets/site.css?v=26">
-<script defer src="assets/site-map.js?v=26"></script>
-<script defer src="assets/datenstand.js?v=26"></script>
-<script defer src="assets/profil.js?v=26"></script>
-<script defer src="assets/reihen.js?v=26"></script>
-<script defer src="assets/de-rente.js?v=26"></script>
-<script defer src="assets/de-vermoegen.js?v=26"></script>
-<script defer src="assets/site.js?v=26"></script>
+<meta property=og:type content=website>
+<meta property=og:site_name content=Finanzanalysen>
+<meta property=og:locale content=de_DE>
+<meta property=og:title content="Finanzanalysen — 150 Jahre Marktdaten für dein Geld">
+<meta property=og:description content="Ertrag, Preis und Pfad: was Aktien real lieferten, wie teuer der Markt heute steht und was daraus für die eigene Altersvorsorge folgt. Alles nachgerechnet, alles im Browser.">
+<meta property=og:url content="https://nickischicki.github.io/finanzanalysen/">
+<meta name=twitter:card content=summary>
+<link rel=stylesheet href="assets/site.css?v=31">
+<script defer src="assets/site-map.js?v=31"></script>
+<script defer src="assets/datenstand.js?v=31"></script>
+<script defer src="assets/profil.js?v=31"></script>
+<script defer src="assets/reihen.js?v=31"></script>
+<script defer src="assets/de-rente.js?v=31"></script>
+<script defer src="assets/de-vermoegen.js?v=31"></script>
+<script defer src="assets/site.js?v=31"></script>
 <style>
 /* ===== Startseite: eigene Bausteine ======================================= */
 
@@ -137,6 +144,23 @@
 .zrpaar .zb{display:block;font-size:13px;line-height:1.55;color:var(--ink-2)}
 .zrpaar .zo{display:block;font-size:11px;text-transform:uppercase;letter-spacing:.13em;color:var(--accent);
   font-weight:700;margin-top:11px}
+
+/* — Wiedereinstieg: nur sichtbar, wenn schon etwas gelesen wurde — */
+.wied{background:var(--card);border:1px solid var(--rule);border-left:3px solid var(--good);
+  border-radius:0 12px 12px 0;padding:15px 18px;margin:0 0 22px}
+.wied .l{font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.14em;color:var(--ink-3)}
+.wied p{font-size:14px;line-height:1.6;color:var(--ink-2);margin:7px 0 0;max-width:74ch}
+.wied p b{color:var(--ink)}
+.wied a{color:var(--accent);font-weight:600}
+.wied .fort{display:block;height:4px;border-radius:2px;background:var(--card-2);
+  border:1px solid var(--rule-soft);margin-top:11px;overflow:hidden}
+.wied .fort i{display:block;height:100%;background:var(--good)}
+.wied button{font-family:var(--sans);font-size:11.5px;color:var(--ink-3);background:none;border:0;
+  cursor:pointer;text-decoration:underline;padding:0;margin-top:8px}
+.wied button:hover{color:var(--accent)}
+/* Gelesene Kapitel-Chips im roten Faden */
+.fl a.gel{border-color:var(--good);color:var(--ink-2)}
+.fl a.gel::after{content:" ✓";color:var(--good)}
 
 /* — Der rote Faden — */
 .faden{position:relative;padding-left:30px;margin-top:6px}
@@ -304,6 +328,7 @@ Zwei Vorbehalte, die das Bild ehrlich halten: Ab Startjahr <b>1963</b> ging kein
 <!-- ============================ Roter Faden ========================== -->
 <div class=sechead><span class=num>04</span><h2>Der rote Faden</h2><span class=line></span></div>
 <p class=lead style="margin-bottom:20px">Sechs Kapitel, aufeinander aufbauend &mdash; zusammen alle 36 Analysen dieses Projekts. Wer alles lesen will, liest in dieser Reihenfolge.</p>
+<div id=wiedereinstieg></div>
 <div class=faden>
 
 <div class=fst><div class=fk>Kapitel eins</div>
@@ -503,6 +528,40 @@ function aktualisiereBezuege(stand) {
       eur(waechst(1.40)) + ' auf dem Sparbuch und ' + eur(waechst(5.18)) + ' in Aktien — dieselbe Zeit, derselbe Betrag.';
   }
 }
+
+/* ---- Wiedereinstieg: wo der Leser stehen geblieben ist -------------------
+   Der Lesestand liegt in einem eigenen localStorage-Schlüssel (site.js), damit
+   „Angaben löschen" im Profil den Lesepfad nicht mitnimmt.                  */
+bereit(function () {
+  if (typeof Gelesen === 'undefined' || !$('wiedereinstieg')) return;
+  const gel = Gelesen.alle();
+
+  // Kapitel-Chips: gelesene Seiten bekommen einen Haken
+  document.querySelectorAll('.fl a').forEach(a => {
+    if (gel[a.getAttribute('href')]) a.classList.add('gel');
+  });
+
+  const s = Gelesen.stand();
+  if (!s) return;                       // noch nichts gelesen — kein Kasten
+  const anteil = Math.round(100 * s.anzahl / s.gesamt);
+  $('wiedereinstieg').innerHTML =
+    '<div class=wied><div class=l>Dein Lesestand</div>' +
+    '<p>Zuletzt gelesen: <b>' + s.zuletzt.t + '</b>. ' +
+    (s.naechste
+      ? 'Weiter geht es mit <a href="' + s.naechste.f + '">' + s.naechste.t + '</a> (' + s.naechste.s + ').'
+      : 'Damit sind alle ' + s.gesamt + ' Analysen gelesen.') +
+    '</p>' +
+    '<span class=fort><i style="width:' + anteil + '%"></i></span>' +
+    '<p style="font-size:12px;margin-top:7px">' + s.anzahl + ' von ' + s.gesamt + ' Analysen — ' + anteil + ' %. ' +
+    'Der Lesestand liegt nur in diesem Browser. ' +
+    '<button type=button id=leseLeeren>zurücksetzen</button></p></div>';
+  const b = $('leseLeeren');
+  if (b) b.addEventListener('click', () => {
+    Gelesen.leeren();
+    $('wiedereinstieg').innerHTML = '';
+    document.querySelectorAll('.fl a.gel').forEach(a => a.classList.remove('gel'));
+  });
+});
 
 /* ---- Frischezeile aus dem zentralen Datenstand-Register ----------------- */
 bereit(function () {
@@ -846,7 +905,9 @@ $('t_cape').textContent   = nf(D.cape.heute, 1);
    mit Teilprofil wird gerechnet, was rechenbar ist; mit vollem Profil
    erscheint zus&auml;tzlich die Einordnung in der Verm&ouml;gensverteilung.       */
 const MEIN = (function () {
-  const P = (typeof Profil !== 'undefined') ? Profil : null;
+  /* Nicht beim Auswerten dieses Skripts festhalten: profil.js hängt an `defer`
+     und existiert hier noch nicht. Erst zur Laufzeit nachschlagen. */
+  const P = () => (typeof Profil !== 'undefined') ? Profil : null;
   const BEISPIEL = { gj: 1985, brutto: 60000, verm: 120000, rate: 500 };
   const JAHRE_RUHESTAND = 25;
   const EINTRITT = 22;                     // angenommener Beginn der Beitragszeit
@@ -858,7 +919,7 @@ const MEIN = (function () {
     '2.0': 'Was aus einem CAPE um ' + nf(D.cape.heute, 0) + ' historisch folgte: im teuersten Fünftel lag der Median der realen Zehnjahresrendite bei ' + nf(D.cape.quint[4].med, 1) + ' %, ein Fünftel dieser Startjahre verlor real Geld. Ein Szenario, keine Prognose.'
   };
 
-  function zahl(el) { return P ? P.zahl(el) : (parseFloat(String(el.value).replace(/\./g, '').replace(',', '.')) || null); }
+  function zahl(el) { const p = P(); return p ? p.zahl(el) : (parseFloat(String(el.value).replace(/\./g, '').replace(',', '.')) || null); }
   function fmtIn(el) { const raw = String(el.value || '').replace(/\D/g, ''); el.value = raw === '' ? '' : parseInt(raw, 10).toLocaleString('de-DE'); }
 
   /* Wird auch vom Perzentilstreifen und den Bildunterschriften gelesen */
@@ -927,16 +988,17 @@ const MEIN = (function () {
         'wie stark das Ergebnis vom Startjahr abhängt, zeigt der <a href="Geschichts_Stresstest.html" style="color:#fff">Stresstest</a>.</p>' +
       fehlt;
 
-    if (eigen && P) P.merge({ geburtsjahr: gj, bruttoJahr: brutto, sparrateMonat: rate || null });
+    const pm = P();
+    if (eigen && pm) pm.merge({ geburtsjahr: gj, bruttoJahr: brutto, sparrateMonat: rate || null });
     if (typeof aktualisiereBezuege === 'function') aktualisiereBezuege(stand);
   }
 
   function start() {
-    const p = P ? P.get() : {};
+    const pl = P(), p = pl ? pl.get() : {};
     if (p.geburtsjahr != null) $('m_gj').value = String(Math.round(p.geburtsjahr));
     if (p.bruttoJahr != null) $('m_brutto').value = Math.round(p.bruttoJahr).toLocaleString('de-DE');
     if (p.sparrateMonat != null) $('m_rate').value = Math.round(p.sparrateMonat).toLocaleString('de-DE');
-    const nv = P ? P.nettovermoegen() : null;
+    const nv = pl ? pl.nettovermoegen() : null;
     if (nv !== null && nv > 0) $('m_verm').value = Math.round(nv).toLocaleString('de-DE');
 
     ['m_gj', 'm_brutto', 'm_verm', 'm_rate'].forEach(id => {
@@ -956,7 +1018,7 @@ const MEIN = (function () {
     $('m_szen_h').textContent = SZEN_TEXT['4.0'];
 
     $('mein_leeren').addEventListener('click', () => {
-      if (P) P.leeren();
+      const pd = P(); if (pd) pd.leeren();
       ['m_gj', 'm_brutto', 'm_verm', 'm_rate'].forEach(id => $(id).value = '');
       rechne();
     });

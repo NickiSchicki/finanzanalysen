@@ -1,10 +1,19 @@
 <!DOCTYPE html><html lang=de><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1">
 <title>Wo dieses Vermögen in Deutschland steht</title>
-<link rel=stylesheet href="assets/site.css?v=26">
-<script defer src="assets/site-map.js?v=26"></script>
-<script defer src="assets/datenstand.js?v=26"></script>
-<script defer src="assets/site.js?v=26"></script>
-<script src="assets/de-vermoegen.js?v=26"></script>
+<meta name=description content="Ein Nettovermögen ist eine Zahl ohne Maßstab, solange offen bleibt, wie die anderen stehen. Diese Seite ordnet einen Betrag in die Vermögensverteilung der deutschen Haushalte ein: Perzentilrang im…">
+<meta property=og:type content=article>
+<meta property=og:site_name content=Finanzanalysen>
+<meta property=og:locale content=de_DE>
+<meta property=og:title content="Wo dieses Vermögen in Deutschland steht">
+<meta property=og:description content="Ein Nettovermögen ist eine Zahl ohne Maßstab, solange offen bleibt, wie die anderen stehen. Diese Seite ordnet einen Betrag in die Vermögensverteilung der deutschen Haushalte ein: Perzentilrang im…">
+<meta property=og:url content="https://nickischicki.github.io/finanzanalysen/Vermoegen_Einordnung.html">
+<meta name=twitter:card content=summary>
+<link rel=stylesheet href="assets/site.css?v=31">
+<script defer src="assets/site-map.js?v=31"></script>
+<script defer src="assets/datenstand.js?v=31"></script>
+<script defer src="assets/site.js?v=31"></script>
+<script defer src="assets/profil.js?v=31"></script>
+<script src="assets/de-vermoegen.js?v=31"></script>
 <style>
 /* seitenspezifisch */
 .res{display:grid;grid-template-columns:1fr 1fr;gap:12px}
@@ -426,5 +435,40 @@ $('htyp').addEventListener('change',render);
 seg('hgr',v=>hgr=v); seg('reg',v=>reg=v); seg('wohn',v=>wohn=v); seg('skala',v=>scale=v);
 buildStatic();
 render();
+
+
+/* ============ Gemeinsames Profil ============
+   Übernimmt, was im Vermögensbild eingetragen wurde. Bewusst eigenständig:
+   $ und render() der Seiten liegen in IIFEs und sind hier nicht sichtbar —
+   deshalb eigene Helfer und Auslösen der seiteneigenen input-Listener.      */
+(function () {
+  function g(id) { return document.getElementById(id); }
+  function feuer(el, typ) { el.dispatchEvent(new Event(typ, { bubbles: true })); }
+  function setz(id, wert) {
+    var el = g(id); if (!el) return;
+    el.value = (el.classList && el.classList.contains('eurin'))
+      ? Math.round(wert).toLocaleString('de-DE') : wert;
+    feuer(el, 'input'); feuer(el, 'change');
+  }
+  function los() {
+    if (!window.Profil || !Profil.gefuellt()) return;
+    try {
+  /* Alle Geldfelder tragen Demo-Vorgaben. Sobald das Profil einen Vermögenswert
+     kennt, werden die übrigen genullt — sonst mischten sich eigene Zahlen mit
+     Beispielwerten zu einem Phantasievermögen. */
+  var pv = Profil.get();
+  var hat = ['immoWert','bankGuthaben','depotWert','sonstVermoegen','immoSchuld','sonstSchulden']
+              .some(function (k) { return pv[k] != null; });
+  if (hat) {
+    ['imm','bank','wp','lv','sonst','hypo','kredit'].forEach(function (id) { setz(id, 0); });
+    Profil.vorbelegen({ immoWert:'imm', bankGuthaben:'bank', depotWert:'wp',
+                        sonstVermoegen:'sonst', immoSchuld:'hypo', sonstSchulden:'kredit' });
+    var a = Profil.alter(); if (a) setz('alter_r', a);
+  }
+    } catch (e) { /* Vorbelegung darf die Seite nie lahmlegen */ }
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', los);
+  else los();
+})();
 </script>
 </body></html>

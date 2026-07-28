@@ -1,13 +1,22 @@
 <!DOCTYPE html><html lang=de><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1">
 <title>Selbsttest — Rechenkerne und Seitenintegrität</title>
-<link rel=stylesheet href="assets/site.css?v=26">
-<script defer src="assets/site-map.js?v=26"></script>
-<script defer src="assets/datenstand.js?v=26"></script>
-<script defer src="assets/site.js?v=26"></script>
-<script defer src="assets/de-rente.js?v=26"></script>
-<script defer src="assets/de-kapitalertrag.js?v=26"></script>
-<script defer src="assets/de-vermoegen.js?v=26"></script>
-<script defer src="assets/reihen.js?v=26"></script>
+<meta name=description content="Diese Seite prüft die gemeinsamen Rechenbibliotheken gegen bekannte Sollwerte und kontrolliert, ob alle Seiten des Projekts erreichbar und korrekt eingebunden sind. Sie ist nach jedem Umbau…">
+<meta property=og:type content=article>
+<meta property=og:site_name content=Finanzanalysen>
+<meta property=og:locale content=de_DE>
+<meta property=og:title content="Selbsttest der Rechenkerne">
+<meta property=og:description content="Diese Seite prüft die gemeinsamen Rechenbibliotheken gegen bekannte Sollwerte und kontrolliert, ob alle Seiten des Projekts erreichbar und korrekt eingebunden sind. Sie ist nach jedem Umbau…">
+<meta property=og:url content="https://nickischicki.github.io/finanzanalysen/Selbsttest.html">
+<meta name=twitter:card content=summary>
+<link rel=stylesheet href="assets/site.css?v=31">
+<script defer src="assets/site-map.js?v=31"></script>
+<script defer src="assets/datenstand.js?v=31"></script>
+<script defer src="assets/site.js?v=31"></script>
+<script defer src="assets/de-rente.js?v=31"></script>
+<script defer src="assets/de-kapitalertrag.js?v=31"></script>
+<script defer src="assets/de-vermoegen.js?v=31"></script>
+<script defer src="assets/profil.js?v=31"></script>
+<script defer src="assets/reihen.js?v=31"></script>
 <style>
 .sum{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:12px;margin-bottom:22px}
 .sc{background:var(--card);border:1px solid var(--rule);border-radius:12px;padding:15px 17px}
@@ -75,6 +84,17 @@ function run(){
     chk(G1,'Eckrente, Eintritt 2052: Einkommensteuer', s.einkommensteuer, 1398, 1,'97 % steuerpflichtig, Kassenbeiträge als Sonderausgaben');
     chk(G1,'Eckrente, Eintritt 2052: Zahlbetrag nach Steuer', s.nettoMonat, 1561, 1,'1.677 € nach Kassen − 117 € Steuer');
   })();
+
+  // ---------- Gemeinsames Profil ----------
+  const G7='Gemeinsames Profil (profil.js)';
+  const feld=(v,typ)=>({value:v, type:typ, classList:{contains:()=>false}});
+  // type=number liefert laut Standard einen PUNKT als Dezimaltrenner — die
+  // deutsche Lesart machte daraus früher 205 statt 20,5
+  chk(G7,'Dezimalzahl aus type=number', Profil.zahl(feld('20.5','number')), 20.5, 0.0001,'Entgeltpunkte 20,5');
+  chk(G7,'Dezimalzahl aus type=range',  Profil.zahl(feld('67','range')), 67, 0,'Regler liefern immer Punkt-Notation');
+  chk(G7,'Tausenderpunkte aus Textfeld', Profil.zahl(feld('180.000','text')), 180000, 0,'deutsche Schreibweise');
+  chk(G7,'Dezimalkomma aus Textfeld',   Profil.zahl(feld('20,5','text')), 20.5, 0.0001);
+  chk(G7,'Leeres Feld liefert null',    String(Profil.zahl(feld('','text'))), 'null', 0);
 
   // ---------- Historische Reihen ----------
   const G5='Historische Reihen (reihen.js)';
@@ -231,6 +251,33 @@ async function pruefeSeiten(){
       chkTrue(G4,'Startseite nennt die Ausnahme im Text', ohne.every(j=>t.includes(String(j))), ohne.join(' und '));
       chkTrue(G4,'Startseite trägt keine eigene Sequenz-Kopie mehr', !/"us":\[\[1871/.test(t),'Daten kommen aus reihen.js');
     })();
+
+    // Das Versprechen "Die Rechner übernehmen deine Angaben automatisch"
+    // muss von jedem Rechner auch eingelöst werden
+    const RECHNER=['Rentenluecke_Rechner.html','Depot_Steuern_Kosten.html','Vermoegen_Einordnung.html',
+      'Tilgen_oder_Investieren.html','Sparplan_Perzentile.html','Altersvorsorge_Rechner.html',
+      'Lebenszyklus_Simulator.html','Geschichts_Stresstest.html'];
+    const ohneProfil=[], ohneVorbelegung=[];
+    await Promise.all(RECHNER.map(async f=>{
+      try{
+        const txt=await (await fetch(f,{cache:'no-store'})).text();
+        if(!txt.includes('assets/profil.js')) ohneProfil.push(f);
+        if(!txt.includes('Profil.vorbelegen(')) ohneVorbelegung.push(f);
+      }catch(e){ ohneProfil.push(f); }
+    }));
+    chkTrue(G4,'Alle Rechner binden profil.js ein', ohneProfil.length===0,
+      ohneProfil.length?('fehlt: '+ohneProfil.join(', ')):RECHNER.length+' Rechner geprüft');
+    chkTrue(G4,'Alle Rechner belegen aus dem Profil vor', ohneVorbelegung.length===0,
+      ohneVorbelegung.length?('ohne: '+ohneVorbelegung.join(', ')):'das Versprechen der Startseite ist eingelöst');
+    // Metadaten für geteilte Links
+    const ohneMeta=[];
+    await Promise.all(M.map(async p=>{
+      try{ const txt=await (await fetch(p.f,{cache:'no-store'})).text();
+        if(!/property=og:title/.test(txt) || !/name=description/.test(txt)) ohneMeta.push(p.f);
+      }catch(e){ ohneMeta.push(p.f); }
+    }));
+    chkTrue(G4,'Jede Seite trägt Beschreibung und og-Titel', ohneMeta.length===0,
+      ohneMeta.length?('ohne: '+ohneMeta.slice(0,4).join(', ')):M.length+' Seiten mit Vorschau-Metadaten');
 
     chkTrue(G4,'Startseite bindet die Rechenkerne ein',
       t.includes('assets/de-rente.js') && t.includes('assets/de-vermoegen.js') && t.includes('assets/profil.js') && t.includes('assets/reihen.js'),

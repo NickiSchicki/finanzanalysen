@@ -1,10 +1,19 @@
 <!DOCTYPE html><html lang=de><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1">
 <title>Gesetzliche Rente und die Lücke</title>
-<link rel=stylesheet href="assets/site.css?v=26">
-<script defer src="assets/site-map.js?v=26"></script>
-<script defer src="assets/datenstand.js?v=26"></script>
-<script defer src="assets/site.js?v=26"></script>
-<script defer src="assets/de-rente.js?v=26"></script>
+<meta name=description content="Was die Deutsche Rentenversicherung später überweist, folgt einer einzigen Formel: Entgeltpunkte mal Zugangsfaktor mal Rentenwert. Diese Seite rechnet sie durch — bis hinunter zum Zahlbetrag nach…">
+<meta property=og:type content=article>
+<meta property=og:site_name content=Finanzanalysen>
+<meta property=og:locale content=de_DE>
+<meta property=og:title content="Gesetzliche Rente und die Lücke">
+<meta property=og:description content="Was die Deutsche Rentenversicherung später überweist, folgt einer einzigen Formel: Entgeltpunkte mal Zugangsfaktor mal Rentenwert. Diese Seite rechnet sie durch — bis hinunter zum Zahlbetrag nach…">
+<meta property=og:url content="https://nickischicki.github.io/finanzanalysen/Rentenluecke_Rechner.html">
+<meta name=twitter:card content=summary>
+<link rel=stylesheet href="assets/site.css?v=31">
+<script defer src="assets/site-map.js?v=31"></script>
+<script defer src="assets/datenstand.js?v=31"></script>
+<script defer src="assets/site.js?v=31"></script>
+<script defer src="assets/profil.js?v=31"></script>
+<script defer src="assets/de-rente.js?v=31"></script>
 <style>
 /* seitenspezifisch */
 .gap{background:var(--card-2);border:1px solid var(--rule);border-left:3px solid var(--s1);border-radius:0 14px 14px 0;padding:18px 22px;margin:0 0 18px}
@@ -448,5 +457,42 @@ document.addEventListener('DOMContentLoaded', function () {
 
   render();
 });
+
+
+/* ============ Gemeinsames Profil ============
+   Übernimmt, was im Vermögensbild eingetragen wurde. Bewusst eigenständig:
+   $ und render() der Seiten liegen in IIFEs und sind hier nicht sichtbar —
+   deshalb eigene Helfer und Auslösen der seiteneigenen input-Listener.      */
+(function () {
+  function g(id) { return document.getElementById(id); }
+  function feuer(el, typ) { el.dispatchEvent(new Event(typ, { bubbles: true })); }
+  function setz(id, wert) {
+    var el = g(id); if (!el) return;
+    el.value = (el.classList && el.classList.contains('eurin'))
+      ? Math.round(wert).toLocaleString('de-DE') : wert;
+    feuer(el, 'input'); feuer(el, 'change');
+  }
+  function los() {
+    if (!window.Profil || !Profil.gefuellt()) return;
+    try {
+  Profil.vorbelegen({ geburtsjahr:'gj_r', bruttoJahr:'brutto', bedarf:'bedarf' });
+  /* Entgeltpunkte wirken nur mit gesetztem Schalter */
+  var pEP = Profil.get('entgeltpunkte');
+  if (pEP != null && +pEP > 0 && +pEP < 100) {
+    setz('ep_man', pEP);
+    var u = g('ep_use'), b = g('ep_box');
+    if (u && !u.checked) { u.checked = true; feuer(u, 'change'); }
+    if (b) b.classList.add('on');
+  }
+  /* Renteneintritt: Profil in JAHREN, dieser Regler in MONATEN */
+  var pRA = +Profil.get('renteAlter');
+  if (pRA >= 63 && pRA <= 70) setz('beg_r', Math.round(pRA * 12));
+  var br = g('beg_r');
+  if (br) br.addEventListener('change', function () { Profil.set('renteAlter', Math.floor(+this.value / 12)); });
+    } catch (e) { /* Vorbelegung darf die Seite nie lahmlegen */ }
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', los);
+  else los();
+})();
 </script>
 </body></html>

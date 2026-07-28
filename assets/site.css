@@ -76,6 +76,8 @@ body{
 .navgrp a:hover{color:var(--accent)}
 .navgrp a.cur{color:var(--accent);font-weight:700}
 .navgrp a.cur::before{content:"— ";color:var(--accent)}
+/* Gelesene Seiten im Sprungmenü: ein Haken, kein Ausgrauen — Gelesenes bleibt lesbar */
+.navgrp a.gel::after{content:" ✓";color:var(--good);font-size:11px}
 
 /* Weiterlesen + Vor/Zurück am Seitenfuß */
 .sitenav{margin-top:52px;padding-top:30px;border-top:1px solid var(--rule)}

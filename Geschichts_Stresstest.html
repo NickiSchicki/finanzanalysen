@@ -1,9 +1,18 @@
 <!DOCTYPE html><html lang=de><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1">
 <title>Der Geschichts-Stresstest — Entnahmepläne an echten Renditesequenzen</title>
-<link rel=stylesheet href="assets/site.css?v=26">
-<script defer src="assets/site-map.js?v=26"></script>
-<script defer src="assets/datenstand.js?v=26"></script>
-<script defer src="assets/site.js?v=26"></script>
+<meta name=description content="Keine Modellannahmen, sondern echte Renditesequenzen seit 1871 — realer S&amp;P-Total-Return, inklusive Dividenden und Inflation. Die Frage ist nicht, welche Durchschnittsrendite ein Depot erwarten…">
+<meta property=og:type content=article>
+<meta property=og:site_name content=Finanzanalysen>
+<meta property=og:locale content=de_DE>
+<meta property=og:title content="Der Geschichts-Stresstest">
+<meta property=og:description content="Keine Modellannahmen, sondern echte Renditesequenzen seit 1871 — realer S&amp;P-Total-Return, inklusive Dividenden und Inflation. Die Frage ist nicht, welche Durchschnittsrendite ein Depot erwarten…">
+<meta property=og:url content="https://nickischicki.github.io/finanzanalysen/Geschichts_Stresstest.html">
+<meta name=twitter:card content=summary>
+<link rel=stylesheet href="assets/site.css?v=31">
+<script defer src="assets/site-map.js?v=31"></script>
+<script defer src="assets/datenstand.js?v=31"></script>
+<script defer src="assets/site.js?v=31"></script>
+<script defer src="assets/profil.js?v=31"></script>
 <style>
 /* seitenspezifisch */
 .wd{font-size:13px;color:var(--ink-3);margin-top:-4px}
@@ -135,5 +144,30 @@ $('cap').addEventListener('input',()=>{$('cap_r').value=$('cap').value;render();
 $('cap_r').addEventListener('input',()=>{$('cap').value=$('cap_r').value;render();});
 ['rate','hor','sy'].forEach(id=>$(id).addEventListener('input',render));
 render();
+
+
+/* ============ Gemeinsames Profil ============
+   Übernimmt, was im Vermögensbild eingetragen wurde. Bewusst eigenständig:
+   $ und render() der Seiten liegen in IIFEs und sind hier nicht sichtbar —
+   deshalb eigene Helfer und Auslösen der seiteneigenen input-Listener.      */
+(function () {
+  function g(id) { return document.getElementById(id); }
+  function feuer(el, typ) { el.dispatchEvent(new Event(typ, { bubbles: true })); }
+  function setz(id, wert) {
+    var el = g(id); if (!el) return;
+    el.value = (el.classList && el.classList.contains('eurin'))
+      ? Math.round(wert).toLocaleString('de-DE') : wert;
+    feuer(el, 'input'); feuer(el, 'change');
+  }
+  function los() {
+    if (!window.Profil || !Profil.gefuellt()) return;
+    try {
+  /* 'hor' ist eine DAUER, renteAlter ein ALTER — nur das Startkapital passt */
+  Profil.vorbelegen({ depotWert:'cap' });
+    } catch (e) { /* Vorbelegung darf die Seite nie lahmlegen */ }
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', los);
+  else los();
+})();
 </script>
 </body></html>

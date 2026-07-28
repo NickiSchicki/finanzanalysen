@@ -1,10 +1,19 @@
 <!DOCTYPE html><html lang=de><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1">
 <title>Was Steuern und Kosten vom Depot nehmen</title>
-<link rel=stylesheet href="assets/site.css?v=26">
-<script defer src="assets/site-map.js?v=26"></script>
-<script defer src="assets/datenstand.js?v=26"></script>
-<script src="assets/de-kapitalertrag.js?v=26"></script>
-<script defer src="assets/site.js?v=26"></script>
+<meta name=description content="Zwischen der Rendite, die ein Index ausweist, und dem Betrag, der am Ende auf dem Konto landet, liegen zwei Abzüge: die laufenden Kosten des Produkts und die deutsche Kapitalertragsbesteuerung.…">
+<meta property=og:type content=article>
+<meta property=og:site_name content=Finanzanalysen>
+<meta property=og:locale content=de_DE>
+<meta property=og:title content="Was Steuern und Kosten vom Depot nehmen">
+<meta property=og:description content="Zwischen der Rendite, die ein Index ausweist, und dem Betrag, der am Ende auf dem Konto landet, liegen zwei Abzüge: die laufenden Kosten des Produkts und die deutsche Kapitalertragsbesteuerung.…">
+<meta property=og:url content="https://nickischicki.github.io/finanzanalysen/Depot_Steuern_Kosten.html">
+<meta name=twitter:card content=summary>
+<link rel=stylesheet href="assets/site.css?v=31">
+<script defer src="assets/site-map.js?v=31"></script>
+<script defer src="assets/datenstand.js?v=31"></script>
+<script src="assets/de-kapitalertrag.js?v=31"></script>
+<script defer src="assets/site.js?v=31"></script>
+<script defer src="assets/profil.js?v=31"></script>
 <style>
 /* seitenspezifisch */
 .res3{display:grid;grid-template-columns:1fr;gap:12px;margin-bottom:16px}
@@ -580,5 +589,29 @@ $('dNom').addEventListener('click',()=>{disp='nom';upd();});
 $('dReal').addEventListener('click',()=>{disp='real';upd();});
 $('infl').addEventListener('input',upd);
 upd();
+
+
+/* ============ Gemeinsames Profil ============
+   Übernimmt, was im Vermögensbild eingetragen wurde. Bewusst eigenständig:
+   $ und render() der Seiten liegen in IIFEs und sind hier nicht sichtbar —
+   deshalb eigene Helfer und Auslösen der seiteneigenen input-Listener.      */
+(function () {
+  function g(id) { return document.getElementById(id); }
+  function feuer(el, typ) { el.dispatchEvent(new Event(typ, { bubbles: true })); }
+  function setz(id, wert) {
+    var el = g(id); if (!el) return;
+    el.value = (el.classList && el.classList.contains('eurin'))
+      ? Math.round(wert).toLocaleString('de-DE') : wert;
+    feuer(el, 'input'); feuer(el, 'change');
+  }
+  function los() {
+    if (!window.Profil || !Profil.gefuellt()) return;
+    try {
+  Profil.vorbelegen({ depotWert:'einmal', sparrateMonat:'rate' });
+    } catch (e) { /* Vorbelegung darf die Seite nie lahmlegen */ }
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', los);
+  else los();
+})();
 </script>
 </body></html>

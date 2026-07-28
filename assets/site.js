@@ -11,6 +11,36 @@
   function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;'); }
   function here(){ return (location.pathname.split('/').pop() || '00_Start.html'); }
 
+  /* Lesefortschritt: eigener Schlüssel, getrennt vom Profil, damit "Angaben
+     löschen" den Lesepfad nicht mitnimmt. Speichert je Datei den Zeitstempel
+     des letzten Besuchs — daraus wird auf der Startseite der Wiedereinstieg. */
+  var LESE_KEY = 'finanzanalysen.gelesen.v1';
+  window.Gelesen = {
+    alle: function () {
+      try { return JSON.parse(localStorage.getItem(LESE_KEY) || '{}') || {}; }
+      catch (e) { return {}; }
+    },
+    merken: function (datei) {
+      try {
+        var o = this.alle(); o[datei] = Date.now();
+        localStorage.setItem(LESE_KEY, JSON.stringify(o));
+      } catch (e) {}
+    },
+    leeren: function () { try { localStorage.removeItem(LESE_KEY); } catch (e) {} },
+    /* Nächste ungelesene Seite entlang des Lesefadens, plus die zuletzt gelesene */
+    stand: function () {
+      var o = this.alle();
+      var faden = MAP.filter(function (p) { return !p.intern; });
+      var gelesen = faden.filter(function (p) { return o[p.f]; });
+      if (!gelesen.length) return null;
+      var zuletzt = gelesen.reduce(function (a, b) { return o[b.f] > o[a.f] ? b : a; });
+      var i = faden.indexOf(zuletzt), naechste = null;
+      for (var k = i + 1; k < faden.length; k++) { if (!o[faden[k].f]) { naechste = faden[k]; break; } }
+      if (!naechste) for (var j = 0; j < faden.length; j++) { if (!o[faden[j].f]) { naechste = faden[j]; break; } }
+      return { zuletzt: zuletzt, naechste: naechste, anzahl: gelesen.length, gesamt: faden.length };
+    }
+  };
+
   function buildHeader(file, isIndex, section) {
     var h = document.createElement('header');
     h.className = 'sitehead';
@@ -34,8 +64,10 @@
     var html = '<div class="navpanel-in">';
     order.forEach(function (sec) {
       html += '<div class="navgrp"><div class="navgrp-t">' + esc(sec) + '</div>';
+      var gel = window.Gelesen.alle();
       groups[sec].forEach(function (p) {
-        html += '<a href="' + p.f + '"' + (p.f === file ? ' class="cur"' : '') + '>' + esc(p.t) + '</a>';
+        var cls = (p.f === file ? 'cur' : '') + (gel[p.f] ? ' gel' : '');
+        html += '<a href="' + p.f + '"' + (cls.trim() ? ' class="' + cls.trim() + '"' : '') + '>' + esc(p.t) + '</a>';
       });
       html += '</div>';
     });
@@ -118,6 +150,8 @@
       showDatenstand(file, wrap);
       var fn = buildFooterNav(file);
       if (fn) wrap.appendChild(fn);
+      /* Besuch erst hier vermerken: die Startseite selbst zählt nicht als gelesen */
+      if (MAP.some(function (p) { return p.f === file && !p.intern; })) window.Gelesen.merken(file);
     }
   }
 
