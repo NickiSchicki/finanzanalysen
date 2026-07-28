@@ -45,12 +45,13 @@
     return d;
   }
 
-  /* verwandte Seiten: Tag-Überschneidung, gleiche Rubrik zählt leicht mit */
+  /* verwandte Seiten: Tag-Überschneidung, gleiche Rubrik zählt leicht mit.
+     intern markierte Seiten (Selbsttest) erscheinen nicht als Empfehlung. */
   function related(file, n) {
     var me = MAP.filter(function (p) { return p.f === file; })[0];
     if (!me) return [];
     return MAP
-      .filter(function (p) { return p.f !== file; })
+      .filter(function (p) { return p.f !== file && !p.intern; })
       .map(function (p) {
         var shared = p.tags.filter(function (t) { return me.tags.indexOf(t) > -1; }).length;
         return { p: p, score: shared * 2 + (p.s === me.s ? 1 : 0) };
@@ -62,12 +63,15 @@
   }
 
   function buildFooterNav(file) {
+    /* Vor/Zurück läuft nur über den Lesefaden — interne Seiten bleiben außen
+       vor, damit die Synthese das Finale ist und nicht der Selbsttest. */
+    var FADEN = MAP.filter(function (p) { return !p.intern; });
     var idx = -1;
-    MAP.forEach(function (p, i) { if (p.f === file) idx = i; });
+    FADEN.forEach(function (p, i) { if (p.f === file) idx = i; });
     if (idx < 0) return null;
     var rel = related(file, 3);
-    var prev = idx > 0 ? MAP[idx - 1] : null;
-    var next = idx < MAP.length - 1 ? MAP[idx + 1] : null;
+    var prev = idx > 0 ? FADEN[idx - 1] : null;
+    var next = idx < FADEN.length - 1 ? FADEN[idx + 1] : null;
 
     var el = document.createElement('nav');
     el.className = 'sitenav';

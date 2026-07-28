@@ -1,13 +1,13 @@
 <!DOCTYPE html><html lang=de><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1">
 <title>Selbsttest — Rechenkerne und Seitenintegrität</title>
-<link rel=stylesheet href="assets/site.css?v=4">
-<script defer src="assets/site-map.js?v=4"></script>
-<script defer src="assets/datenstand.js?v=4"></script>
-<script defer src="assets/site.js?v=4"></script>
-<script defer src="assets/de-rente.js?v=4"></script>
-<script defer src="assets/de-kapitalertrag.js?v=4"></script>
-<script defer src="assets/de-vermoegen.js?v=4"></script>
-<script defer src="assets/reihen.js?v=14"></script>
+<link rel=stylesheet href="assets/site.css?v=25">
+<script defer src="assets/site-map.js?v=25"></script>
+<script defer src="assets/datenstand.js?v=25"></script>
+<script defer src="assets/site.js?v=25"></script>
+<script defer src="assets/de-rente.js?v=25"></script>
+<script defer src="assets/de-kapitalertrag.js?v=25"></script>
+<script defer src="assets/de-vermoegen.js?v=25"></script>
+<script defer src="assets/reihen.js?v=25"></script>
 <style>
 .sum{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:12px;margin-bottom:22px}
 .sc{background:var(--card);border:1px solid var(--rule);border-radius:12px;padding:15px 17px}
@@ -25,9 +25,9 @@
 .t td.n{color:var(--ink-2)}
 @media(max-width:700px){.t{display:block;overflow-x:auto;white-space:nowrap}}
 </style>
-</head><body data-section="Werkzeug"><div class=wrap>
+</head><body data-section="Selbsttest"><div class=wrap>
 
-<div class=kicker>Werkzeug · Qualitätssicherung</div>
+<div class=kicker>Intern · Qualitätssicherung</div>
 <h1>Selbsttest der <em>Rechenkerne</em></h1>
 <p class=lead>Diese Seite prüft die gemeinsamen Rechenbibliotheken gegen bekannte Sollwerte und kontrolliert, ob alle Seiten des Projekts erreichbar und korrekt eingebunden sind. Sie ist nach jedem Umbau aufzurufen: Was hier rot wird, ist eine Regression.</p>
 
@@ -156,17 +156,22 @@ async function pruefeSeiten(){
   const G4='Seiten und Einbindung';
   const M=window.SITEMAP||[];
   chkTrue(G4,'Sitemap geladen', M.length>0, M.length+' Einträge');
-  let fehlend=[], ohneAssets=[];
+  let fehlend=[], ohneAssets=[], falscheRubrik=[];
   await Promise.all(M.map(async p=>{
     try{
       const r=await fetch(p.f,{cache:'no-store'});
       if(!r.ok){fehlend.push(p.f);return;}
       const t=await r.text();
       if(!t.includes('assets/site.css')||!t.includes('assets/site.js')||!t.includes('assets/site-map.js')) ohneAssets.push(p.f);
+      // Die Rubrik im Seitenkopf (data-section) muss der Sitemap entsprechen —
+      // sonst zeigen Brotkrume und Sprungmenü verschiedene Zuordnungen
+      if(!t.includes('data-section="'+p.s.replace(/&/g,'&amp;')+'"')) falscheRubrik.push(p.f);
     }catch(err){fehlend.push(p.f);}
   }));
   chkTrue(G4,'Alle Seiten der Sitemap erreichbar', fehlend.length===0, fehlend.length?('fehlt: '+fehlend.join(', ')):M.length+' Seiten geprüft');
   chkTrue(G4,'Alle Seiten binden das Design-System ein', ohneAssets.length===0, ohneAssets.length?('ohne: '+ohneAssets.join(', ')):'Stylesheet, Navigation und Sitemap');
+  chkTrue(G4,'Rubrik jeder Seite deckt sich mit der Sitemap', falscheRubrik.length===0,
+    falscheRubrik.length?('abweichend: '+falscheRubrik.join(', ')):'data-section geprüft auf '+M.length+' Seiten');
 
   // Datenstände: nichts darf abgelaufen sein
   const R=window.DATENSTAND||{}, heute=new Date().toISOString().slice(0,10);
@@ -197,23 +202,47 @@ async function pruefeSeiten(){
     const unerreichbar=M.filter(p=>p.f!=='Selbsttest.html' && ziele.indexOf(p.f)<0).map(p=>p.f);
     chkTrue(G4,'Jede Analyse ist von der Startseite aus verlinkt', unerreichbar.length===0,
       unerreichbar.length?('nur im Menü: '+unerreichbar.join(', ')):(M.length-1)+' Analysen im Fließtext erreichbar');
-    // Die Entnahmesimulation der Startseite gegen ihre eigenen Rohreihen gegenrechnen
-    const m=t.match(/const SEQ = (\{[\s\S]*?\});\n/);
-    if(m){
-      const Q=JSON.parse(m[1]);
+    // Die Sequenzrechnung der Startseite kommt jetzt aus reihen.js — hier unabhängig
+    // nachgerechnet, plus die Prüfung, dass der Seitentext die Ausnahmen nennt
+    (function(){
+      const H=30, RATE=0.04;
       const med=a=>{const v=[...a].sort((x,y)=>x-y),n=v.length;return n%2?v[(n-1)/2]:(v[n/2-1]+v[n/2])/2;};
-      const us=Q.us.map(p=>p[1]), de=Q.de.map(p=>p[1]);
-      chk(G4,'Startseite: US-Median der Entnahmesimulation', med(us), Q.statUs.med, 0.005,'Median mit Mittelung bei gerader Anzahl');
-      chk(G4,'Startseite: Zahl der deutschen Ausfälle', de.filter(v=>v===0).length, Q.statDe.pleite, 0,'Startjahre, in denen das Kapital auf null lief');
-      const ohne=Q.de.filter(p=>p[1]===0 && !(p[0]<=1923&&p[0]+Q.H>=1923) && !(p[0]<=1948&&p[0]+Q.H>=1948)).map(p=>p[0]);
-      chk(G4,'Startseite: Ausfälle ohne 1923/1948', ohne.join(','), (Q.ohne1923||[]).join(','), 0,'im Text als Ausnahme benannt');
-      chkTrue(G4,'Startseite nennt die Ausnahme im Text', ohne.every(j=>t.includes(String(j))), ohne.length?ohne.join(' und '):'keine');
-    } else chkTrue(G4,'Startseite: Entnahmesimulation gefunden', false);
+      const lauf=land=>Reihen.lebenszyklus({land:land,aktienAnteil:1,start:1,sparrateJahr:0,jahreAnspar:0,entnahmeJahr:RATE,jahreEntnahme:H}).laeufe;
+      const us=lauf('usa'), de=lauf('de');
+      chk(G4,'Sequenzrechnung: US-Median nach 30 Jahren', med(us.map(l=>l.ende)), 3.325, 0.01,'4 % Entnahme, 100 % Aktien, aus reihen.js');
+      chk(G4,'Sequenzrechnung: deutsche Ausfälle', de.filter(l=>l.pleiteNach!==null).length, 48, 0,'Startjahre, in denen das Kapital auf null lief');
+      const ohne=de.filter(l=>l.pleiteNach!==null && !(l.jahr<=1923&&l.jahr+H>=1923) && !(l.jahr<=1948&&l.jahr+H>=1948)).map(l=>l.jahr);
+      chk(G4,'Sequenzrechnung: Ausfälle ohne 1923/1948', ohne.join(','), '1961,1962', 0,'die zwei Jahrgänge der Aktienbaisse');
+      chkTrue(G4,'Startseite nennt die Ausnahme im Text', ohne.every(j=>t.includes(String(j))), ohne.join(' und '));
+      chkTrue(G4,'Startseite trägt keine eigene Sequenz-Kopie mehr', !/"us":\[\[1871/.test(t),'Daten kommen aus reihen.js');
+    })();
 
     chkTrue(G4,'Startseite bindet die Rechenkerne ein',
-      t.includes('assets/de-rente.js') && t.includes('assets/de-vermoegen.js') && t.includes('assets/profil.js'),
-      'für den personalisierten Block');
+      t.includes('assets/de-rente.js') && t.includes('assets/de-vermoegen.js') && t.includes('assets/profil.js') && t.includes('assets/reihen.js'),
+      'für den personalisierten Block und die Sequenzrechnung');
   }catch(err){ chkTrue(G4,'Startseite erreichbar', false, String(err)); }
+
+  // Eine Quelle für die Reihen: die Kopien in den Werkzeugseiten müssen mit
+  // reihen.js identisch sein — sonst rechnen zwei Seiten stillschweigend
+  // auf verschiedenen Daten
+  const G6='Reihen-Identität (eine Quelle)';
+  const QUELLEN=[
+    {f:'Lebenszyklus_Simulator.html', re:/RS=(\[[-0-9.,]+\])/,   soll:REIHEN.usa.aktien,   was:'US-Aktien'},
+    {f:'Lebenszyklus_Simulator.html', re:/DE_EQ=(\[[-0-9.,]+\])/, soll:REIHEN.de.aktien,   was:'deutsche Aktien'},
+    {f:'Sparplan_Perzentile.html',    re:/R=(\[[-0-9.,]+\])/,     soll:REIHEN.usa.aktien,  was:'US-Aktien'},
+    {f:'Geschichts_Stresstest.html',  re:/R=(\[[-0-9.,]+\])/,     soll:REIHEN.usa.aktien,  was:'US-Aktien'}
+  ];
+  await Promise.all(QUELLEN.map(async q=>{
+    try{
+      const txt=await (await fetch(q.f,{cache:'no-store'})).text();
+      const mm=txt.match(q.re);
+      if(!mm){ chkTrue(G6,q.f+': '+q.was+' gefunden', false); return; }
+      const arr=JSON.parse(mm[1]);
+      const gleich = arr.length===q.soll.length && arr.every((v,i)=>Math.abs(v-q.soll[i])<1e-9);
+      chkTrue(G6,q.f.replace('.html','')+': '+q.was+' identisch mit reihen.js', gleich,
+        arr.length+' Jahreswerte, elementweise verglichen');
+    }catch(err){ chkTrue(G6,q.f+': '+q.was, false, String(err)); }
+  }));
 
   render(); zeigeDatenstaende();
 }
