@@ -1,13 +1,13 @@
 <!DOCTYPE html><html lang=de><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1">
 <title>Selbsttest — Rechenkerne und Seitenintegrität</title>
-<link rel=stylesheet href="assets/site.css?v=25">
-<script defer src="assets/site-map.js?v=25"></script>
-<script defer src="assets/datenstand.js?v=25"></script>
-<script defer src="assets/site.js?v=25"></script>
-<script defer src="assets/de-rente.js?v=25"></script>
-<script defer src="assets/de-kapitalertrag.js?v=25"></script>
-<script defer src="assets/de-vermoegen.js?v=25"></script>
-<script defer src="assets/reihen.js?v=25"></script>
+<link rel=stylesheet href="assets/site.css?v=26">
+<script defer src="assets/site-map.js?v=26"></script>
+<script defer src="assets/datenstand.js?v=26"></script>
+<script defer src="assets/site.js?v=26"></script>
+<script defer src="assets/de-rente.js?v=26"></script>
+<script defer src="assets/de-kapitalertrag.js?v=26"></script>
+<script defer src="assets/de-vermoegen.js?v=26"></script>
+<script defer src="assets/reihen.js?v=26"></script>
 <style>
 .sum{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:12px;margin-bottom:22px}
 .sc{background:var(--card);border:1px solid var(--rule);border-radius:12px;padding:15px 17px}
@@ -60,6 +60,21 @@ function run(){
   chk(G1,'Zugangsfaktor zur Regelaltersgrenze', zugangsfaktor(regelaltersgrenzeMonate(1985),1985), 1.0, 0.0001,'Kein Ab- oder Zuschlag');
   chk(G1,'Zahlbetrag der Eckrente nach KV und Pflege', nettoRente(1913.40,2026,false), 1677.10, 0.05,'Abzüge nach § 249a SGB V, § 59 SGB XI');
   chkTrue(G1,'Kinderlosenzuschlag mindert den Zahlbetrag', nettoRente(1913.40,2026,true) < nettoRente(1913.40,2026,false),'Pflegeversicherung');
+
+  // Einkommensteuertarif § 32a, Stand 2026 — jeder Wert deckt eine andere Tarifzone ab;
+  // der Tarif ist auf jeden Euro identisch mit dem verifizierten des Immobilienrechners
+  chk(G1,'ESt: Grundfreibetrag 2026 bleibt steuerfrei', einkommensteuer(12348,2026), 0, 0,'§ 32a EStG');
+  chk(G1,'ESt: Ende der ersten Progressionszone', einkommensteuer(17799,2026), 1034, 0,'zvE 17.799 €');
+  chk(G1,'ESt: mittlere Progressionszone', einkommensteuer(22459,2026), 2189, 0,'zvE 22.459 € — Beispielrente des Vermögensbilds');
+  chk(G1,'ESt: Proportionalzone 42 %', einkommensteuer(100000,2026), 30864, 0,'0,42 × zvE − 11.135,63');
+  chk(G1,'ESt: Reichensteuer 45 %', einkommensteuer(300000,2026), 115529, 0,'0,45 × zvE − 19.470,38');
+  // Rente nach Steuer: fehlender Freibetrag darf kein NaN mehr erzeugen
+  (function(){
+    const s=nettoRenteNachSteuer(1913.40*12,2026,false,2052);
+    chkTrue(G1,'Rente nach Steuer ohne expliziten Freibetrag rechenbar', isFinite(s.nettoMonat),'Freibetrag wird aus dem Rentenbeginn hergeleitet');
+    chk(G1,'Eckrente, Eintritt 2052: Einkommensteuer', s.einkommensteuer, 1398, 1,'97 % steuerpflichtig, Kassenbeiträge als Sonderausgaben');
+    chk(G1,'Eckrente, Eintritt 2052: Zahlbetrag nach Steuer', s.nettoMonat, 1561, 1,'1.677 € nach Kassen − 117 € Steuer');
+  })();
 
   // ---------- Historische Reihen ----------
   const G5='Historische Reihen (reihen.js)';

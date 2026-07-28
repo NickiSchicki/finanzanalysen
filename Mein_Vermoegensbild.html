@@ -1,14 +1,14 @@
 <!DOCTYPE html><html lang=de><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1">
 <title>Mein Vermögensbild — alles auf einen Blick</title>
-<link rel=stylesheet href="assets/site.css?v=25">
-<script defer src="assets/site-map.js?v=25"></script>
-<script defer src="assets/datenstand.js?v=25"></script>
-<script defer src="assets/site.js?v=25"></script>
-<script defer src="assets/profil.js?v=25"></script>
-<script defer src="assets/de-rente.js?v=25"></script>
-<script defer src="assets/de-kapitalertrag.js?v=25"></script>
-<script defer src="assets/de-vermoegen.js?v=25"></script>
-<script defer src="assets/reihen.js?v=25"></script>
+<link rel=stylesheet href="assets/site.css?v=26">
+<script defer src="assets/site-map.js?v=26"></script>
+<script defer src="assets/datenstand.js?v=26"></script>
+<script defer src="assets/site.js?v=26"></script>
+<script defer src="assets/profil.js?v=26"></script>
+<script defer src="assets/de-rente.js?v=26"></script>
+<script defer src="assets/de-kapitalertrag.js?v=26"></script>
+<script defer src="assets/de-vermoegen.js?v=26"></script>
+<script defer src="assets/reihen.js?v=26"></script>
 <style>
 .two{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 @media(max-width:820px){.two{grid-template-columns:1fr}}
@@ -284,38 +284,75 @@ function auswerten(){
 
   // --- Säule 4: die Lücke ---
   const bedarf=z('p_bedarf')||2500;
-  const luecke=Math.max(0,bedarf-rentenNetto);
+  // --- Steuer auf die gesetzliche Rente (nachgelagerte Besteuerung, § 22 EStG) ---
+  // KV/PV-Beiträge sind Sonderausgaben, der Grundfreibetrag steckt im Tarif.
+  // Annahme: keine weiteren steuerpflichtigen Einkünfte im Ruhestand, keine Kirchensteuer.
+  const beginnJahr = gj + raAlter;
+  const bAnteil = besteuerungsanteil(beginnJahr);
+  const stRente = nettoRenteNachSteuer(rentenBrutto*12, 2026, false, beginnJahr);
+  const estMonat = (stRente.einkommensteuer||0)/12;
+  const renteNachSteuer = rentenNetto - estMonat;
+
+  const luecke=Math.max(0,bedarf-renteNachSteuer);
   // Kapitalbedarf = Barwert einer realen Rente über die gewählte Ruhestandsdauer (Regler)
   // Nominale Rendite und Inflation werden getrennt abgefragt; gerechnet wird real.
   const rNom=(+$('p_rn').value)/100, infl=(+$('p_inf').value)/100;
   const rReal=(1+rNom)/(1+infl)-1;                    // Fisher, nicht rNom − infl
   const jahreRuhestand=+$('p_rd').value, rr=rReal, rAnspar=rReal;
-  const bedarfRente = luecke>0 ? kapitalbedarfBarwert(luecke*12, jahreRuhestand, rr) : 0;
-
-  // Läuft die Kreditrate in den Ruhestand hinein, ist sie zusätzlicher Kapitalbedarf.
-  // Bei Verkauf entfällt sie, weil die Restschuld aus dem Erlös getilgt wird.
-  let restJahreKredit=0, bedarfKredit=0;
-  if(immoS>0 && krate>0 && jahreBisSchuldenfrei!==null && !immoVerkaufen){
-    restJahreKredit = Math.max(0, Math.min(jahreBisSchuldenfrei-jahreBisRente, jahreRuhestand));
-    if(restJahreKredit>0){
-      // Die Annuität ist nominal fest: nominal abzinsen, dann in heutige Kaufkraft umrechnen
-      const bwNominal = rNom>0 ? krate*(1-Math.pow(1+rNom,-restJahreKredit))/rNom : krate*restJahreKredit;
-      bedarfKredit = bwNominal/Math.pow(1+infl, jahreBisRente);
-    }
-  }
-  // Sicherheitspuffer: Betrag, der am Ende noch stehen soll — auf den Renteneintritt abgezinst
-  const puffer = z('p_puffer')||0;
-  const bedarfPuffer = puffer>0 ? puffer/Math.pow(1+rr, jahreRuhestand) : 0;
-  const kapitalbedarf = bedarfRente + bedarfKredit + bedarfPuffer;
   const rate=(z('p_rate')||0)*12;
   const liquide=depot+bank;
-  let projiziert=liquide;
-  for(let i=0;i<jahreBisRente;i++) projiziert=projiziert*(1+rAnspar)+rate;
   // Bei Verkauf kommt der Nettoerlös zum Renteneintritt hinzu.
   // Wertsteigerung: fester historischer Durchschnitt, nicht einstellbar (siehe Hinweis am Umschalter).
   const IMMO_REAL_PA = 0.015;                                   // deutsche Wohnimmobilien, real, 1963–2020
   const immoWertBeiRente = immo * Math.pow(1+IMMO_REAL_PA, jahreBisRente);
   const verkaufserloes = (immo>0 && immoVerkaufen) ? Math.max(0, immoWertBeiRente-restschuld) : 0;
+
+  // --- Steuer auf die Depot-Entnahme -------------------------------------
+  // Besteuert wird der NOMINALE Gewinnanteil jeder Entnahme (Abgeltungsteuer
+  // inkl. Soli, nach 30 % Teilfreistellung für Aktienfonds). Der Gewinnanteil
+  // des Topfs bei Rentenbeginn wird nominal fortgeschrieben; das heutige Depot
+  // zählt als Anschaffungskosten, der Immobilienerlös ist nach § 23 steuerfrei
+  // und wirkt wie eine Einzahlung. Sparer-Pauschbetrag bleibt unberücksichtigt.
+  let topfNom=liquide, einzNom=liquide;
+  for(let t=0;t<jahreBisRente;t++){
+    const rateNom = rate*Math.pow(1+infl,t);          // reale Sparrate nominal wachsend
+    topfNom = topfNom*(1+rNom)+rateNom; einzNom += rateNom;
+  }
+  const verkNom = verkaufserloes*Math.pow(1+infl,jahreBisRente);
+  topfNom += verkNom; einzNom += verkNom;
+  const gewinnanteil = topfNom>0 ? Math.max(0,(topfNom-einzNom)/topfNom) : 0;
+  // Der Anschaffungskosten-Anteil des Topfs fällt in der Entnahmephase mit der
+  // nominalen Rendite weiter — unabhängig von der Entnahmehöhe. Der Steuersatz
+  // je Entnahme steigt deshalb Jahr für Jahr; ein konstanter Satz würde den
+  // Bedarf systematisch untertreiben.
+  const basisAnteil0 = 1 - gewinnanteil;
+  const sSatz = j => Math.min(0.9, Math.max(0, 1 - basisAnteil0/Math.pow(1+rNom, j)))
+                     * gesamtsatz(0) * (1 - KAP.teilfreistellung.aktienfonds);
+  const entnSteuer = sSatz(1);                                        // Satz im ersten Ruhestandsjahr
+  const gewinnEnde = Math.min(1, Math.max(0, 1 - basisAnteil0/Math.pow(1+rNom, jahreRuhestand)));
+
+  // Kapitalbedarf der Lücke: jahresgenaue Brutto-Entnahmen, real abgezinst —
+  // netto konstant, brutto steigend
+  let bedarfRente=0;
+  if(luecke>0) for(let j=1;j<=jahreRuhestand;j++) bedarfRente += luecke*12/(1-sSatz(j))/Math.pow(1+rr,j);
+  const bwNetto = luecke>0 ? kapitalbedarfBarwert(luecke*12, jahreRuhestand, rr) : 0;
+  const bruttoFaktorEff = bwNetto>0 ? bedarfRente/bwNetto : 1;        // mittlerer Aufschlag, für die Anzeige
+  const lueckeBrutto = luecke*bruttoFaktorEff;
+
+  // Läuft die Kreditrate in den Ruhestand hinein, ist sie zusätzlicher Kapitalbedarf —
+  // auch sie wird aus versteuerten Entnahmen bezahlt, deshalb brutto (jahresgenau).
+  let restJahreKredit=0, bedarfKredit=0;
+  if(immoS>0 && krate>0 && jahreBisSchuldenfrei!==null && !immoVerkaufen){
+    restJahreKredit = Math.max(0, Math.min(jahreBisSchuldenfrei-jahreBisRente, jahreRuhestand));
+    for(let j=1;j<=restJahreKredit;j++)
+      bedarfKredit += krate/Math.pow(1+infl, jahreBisRente+j)/(1-sSatz(j))/Math.pow(1+rr,j);
+  }
+  // Sicherheitspuffer: Betrag, der am Ende noch stehen soll — auf den Renteneintritt abgezinst
+  const puffer = z('p_puffer')||0;
+  const bedarfPuffer = puffer>0 ? puffer/Math.pow(1+rr, jahreRuhestand) : 0;
+  const kapitalbedarf = bedarfRente + bedarfKredit + bedarfPuffer;
+  let projiziert=liquide;
+  for(let i=0;i<jahreBisRente;i++) projiziert=projiziert*(1+rAnspar)+rate;
   projiziert += verkaufserloes;
   const deckung = kapitalbedarf>0 ? Math.min(1.5,projiziert/kapitalbedarf) : 1;
 
@@ -323,11 +360,11 @@ function auswerten(){
   // Reihenfolge Verzinsung -> Entnahme am Jahresende, damit die Simulation exakt zur
   // nachschüssigen Barwertformel des Kapitalbedarfs passt (Deckung 100 % => Rest = Puffer).
   let rest=projiziert, pleiteNach=null;
-  const entnahmeJahr=luecke*12;
+  const entnahmeNetto=luecke*12;
   for(let t=1;t<=jahreRuhestand;t++){
-    let abfluss=entnahmeJahr;
-    // Kreditrate real: nominal fest, deshalb mit den Jahren real abnehmend
-    if(t<=restJahreKredit) abfluss += krate/Math.pow(1+infl, jahreBisRente+t);
+    let abfluss=entnahmeNetto/(1-sSatz(t));
+    // Kreditrate real: nominal fest, deshalb mit den Jahren real abnehmend — brutto entnommen
+    if(t<=restJahreKredit) abfluss += krate/(1-sSatz(t))/Math.pow(1+infl, jahreBisRente+t);
     rest = rest*(1+rr) - abfluss;
     if(rest<=0){ pleiteNach=t; rest=0; break; }
   }
@@ -336,8 +373,11 @@ function auswerten(){
   $('bild').innerHTML=
    '<div class=station><b>①</b> Dein Stand heute</div>'+
    '<div class=saeulen>'+
-   '<div class="sae a"><div class=l>Gesetzliche Rente mit '+raAlter+'</div><div class=v>'+eur(rentenNetto)+'</div>'+
-     '<div class=s>Zahlbetrag nach Kranken- und Pflegeversicherung · Zugangsfaktor '+zf.toLocaleString('de-DE',{minimumFractionDigits:3,maximumFractionDigits:3})+
+   '<div class="sae a"><div class=l>Gesetzliche Rente mit '+raAlter+', nach Steuer</div><div class=v>'+eur(renteNachSteuer)+'</div>'+
+     '<div class=s>Zahlbetrag '+eur(rentenNetto)+' nach Kranken- und Pflegeversicherung, davon gehen '+
+     (estMonat>0.5?'<b>'+eur(estMonat)+' Einkommensteuer</b> ab ('+Math.round(bAnteil*100)+' % steuerpflichtig bei Eintritt '+beginnJahr+')'
+                  :'praktisch keine Einkommensteuer ab')+
+     ' · Zugangsfaktor '+zf.toLocaleString('de-DE',{minimumFractionDigits:3,maximumFractionDigits:3})+
      (raAlter<regelalter?' (Abschlag)':(raAlter>regelalter?' (Zuschlag)':''))+'<br>'+
      '<b>'+ep1(epGesamt)+' Entgeltpunkte</b> = '+ep1(epJetzt)+' bereits erworben'+(epSelbstAngegeben?' (deine Angabe)':' (geschätzt)')+
      ' + <b>'+ep1(epKuenftig)+' bis '+raAlter+'</b>'+(jahreBisRente>0?' ('+jahreBisRente+' Jahre × '+ep1(epJahr)+')':'')+'</div></div>'+
@@ -350,9 +390,10 @@ function auswerten(){
    '<div class=saeulen>'+
    '<div class="sae d"><div class=l>Lücke zum Wunsch von '+eur(bedarf)+'</div><div class=v>'+(luecke>0?eur(luecke):'gedeckt')+'</div>'+
      '<div class=s>'+(kapitalbedarf>0
-       ? (luecke>0?'pro Monat · ':'Die Rente deckt den Wunsch, aber ')+'nötiges Kapital rund <b>'+eur(kapitalbedarf)+'</b>'+
-         (bedarfKredit>0?' — darin '+eur(bedarfKredit)+' für die Kreditrate, die noch '+restJahreKredit+' Jahre weiterläuft':'')
-       : 'Die gesetzliche Rente deckt den Wunsch bereits')+'</div></div>'+
+       ? (luecke>0?'pro Monat, gegen die Rente <b>nach Steuer</b> · ':'Die Rente deckt den Wunsch auch nach Steuer, aber ')+'nötiges Kapital rund <b>'+eur(kapitalbedarf)+'</b>'+
+         (entnSteuer>0.001?' — Entnahmen brutto gerechnet, weil der Gewinnanteil versteuert wird':'')+
+         (bedarfKredit>0?' · darin '+eur(bedarfKredit)+' für die Kreditrate, die noch '+restJahreKredit+' Jahre weiterläuft':'')
+       : 'Die gesetzliche Rente deckt den Wunsch auch nach Steuer bereits')+'</div></div>'+
    '<div class="sae e"><div class=l>Voraussichtliches Erbe nach '+jahreRuhestand+' Jahren</div>'+
      '<div class=v'+(pleiteNach!==null?' style="color:var(--bad)"':'')+'>'+(pleiteNach!==null?'0 €':eur(erbe))+'</div>'+
      '<div class=s>'+(pleiteNach!==null
@@ -367,11 +408,17 @@ function auswerten(){
    '</div>'+
    (kapitalbedarf>0?deckungsBalken(projiziert,kapitalbedarf,deckung,jahreBisRente)+
      '<details class=aufk><summary>Wie sich Bedarf und Projektion errechnen</summary>'+
-     herleitung(luecke,jahreRuhestand,rr,kapitalbedarf,rAnspar,jahreBisRente,liquide,rate,verkaufserloes,bedarfRente,bedarfKredit,restJahreKredit,krate/12,bedarfPuffer,puffer)+
+     herleitung({luecke:luecke, lueckeBrutto:lueckeBrutto, jahre:jahreRuhestand, rz:rr, bedarf:kapitalbedarf,
+       rAnspar:rAnspar, jahreBis:jahreBisRente, liquide:liquide, rate:rate, verk:verkaufserloes,
+       bRente:bedarfRente, bKredit:bedarfKredit, kJahre:restJahreKredit, kRate:krate/12,
+       bPuffer:bedarfPuffer, puffer:puffer, bedarfWunsch:bedarf, renteKV:rentenNetto,
+       estMonat:estMonat, bAnteil:bAnteil, beginnJahr:beginnJahr,
+       entnSteuer:entnSteuer, gewinnanteil:gewinnanteil, gewinnEnde:gewinnEnde, sEnde:sSatz(jahreRuhestand)})+
      '</details>':'')+
    zeitreihenTest({liquide:liquide, rate:rate, jahreBisRente:jahreBisRente, verkaufserloes:verkaufserloes,
-     entnahmeJahr:entnahmeJahr, jahreRuhestand:jahreRuhestand, restJahreKredit:restJahreKredit,
-     krate:krate, infl:infl, projiziert:projiziert, rReal:rReal});
+     lueckeNetto:luecke*12, sSatz:sSatz, jahreRuhestand:jahreRuhestand, restJahreKredit:restJahreKredit,
+     krate:krate, infl:infl, projiziert:projiziert, rReal:rReal,
+     entnSteuer:entnSteuer});
 
   // Renditehinweis: was real übrig bleibt, plus historische Einordnung
   let ein='';
@@ -402,8 +449,8 @@ function auswerten(){
 
   const kredZusatz = bedarfKredit>0 ? ' (davon <b>'+eur(bedarfKredit)+'</b> für die Kreditrate, die noch '+restJahreKredit+' Jahre läuft)' : '';
   $('take').innerHTML = luecke>0
-    ? 'Mit '+alter+' Jahren und '+eur(brutto)+' Brutto stehen zum Renteneintritt mit '+raAlter+' rund <b>'+eur(rentenNetto)+'</b> gesetzliche Rente im Monat zu buche. Vom Wunsch über '+eur(bedarf)+' fehlen damit <b>'+eur(luecke)+' im Monat</b> — dafür braucht es etwa <b>'+eur(kapitalbedarf)+'</b> eigenes Kapital'+kredZusatz+'. Bei der aktuellen Sparrate wären zum Rentenbeginn voraussichtlich <b>'+eur(projiziert)+'</b> vorhanden — '+(projiziert>=kapitalbedarf ? 'das <b>'+(projiziert/kapitalbedarf).toLocaleString('de-DE',{maximumFractionDigits:1})+'-fache</b> des Nötigen.' : 'also <b>'+p1(projiziert/kapitalbedarf)+'</b> des Nötigen.')
-    : 'Mit '+alter+' Jahren und '+eur(brutto)+' Brutto deckt die gesetzliche Rente von rund <b>'+eur(rentenNetto)+'</b> den Wunsch über '+eur(bedarf)+' bereits ab.'+(bedarfKredit>0 ? ' Allerdings läuft die Kreditrate noch '+restJahreKredit+' Jahre in den Ruhestand hinein — dafür werden rund <b>'+eur(bedarfKredit)+'</b> eigenes Kapital gebraucht.' : ' Alles darüber hinaus Angesparte ist Zusatz.');
+    ? 'Mit '+alter+' Jahren und '+eur(brutto)+' Brutto bleiben zum Renteneintritt mit '+raAlter+' von der gesetzlichen Rente <b>'+eur(renteNachSteuer)+'</b> im Monat — nach Kassenbeiträgen'+(estMonat>0.5?' und <b>'+eur(estMonat)+' Einkommensteuer</b>':'')+'. Vom Wunsch über '+eur(bedarf)+' fehlen damit <b>'+eur(luecke)+' im Monat</b> — dafür braucht es etwa <b>'+eur(kapitalbedarf)+'</b> eigenes Kapital'+(entnSteuer>0.001?' (Entnahmen brutto, weil der Gewinnanteil versteuert wird)':'')+kredZusatz+'. Bei der aktuellen Sparrate wären zum Rentenbeginn voraussichtlich <b>'+eur(projiziert)+'</b> vorhanden — '+(projiziert>=kapitalbedarf ? 'das <b>'+(projiziert/kapitalbedarf).toLocaleString('de-DE',{maximumFractionDigits:1})+'-fache</b> des Nötigen.' : 'also <b>'+p1(projiziert/kapitalbedarf)+'</b> des Nötigen.')
+    : 'Mit '+alter+' Jahren und '+eur(brutto)+' Brutto deckt die gesetzliche Rente von <b>'+eur(renteNachSteuer)+'</b> nach Kassenbeiträgen und Steuer den Wunsch über '+eur(bedarf)+' bereits ab.'+(bedarfKredit>0 ? ' Allerdings läuft die Kreditrate noch '+restJahreKredit+' Jahre in den Ruhestand hinein — dafür werden rund <b>'+eur(bedarfKredit)+'</b> eigenes Kapital gebraucht.' : ' Alles darüber hinaus Angesparte ist Zusatz.');
   // Der Härtetest aus ③ gehört mit ins Fazit — eine Box, ein Urteil
   if(ZR.ergebnis){
     const z=ZR.ergebnis;
@@ -447,7 +494,7 @@ function zeitreihenTest(o){
     start:o.liquide, sparrateJahr:o.rate, jahreAnspar:o.jahreBisRente,
     einmalBeiRente:o.verkaufserloes,
     // Die Kreditrate ist nominal fest und wiegt real mit den Jahren leichter
-    entnahmeJahr:j=>o.entnahmeJahr + (j<=o.restJahreKredit ? o.krate/Math.pow(1+o.infl,o.jahreBisRente+j) : 0),
+    entnahmeJahr:j=>o.lueckeNetto/(1-o.sSatz(j)) + (j<=o.restJahreKredit ? o.krate/(1-o.sSatz(j))/Math.pow(1+o.infl,o.jahreBisRente+j) : 0),
     jahreEntnahme:o.jahreRuhestand
   });
 
@@ -472,7 +519,7 @@ function zeitreihenTest(o){
   const quote=Math.round(e.quote*100), gescheitert=e.n-e.durchgehalten;
   const farbe = quote===100?'var(--good)':(quote>=90?'var(--warn)':'var(--bad)');
   // Ohne Entnahme ist eine Erfolgsquote ohne Aussage — dann wird der Test zum Wachstumsvergleich
-  const ohneEntnahme = o.entnahmeJahr<1 && o.restJahreKredit===0;
+  const ohneEntnahme = o.lueckeNetto<1 && o.restJahreKredit===0;
   const trag = ohneEntnahme ? tragfaehig(o) : null;   // einmal suchen, zweimal verwenden
   // Kurzform für das Fazit ganz oben auf der Seite — die eine Fazit-Box der Seite
   ZR.ergebnis = ohneEntnahme
@@ -482,12 +529,12 @@ function zeitreihenTest(o){
   return kopf+'<div class=zr>'+
    '<p>Alles oben rechnet mit <b>einer</b> gleichbleibenden Rendite — so verläuft kein Anlegerleben. '+
    'Hier läuft derselbe Plan durch <b>jede tatsächliche Renditefolge seit '+e.erstesStartjahr+'</b>: '+
-   o.jahreBisRente+' Jahre ansparen, '+o.jahreRuhestand+' Jahre '+(ohneEntnahme?'liegen lassen':'entnehmen')+
+   o.jahreBisRente+' Jahre ansparen, '+o.jahreRuhestand+' Jahre '+(ohneEntnahme?'liegen lassen':'entnehmen — die Brutto-Lücke aus ②, also nach Steuern')+
    ' — einmal je Startjahr, '+e.n+' Durchläufe, real gerechnet.</p>'+
    steuer+
    '<div class=zrerg>'+
      (ohneEntnahme
-       ? '<div><div class=l>Trägt zusätzlich zur Rente</div><div class=v style="color:var(--good)">'+eur(trag.sicher)+'</div>'+
+       ? '<div><div class=l>Trägt zusätzlich zur Rente, nach Steuern</div><div class=v style="color:var(--good)">'+eur(trag.sicher)+'</div>'+
          '<div class=s>im Monat, '+o.jahreRuhestand+' Jahre lang, und zwar in <b>jedem</b> der '+e.n+' Startjahre · in 90 % waren '+eur(trag.neunzig)+' drin</div></div>'
        : '<div><div class=l>Hätte gehalten in</div><div class=v style="color:'+farbe+'">'+quote+' %</div>'+
            '<div class=s>'+e.durchgehalten+' von '+e.n+' Startjahren'+(gescheitert?' · in '+gescheitert+' ging das Geld vorher aus':'')+'</div></div>')+
@@ -513,7 +560,7 @@ function zeitreihenTest(o){
 function tragfaehig(o){
   const lauf=m=>Reihen.lebenszyklus({land:ZR.land,aktienAnteil:ZR.aktien,
     start:o.liquide, sparrateJahr:o.rate, jahreAnspar:o.jahreBisRente,
-    einmalBeiRente:o.verkaufserloes, entnahmeJahr:m*12, jahreEntnahme:o.jahreRuhestand});
+    einmalBeiRente:o.verkaufserloes, entnahmeJahr:j=>m*12/(1-o.sSatz(j)), jahreEntnahme:o.jahreRuhestand});
   const suche=ziel=>{let lo=0,hi=20000;
     for(let i=0;i<20;i++){const m=(lo+hi)/2; const q=lauf(m); if(q&&q.quote>=ziel) lo=m; else hi=m;}
     return lo;};
@@ -603,37 +650,46 @@ function zrChart(e,o,ohneEntnahme){
     '<span class=zrachs>Beachte: beide Felder haben eine <b>eigene</b> Wertachse</span></div>';
 }
 
-/* Woher der Kapitalbedarf kommt — offengelegt statt behauptet */
-function herleitung(luecke,jahre,rz,bedarf,rAnspar,jahreBis,liquide,rate,verk,bRente,bKredit,kJahre,kRate,bPuffer,puffer){
-  const jl=luecke*12;
-  const ohneRendite=jl*jahre;
-  const rzT=(rz*100).toLocaleString('de-DE',{minimumFractionDigits:1,maximumFractionDigits:1});
+/* Woher der Kapitalbedarf kommt — offengelegt statt behauptet, inklusive der
+   beiden Steuern: Einkommensteuer auf die Rente, Abgeltungsteuer auf Entnahmen. */
+function herleitung(H){
+  const jl=H.lueckeBrutto*12;
+  const ohneRendite=jl*H.jahre;
+  const pz=x=>(x*100).toLocaleString('de-DE',{minimumFractionDigits:1,maximumFractionDigits:1})+' %';
+  const rzT=pz(H.rz).replace(' %','');
   return '<div class=herl>'+
    '<table class=hltab><tbody>'+
-   (luecke>0?
-     '<tr><td>Monatliche Lücke</td><td class=r>'+eur(luecke)+'</td></tr>'+
-     '<tr><td>× 12 Monate = jährlicher Bedarf</td><td class=r>'+eur(jl)+'</td></tr>'+
-     '<tr><td>× '+jahre+' Jahre Ruhestand, ohne jede Rendite</td><td class=r>'+eur(ohneRendite)+'</td></tr>'+
-     '<tr'+((bKredit>0||bPuffer>0)?'':' class=erg')+'><td>Barwert bei '+rzT+' % <b>realer</b> Rendite auf das verbleibende Kapital</td><td class=r>'+eur(bRente)+'</td></tr>'
+   (H.luecke>0?
+     '<tr><td>Wunsch-Nettorente</td><td class=r>'+eur(H.bedarfWunsch)+'</td></tr>'+
+     '<tr><td>gesetzliche Rente nach Kranken- und Pflegeversicherung</td><td class=r>'+eur(H.renteKV)+'</td></tr>'+
+     (H.estMonat>0.5?'<tr><td>− Einkommensteuer auf die Rente ('+Math.round(H.bAnteil*100)+' % steuerpflichtig, Eintritt '+H.beginnJahr+')</td><td class=r>'+eur(H.estMonat)+'</td></tr>':'')+
+     '<tr><td><b>= monatliche Lücke</b>, Wunsch gegen Rente nach Steuer</td><td class=r>'+eur(H.luecke)+'</td></tr>'+
+     (H.entnSteuer>0.001?'<tr><td>+ Entnahmesteuer: der Gewinnanteil steigt von ~'+Math.round(H.gewinnanteil*100)+' % auf ~'+Math.round(H.gewinnEnde*100)+' % → <b>brutto im Mittel</b></td><td class=r>'+eur(H.lueckeBrutto)+'</td></tr>':'')+
+     '<tr><td>× 12 Monate = jährliche Entnahme (Durchschnitt)</td><td class=r>'+eur(jl)+'</td></tr>'+
+     '<tr><td>× '+H.jahre+' Jahre Ruhestand, ohne jede Rendite</td><td class=r>'+eur(ohneRendite)+'</td></tr>'+
+     '<tr'+((H.bKredit>0||H.bPuffer>0)?'':' class=erg')+'><td>Barwert bei '+rzT+' % <b>realer</b> Rendite auf das verbleibende Kapital</td><td class=r>'+eur(H.bRente)+'</td></tr>'
     :'')+
-   (bKredit>0?
-     '<tr><td>Kreditrate '+eur(kRate)+' im Monat, die noch '+kJahre+' Jahre in den Ruhestand hineinläuft</td><td class=r>'+eur(bKredit)+'</td></tr>'
+   (H.bKredit>0?
+     '<tr><td>Kreditrate '+eur(H.kRate)+' im Monat, die noch '+H.kJahre+' Jahre in den Ruhestand hineinläuft — brutto entnommen</td><td class=r>'+eur(H.bKredit)+'</td></tr>'
     :'')+
-   (bPuffer>0?
-     '<tr><td>Sicherheitspuffer '+eur(puffer)+', der am Ende noch stehen soll — auf den Renteneintritt abgezinst</td><td class=r>'+eur(bPuffer)+'</td></tr>'
+   (H.bPuffer>0?
+     '<tr><td>Sicherheitspuffer '+eur(H.puffer)+', der am Ende noch stehen soll — auf den Renteneintritt abgezinst</td><td class=r>'+eur(H.bPuffer)+'</td></tr>'
     :'')+
-   ((bKredit>0||bPuffer>0)?
-     '<tr class=erg><td>Kapitalbedarf insgesamt</td><td class=r>'+eur(bedarf)+'</td></tr>'
+   ((H.bKredit>0||H.bPuffer>0)?
+     '<tr class=erg><td>Kapitalbedarf insgesamt</td><td class=r>'+eur(H.bedarf)+'</td></tr>'
     :'')+
    '</tbody></table>'+
-   (luecke>0?'<div class=hlf>Formel: Bedarf = Jahresbetrag × (1 − (1 + r)<sup>−n</sup>) ÷ r — der Barwert einer über '+jahre+' Jahre real gleichbleibenden Entnahme. '+
-   'Weil das Restkapital weiterarbeitet, liegt der Bedarf um '+eur(ohneRendite-bRente)+' unter der reinen Summe der Entnahmen. '+
-   (bPuffer>0
-     ? 'Am Ende der '+jahre+' Jahre bleibt planmäßig der Sicherheitspuffer von '+eur(puffer)+' stehen — dafür ist der Bedarf um '+eur(bPuffer)+' höher.'
-     : 'Das Kapital ist am Ende der '+jahre+' Jahre planmäßig aufgebraucht.')+'</div>':'')+
-   (bKredit>0?'<div class=hlf>Die Kreditrate ist <b>nominal fest</b> — sie wird deshalb nominal abgezinst und anschließend in heutige Kaufkraft umgerechnet. Dadurch wiegt sie mit den Jahren real leichter. Wird die Immobilie zum Renteneintritt verkauft, entfällt dieser Posten, weil die Restschuld aus dem Erlös getilgt wird.</div>':'')+
-   '<div class=hlf>Die Projektion auf der linken Seite des Balkens rechnet '+eur(liquide)+' liquides Vermögen und '+eur(rate/12)+' Sparrate im Monat über '+jahreBis+' Jahre mit '+(rAnspar*100).toLocaleString('de-DE',{minimumFractionDigits:1,maximumFractionDigits:1})+' % realer Rendite hoch'+
-   (verk>0?', zuzüglich '+eur(verk)+' Nettoerlös aus dem Immobilienverkauf':'')+'. Alle Beträge in heutiger Kaufkraft.</div>'+
+   (H.luecke>0?'<div class=hlf>Formel: Bedarf = Summe der jahresgenauen <b>Brutto</b>-Entnahmen, jeweils real abgezinst — netto konstant, brutto steigend, weil der Gewinnanteil des Depots weiter wächst. '+
+   'Weil das Restkapital weiterarbeitet, liegt der Bedarf um '+eur(ohneRendite-H.bRente)+' unter der reinen Summe der Entnahmen. '+
+   (H.bPuffer>0
+     ? 'Am Ende der '+H.jahre+' Jahre bleibt planmäßig der Sicherheitspuffer von '+eur(H.puffer)+' stehen — dafür ist der Bedarf um '+eur(H.bPuffer)+' höher.'
+     : 'Das Kapital ist am Ende der '+H.jahre+' Jahre planmäßig aufgebraucht.')+'</div>':'')+
+   '<div class=hlf><b>Steuerannahmen.</b> Die Rente wird nachgelagert besteuert (§ 22 EStG): bei Eintritt '+H.beginnJahr+' sind '+Math.round(H.bAnteil*100)+' % steuerpflichtig, die Kassenbeiträge sind als Sonderausgaben abgezogen, der Grundfreibetrag steckt im Tarif (§ 32a, Stand 2026); unterstellt sind keine weiteren Einkünfte und keine Kirchensteuer. '+
+   'Entnahmen aus dem Depot: 26,375 % Abgeltungsteuer inklusive Soli auf den <b>nominalen</b> Gewinnanteil, nach 30 % Teilfreistellung (Aktienfonds). Der Gewinnanteil wächst während der Entnahmephase weiter — der effektive Satz steigt von '+pz(H.entnSteuer)+' im ersten auf '+pz(H.sEnde)+' im letzten Jahr und ist jahresgenau eingerechnet. '+
+   'Das heutige Depot zählt dabei als Anschaffungskosten (untertreibt die Steuer, falls Gewinne drinstecken), der Sparer-Pauschbetrag bleibt unberücksichtigt (übertreibt sie leicht); ein Immobilienerlös ist nach § 23 EStG steuerfrei.</div>'+
+   (H.bKredit>0?'<div class=hlf>Die Kreditrate ist <b>nominal fest</b> — sie wird deshalb nominal abgezinst und anschließend in heutige Kaufkraft umgerechnet. Dadurch wiegt sie mit den Jahren real leichter. Wird die Immobilie zum Renteneintritt verkauft, entfällt dieser Posten, weil die Restschuld aus dem Erlös getilgt wird.</div>':'')+
+   '<div class=hlf>Die Projektion auf der linken Seite des Balkens rechnet '+eur(H.liquide)+' liquides Vermögen und '+eur(H.rate/12)+' Sparrate im Monat über '+H.jahreBis+' Jahre mit '+pz(H.rAnspar)+' realer Rendite hoch'+
+   (H.verk>0?', zuzüglich '+eur(H.verk)+' Nettoerlös aus dem Immobilienverkauf':'')+'. Alle Beträge in heutiger Kaufkraft.</div>'+
    '</div>';
 }
 function deckungsBalken(ist,soll,deckung,jahre){

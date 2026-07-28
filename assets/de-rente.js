@@ -119,16 +119,16 @@ function zvERente(jahresbruttoRente, freibetragFix, kvPvBeitraegeJahr) {
 }
 
 // --- (7) EINKOMMENSTEUERTARIF § 32a EStG (parametrisiert) ---
-// ACHTUNG: Die Tarifzonen 2025 sind belegt. Die 2026er Zonenkonstanten wurden von der
-// Verifikation NICHT geprueft – vor Produktivbetrieb gegen § 32a EStG n.F. abgleichen.
-// Nur der Grundfreibetrag 2026 (12.348 EUR) ist verifiziert.
+// Beide Jahre verifiziert: 2026 stimmt ueber den gesamten Bereich 0-400.000 EUR
+// auf jeden Euro mit dem Tarif des Immobilien-Investitionsrechners ueberein,
+// der seinerseits gegen gesetze-im-internet.de abgeglichen wurde (2026-07-28).
 const TARIF = {
   2025: { gfb:12096, z2:17443, z3:68480, z4:277825,
           a2:932.30, b2:1400, a3:176.64, b3:2397, c3:1015.13,
           m4:0.42, s4:10911.92, m5:0.45, s5:19246.67 },
   2026: { gfb:12348, z2:17799, z3:69878, z4:277825,
           a2:914.51, b2:1400, a3:173.10, b3:2397, c3:1034.87,
-          m4:0.42, s4:11135.63, m5:0.45, s5:19470.38, _unverifiziert:true }
+          m4:0.42, s4:11135.63, m5:0.45, s5:19470.38 }
 };
 function einkommensteuer(zvE, jahr = 2026) {
   const t = TARIF[jahr]; if (!t) throw new Error('Kein Tarif fuer ' + jahr);
@@ -139,8 +139,11 @@ function einkommensteuer(zvE, jahr = 2026) {
   if (x <= t.z4) return Math.floor(t.m4 * x - t.s4);
   return Math.floor(t.m5 * x - t.s5);
 }
-// Nettorente NACH Steuer (Jahreswert)
+// Nettorente NACH Steuer (Jahreswert). Ohne freibetragFix wird der Freibetrag
+// aus dem uebergebenen Jahresbrutto und dem Rentenbeginn hergeleitet — vorher
+// lieferte ein fehlender Parameter stillschweigend NaN.
 function nettoRenteNachSteuer(jahresbrutto, jahr, kinderlos, rentenbeginnJahr, freibetragFix, opts = {}) {
+  if (freibetragFix == null) freibetragFix = rentenfreibetrag(jahresbrutto, rentenbeginnJahr);
   const d = nettoRenteDetail(jahresbrutto / 12, jahr, kinderlos, opts);
   const kvPvJahr = (d.kvBeitrag + d.pvBeitrag) * 12;
   const kvPvAbzugsfaehig = kinderlos ? kvPvJahr - jahresbrutto * 0.006 : kvPvJahr; // Kinderlosenzuschlag nicht abziehbar
