@@ -39,6 +39,9 @@
 .zrerg .s{font-size:11px;color:var(--ink-3);margin-top:5px;line-height:1.45}
 .zrleg{display:flex;gap:16px;flex-wrap:wrap;font-size:11.5px;color:var(--ink-2);margin-top:8px}
 .zrleg i{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:6px;vertical-align:middle}
+.zrfazit{font-size:15px;line-height:1.6;color:var(--ink-2);background:var(--card);border:1px solid var(--rule);
+  border-left:3px solid var(--accent);border-radius:0 11px 11px 0;padding:14px 16px;margin:4px 0 0}
+.zrfazit b{color:var(--ink)}
 .zrn{border-left:2px solid var(--accent);padding-left:12px;margin-top:14px !important}
 .zrherk{font-size:11.5px;line-height:1.6;color:var(--ink-3);margin-top:8px;padding-top:8px;
   border-top:1px solid var(--rule-soft)}
@@ -434,28 +437,34 @@ function zeitreihenTest(o){
 
   const quote=Math.round(e.quote*100), gescheitert=e.n-e.durchgehalten;
   const farbe = quote===100?'var(--good)':(quote>=90?'var(--warn)':'var(--bad)');
-  const reihe = ZR.land==='usa'?'S&P 500':'deutsche Aktien';
+  // Ohne Entnahme ist eine Erfolgsquote ohne Aussage — dann wird der Test zum Wachstumsvergleich
+  const ohneEntnahme = o.entnahmeJahr<1 && o.restJahreKredit===0;
 
   return '<div class=zr>'+
    '<div class=hl>Dein Plan durch die Geschichte</div>'+
    '<p>Bis hierher steht überall <b>eine</b> Zahl, weil <b>eine</b> gleichbleibende Rendite unterstellt wird. So verläuft kein Anlegerleben. '+
    'Deshalb läuft derselbe Plan hier durch <b>jede tatsächliche Renditefolge</b>, die es gab: '+e.n+' Startjahre von '+e.erstesJahr+' bis '+e.letztesJahr+', '+
-   'jeweils '+o.jahreBisRente+' Jahre ansparen und '+o.jahreRuhestand+' Jahre entnehmen, real gerechnet.</p>'+
+   'jeweils '+o.jahreBisRente+' Jahre ansparen und '+o.jahreRuhestand+' Jahre '+(ohneEntnahme?'liegen lassen':'entnehmen')+', real gerechnet.</p>'+
    steuer+
+   '<div class=zrfazit>'+fazit(e,o,quote,ohneEntnahme)+'</div>'+
    '<div class=zrerg>'+
-     '<div><div class=l>Hätte gehalten in</div><div class=v style="color:'+farbe+'">'+quote+' %</div>'+
-       '<div class=s>'+e.durchgehalten+' von '+e.n+' Startjahren'+(gescheitert?' · in '+gescheitert+' ging das Geld vorher aus':'')+'</div></div>'+
+     (ohneEntnahme
+       ? '<div><div class=l>Entnahme nötig</div><div class=v style="color:var(--good)">keine</div>'+
+           '<div class=s>Die gesetzliche Rente deckt deinen Wunsch bereits — das Kapital bleibt unangetastet</div></div>'
+       : '<div><div class=l>Hätte gehalten in</div><div class=v style="color:'+farbe+'">'+quote+' %</div>'+
+           '<div class=s>'+e.durchgehalten+' von '+e.n+' Startjahren'+(gescheitert?' · in '+gescheitert+' ging das Geld vorher aus':'')+'</div></div>')+
      '<div><div class=l>Kapital bei Rentenbeginn</div><div class=v>'+eur(e.medianBeiRente)+'</div>'+
        '<div class=s>Median der Geschichte · deine Annahme oben: '+eur(o.projiziert)+'</div></div>'+
-     '<div><div class=l>Am Ende übrig</div><div class=v>'+eur(e.median)+'</div>'+
-       '<div class=s>Median · schwaches Zehntel '+eur(e.p10)+' · starkes '+eur(e.p90)+'</div></div>'+
+     '<div><div class=l>'+(ohneEntnahme?'Nach weiteren '+o.jahreRuhestand+' Jahren':'Am Ende übrig')+'</div><div class=v>'+eur(e.median)+'</div>'+
+       '<div class=s>Median · schwaches Zehntel '+eur(e.p10)+' · starkes '+eur(e.p90)+
+       (ohneEntnahme?' · wächst weiter, weil nichts entnommen wird':'')+'</div></div>'+
      '<div><div class=l>Schlechtestes Startjahr</div><div class=v'+(e.schlechtestes.pleiteNach!==null?' style="color:var(--bad)"':'')+'>'+e.schlechtestes.jahr+'</div>'+
        '<div class=s>'+(e.schlechtestes.pleiteNach!==null
           ? 'Kapital nach '+e.schlechtestes.pleiteNach+' Ruhestandsjahren aufgebraucht'
-          : 'am Ende noch '+eur(e.schlechtestes.ende))+'</div></div>'+
+          : 'selbst dann am Ende noch '+eur(e.schlechtestes.ende))+'</div></div>'+
    '</div>'+
    zrChart(e,o)+
-   '<p class=zrn>'+deutung(e,o,quote)+'</p>'+
+   '<p class=zrn>'+deutung(e,o,quote,ohneEntnahme)+'</p>'+
    '<p>Die beiden Werkzeuge rechnen dasselbe ausführlicher — mit Portfolio-Mix, Glidepath, Leitplanken und der Heatmap aller Startjahre:</p>'+
    '<div class=wl>'+
    karte('Lebenszyklus_Simulator.html','Ein ganzes Finanzleben, durchgerechnet','Ansparen und Entnehmen gekoppelt durch echte Sequenzen — Perzentil-Fächer statt einer Zahl.')+
@@ -463,11 +472,35 @@ function zeitreihenTest(o){
    '</div></div>';
 }
 
+/* Die eine Zeile, die sagt, was hier herauskommt — vor allen Kennzahlen */
+function fazit(e,o,quote,ohneEntnahme){
+  if(ohneEntnahme)
+    return '<b>Hier wird gar nichts entnommen.</b> Deine gesetzliche Rente deckt den Wunschbetrag schon ab, also bleibt das Kapital liegen und wächst weiter. '+
+      'Die Frage „hält es durch?" stellt sich damit nicht — eine Erfolgsquote wäre hier eine leere Zahl. '+
+      'Was du unten siehst, ist etwas anderes: <b>wie verschieden dasselbe Sparen ausgegangen wäre</b>, je nach Startjahr — zwischen '+
+      eur(e.p10)+' und '+eur(e.p90)+'. Interessant wird der eigentliche Test erst, wenn du einen höheren Wunschbetrag einträgst oder früher in Rente gehst.';
+  const g=e.n-e.durchgehalten;
+  if(quote===100)
+    return '<b>Dein Plan hätte jedes der '+e.n+' Startjahre überstanden</b> — auch den Jahrgang '+e.schlechtestes.jahr+
+      ', den es am härtesten traf; dort blieben am Ende noch '+eur(e.schlechtestes.ende)+'.';
+  if(quote>=90)
+    return '<b>Dein Plan hätte in '+e.durchgehalten+' von '+e.n+' Startjahren gehalten</b>, in '+g+' nicht. '+
+      'Diese Ausfälle sind keine Ausreißer, sondern die Jahrgänge, die schwache Jahre direkt nach dem Renteneintritt erwischten.';
+  if(g===e.n)
+    return '<b style="color:var(--bad)">In allen '+e.n+' Startjahren wäre das Geld vor dem Ende ausgegangen</b> — ausnahmslos, im besten wie im schlechtesten Jahrzehnt. '+
+      'Das ist kein Timing-Problem: die Lücke ist schlicht zu groß für das Kapital. Hilfreich sind hier nur eine höhere Sparrate, ein späterer Renteneintritt oder ein niedrigerer Wunschbetrag — nicht eine andere Renditeannahme.';
+  const jeder=Math.round(e.n/g);
+  return '<b style="color:var(--bad)">In '+g+' von '+e.n+' Startjahren wäre das Geld vor dem Ende ausgegangen</b>'+
+    (jeder>=2?' — also in etwa jedem '+jeder+'. Jahrgang':' — in der Mehrzahl aller Jahrgänge')+
+    '. Der Plan ist nicht knapp kalkuliert, er trägt nicht.';
+}
+
 /* Ein Satz, der sagt, was die Verteilung für diesen Plan bedeutet */
-function deutung(e,o,quote){
+function deutung(e,o,quote,ohneEntnahme){
   const abw=o.projiziert>0 ? e.medianBeiRente/o.projiziert : null;
   let s='';
-  if(quote===100) s='In keinem einzigen Startjahr ging das Geld aus. Das ist eine Aussage über die Vergangenheit, keine Garantie — die Zukunft muss diese Renditen erst noch liefern. ';
+  if(ohneEntnahme) s='Weil nichts entnommen wird, misst dieser Abschnitt allein das Sparen. ';
+  else if(quote===100) s='In keinem einzigen Startjahr ging das Geld aus. Das ist eine Aussage über die Vergangenheit, keine Garantie — die Zukunft muss diese Renditen erst noch liefern. ';
   else if(quote>=90) s='In den allermeisten Startjahren hielt der Plan, aber nicht in allen. Die Ausfälle sind keine Ausreißer, sondern die Jahrgänge mit schwachem Beginn. ';
   else s='<b style="color:var(--bad)">Ein erheblicher Teil der Startjahre hätte nicht gereicht.</b> Nicht wegen einer schlechten Durchschnittsrendite, sondern wegen ihrer Reihenfolge. ';
   if(abw && abw>1.25) s+='Auffällig ist der Abstand nach oben: historisch lag das Kapital bei Rentenbeginn im Median beim '+nf1(abw)+'-Fachen deiner Annahme — die Vorgabe oben ist also deutlich vorsichtiger als das, was die Geschichte lieferte. ';
