@@ -8,12 +8,12 @@
 <meta property=og:description content="Der Kredit läuft, und am Monatsende bleibt Geld übrig. In die Sondertilgung damit — oder ins Depot? Die Tilgung wirkt bescheiden: sie bringt nur den Sollzins. Aber sie bringt ihn garantiert und…">
 <meta property=og:url content="https://nickischicki.github.io/finanzanalysen/Tilgen_oder_Investieren.html">
 <meta name=twitter:card content=summary>
-<link rel=stylesheet href="assets/site.css?v=31">
-<script defer src="assets/site-map.js?v=31"></script>
-<script defer src="assets/datenstand.js?v=31"></script>
-<script defer src="assets/site.js?v=31"></script>
-<script defer src="assets/profil.js?v=31"></script>
-<script src="assets/de-kapitalertrag.js?v=31"></script>
+<link rel=stylesheet href="assets/site.css?v=32">
+<script defer src="assets/site-map.js?v=32"></script>
+<script defer src="assets/datenstand.js?v=32"></script>
+<script defer src="assets/site.js?v=32"></script>
+<script defer src="assets/profil.js?v=32"></script>
+<script src="assets/de-kapitalertrag.js?v=32"></script>
 <style>
 /* seitenspezifisch */
 .wbox .sub2{font-size:11.5px;color:var(--ink-3);margin-top:6px;line-height:1.45}
@@ -388,12 +388,20 @@ render();
       ? Math.round(wert).toLocaleString('de-DE') : wert;
     feuer(el, 'input'); feuer(el, 'change');
   }
+  /* Umschalter nicht nachbauen, sondern echt anklicken — dann läuft der
+     seiteneigene Handler samt „on"-Klasse und Neuberechnung. */
+  function klickeSeg(gruppeId, wert) {
+    var box = g(gruppeId); if (!box) return;
+    var b = box.querySelector('[data-v="' + wert + '"]'); if (b) b.click();
+  }
   function los() {
     if (!window.Profil || !Profil.gefuellt()) return;
     try {
   /* sparrateMonat gehört auf 'zus' (freies Geld), NICHT auf 'rate' —
      'rate' ist die Kreditannuität: gleiche Einheit, anderer Sachverhalt. */
   Profil.vorbelegen({ immoSchuld:'rest', sparrateMonat:'zus' });
+  /* Zusammenveranlagung verdoppelt den Sparer-Pauschbetrag (§ 20 Abs. 9 EStG). */
+  if (Profil.get('veranlagung') === 'zusammen') klickeSeg('segVer', 'zusammen');
     } catch (e) { /* Vorbelegung darf die Seite nie lahmlegen */ }
   }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', los);

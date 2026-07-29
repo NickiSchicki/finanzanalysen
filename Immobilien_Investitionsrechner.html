@@ -8,10 +8,11 @@
 <meta property=og:description content="Kaufnebenkosten, Finanzierung, Abschreibung und laufender Cashflow einer vermieteten Wohnimmobilie — samt dem Steuereffekt am persönlichen Grenzsteuersatz nach dem exakten §32a-Tarif. Kernstück…">
 <meta property=og:url content="https://nickischicki.github.io/finanzanalysen/Immobilien_Investitionsrechner.html">
 <meta name=twitter:card content=summary>
-<link rel=stylesheet href="assets/site.css?v=31">
-<script defer src="assets/site-map.js?v=31"></script>
-<script defer src="assets/datenstand.js?v=31"></script>
-<script defer src="assets/site.js?v=31"></script>
+<link rel=stylesheet href="assets/site.css?v=32">
+<script defer src="assets/site-map.js?v=32"></script>
+<script defer src="assets/profil.js?v=32"></script>
+<script defer src="assets/datenstand.js?v=32"></script>
+<script defer src="assets/site.js?v=32"></script>
 <style>
 /* seitenspezifisch */
 .two{display:grid;grid-template-columns:1fr 1fr;gap:12px}
@@ -456,5 +457,33 @@ $('fmRate').addEventListener('click',()=>{finMode='rate';render();});
 $('wmFix').addEventListener('click',()=>{wertMode='fix';render();});
 $('wmHist').addEventListener('click',()=>{wertMode='hist';render();});
 render();
+</script>
+
+<!-- Vorbelegung aus dem gemeinsamen Profil. Eigenständig gehalten: $ und render()
+     liegen oben in einem eigenen Gültigkeitsbereich und sind hier nicht sichtbar —
+     deshalb eigene Helfer und Auslösen der seiteneigenen Listener. -->
+<script>
+(function () {
+  function g(id) { return document.getElementById(id); }
+  function los() {
+    if (!window.Profil || !Profil.gefuellt()) return;
+    try {
+      /* Das zvE aus dem Profil ist das Einkommen OHNE Immobilie — genau das,
+         wonach dieses Feld fragt. Das Bruttogehalt wäre hier falsch. */
+      var zve = Profil.get('zvE');
+      if (zve != null) {
+        var el = g('zve');
+        if (el) { el.value = Math.round(zve).toLocaleString('de-DE');
+                  el.dispatchEvent(new Event('input', { bubbles: true })); }
+      }
+      /* Veranlagung: „zusammen" schaltet auf den Splittingtarif. */
+      var v = Profil.get('veranlagung');
+      if (v === 'zusammen' && g('vSplit')) g('vSplit').click();
+      else if (v === 'einzeln' && g('vSingle')) g('vSingle').click();
+    } catch (e) { /* Vorbelegung darf die Seite nie lahmlegen */ }
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', los);
+  else los();
+})();
 </script>
 </body></html>

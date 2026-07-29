@@ -8,16 +8,19 @@
 <meta property=og:description content="Einmal eintragen, überall verwenden. Diese Seite führt zusammen, was die einzelnen Rechner getrennt betrachten: die gesetzliche Rente als Fundament, das angesparte Vermögen darauf, die Einordnung…">
 <meta property=og:url content="https://nickischicki.github.io/finanzanalysen/Mein_Vermoegensbild.html">
 <meta name=twitter:card content=summary>
-<link rel=stylesheet href="assets/site.css?v=31">
-<script defer src="assets/site-map.js?v=31"></script>
-<script defer src="assets/datenstand.js?v=31"></script>
-<script defer src="assets/site.js?v=31"></script>
-<script defer src="assets/profil.js?v=31"></script>
-<script defer src="assets/de-rente.js?v=31"></script>
-<script defer src="assets/de-kapitalertrag.js?v=31"></script>
-<script defer src="assets/de-vermoegen.js?v=31"></script>
-<script defer src="assets/reihen.js?v=31"></script>
+<link rel=stylesheet href="assets/site.css?v=32">
+<script defer src="assets/site-map.js?v=32"></script>
+<script defer src="assets/datenstand.js?v=32"></script>
+<script defer src="assets/site.js?v=32"></script>
+<script defer src="assets/profil.js?v=32"></script>
+<script defer src="assets/de-rente.js?v=32"></script>
+<script defer src="assets/de-kapitalertrag.js?v=32"></script>
+<script defer src="assets/de-vermoegen.js?v=32"></script>
+<script defer src="assets/reihen.js?v=32"></script>
 <style>
+/* Die Partner-Gruppe ist erstes div in ihrem Kasten und fiele deshalb unter
+   .grp:first-of-type — die Trennlinie zur Person davor soll aber bleiben. */
+#partnerbox>.grp{border-top:1px solid var(--rule);margin-top:22px;padding-top:16px}
 .two{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 @media(max-width:820px){.two{grid-template-columns:1fr}}
 .saeulen{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin-bottom:18px}
@@ -96,6 +99,9 @@ details.aufk>summary:hover{color:var(--accent);border-color:var(--accent)}
 <h2>Deine Eckdaten</h2>
 
 <div class=grp>Das bist du</div>
+<div class=ctrl id=haushaltbox><div class=clabel><span>Wer plant hier?</span></div>
+<div class="seg" id=segHaushalt><button id=hAllein class=on>ich allein</button><button id=hPaar>wir zu zweit</button></div>
+</div>
 <div class=two>
 <div class=ctrl><div class=clabel><span>Geburtsjahr</span></div><input type=number id=p_gj min=1930 max=2015 step=1 placeholder="1985"></div>
 <div class=ctrl><div class=clabel><span>Bruttojahresgehalt</span></div><input type=text inputmode=numeric class=eurin id=p_brutto placeholder="60.000"></div>
@@ -105,6 +111,19 @@ details.aufk>summary:hover{color:var(--accent);border-color:var(--accent)}
 <div class=ctrl><div class=clabel><span>Bisherige Entgeltpunkte</span><span class=cval id=p_ep_h></span></div><input type=number id=p_ep step=0.1 min=0 placeholder="optional"></div>
 </div>
 <div class=hint id=ep_hinweis></div>
+
+<div id=partnerbox style="display:none">
+<div class=grp>Die zweite Person</div>
+<div class=ctrl><div class=clabel><span>Steuerlich</span></div>
+<div class="seg" id=segEhe><button id=eVerh class=on>verheiratet</button><button id=eLedig>nicht verheiratet</button></div>
+</div>
+<div class=two>
+<div class=ctrl><div class=clabel><span>Geburtsjahr</span></div><input type=number id=q_gj min=1930 max=2015 step=1 placeholder="1987"></div>
+<div class=ctrl><div class=clabel><span>Bruttojahresgehalt</span></div><input type=text inputmode=numeric class=eurin id=q_brutto placeholder="45.000"></div>
+</div>
+<div class=ctrl><div class=clabel><span>Bisherige Entgeltpunkte</span></div><input type=number id=q_ep step=0.1 min=0 placeholder="optional"></div>
+<div class=hint id=partner_h></div>
+</div>
 
 <div class=grp>Das hast du</div>
 <div class=two>
@@ -132,8 +151,8 @@ details.aufk>summary:hover{color:var(--accent);border-color:var(--accent)}
 
 <div class=grp>Das planst du</div>
 <div class=two>
-<div class=ctrl><div class=clabel><span>Sparrate pro Monat <span class=sub>(real)</span></span></div><input type=text inputmode=numeric class=eurin id=p_rate placeholder="500"></div>
-<div class=ctrl><div class=clabel><span>Wunsch-Nettorente <span class=sub>(heutige Kaufkraft)</span></span></div><input type=text inputmode=numeric class=eurin id=p_bedarf placeholder="2.500"></div>
+<div class=ctrl><div class=clabel><span id=lblRate>Sparrate pro Monat <span class=sub>(real)</span></span></div><input type=text inputmode=numeric class=eurin id=p_rate placeholder="500"></div>
+<div class=ctrl><div class=clabel><span id=lblBedarf>Wunsch-Nettorente <span class=sub>(heutige Kaufkraft)</span></span></div><input type=text inputmode=numeric class=eurin id=p_bedarf placeholder="2.500"></div>
 </div>
 <div class=two>
 <div class=ctrl><div class=clabel><span>Geplanter Renteneintritt</span><span class=cval id=p_ra_v>67</span></div><input type=range id=p_ra min=63 max=70 step=1 value=67></div>
@@ -197,7 +216,8 @@ const ep1=x=>Number(x).toLocaleString('de-DE',{minimumFractionDigits:1,maximumFr
 const MAP={geburtsjahr:'p_gj',bruttoJahr:'p_brutto',zvE:'p_zve',entgeltpunkte:'p_ep',
   depotWert:'p_depot',bankGuthaben:'p_bank',immoWert:'p_immo',immoSchuld:'p_immoschuld',
   sonstVermoegen:'p_sonst',sonstSchulden:'p_sonstschuld',sparrateMonat:'p_rate',
-  sicherheitspuffer:'p_puffer'};
+  sicherheitspuffer:'p_puffer',
+  partnerGeburtsjahr:'q_gj',partnerBruttoJahr:'q_brutto',partnerEntgeltpunkte:'q_ep'};
 
 function eurin(el){const raw=String(el.value||'').replace(/\D/g,'');el.value=raw===''?'':parseInt(raw,10).toLocaleString('de-DE');}
 function z(id){return Profil.zahl($(id));}
@@ -206,11 +226,23 @@ function speichern(){
   const patch={};
   Object.keys(MAP).forEach(k=>{patch[k]=z(MAP[k]);});
   patch.bedarf=z('p_bedarf'); patch.renteAlter=+$('p_ra').value;
+  patch.paar=paarModus(); patch.veranlagung=zusammenVeranlagt()?'zusammen':'einzeln';
   Profil.merge(patch);
 }
 
+const paarModus       = ()=>$('hPaar').classList.contains('on');
+// Splitting setzt eine Ehe (oder eingetragene Lebenspartnerschaft) voraus — ein
+// unverheiratetes Paar veranlagt jede Person einzeln, auch im Ruhestand.
+const zusammenVeranlagt = ()=>paarModus() && $('eVerh').classList.contains('on');
+
 function auswerten(){
   const gj=z('p_gj'), brutto=z('p_brutto'), zve=z('p_zve')||brutto;
+  const paar=paarModus(), zusammen=zusammenVeranlagt();
+  $('partnerbox').style.display = paar?'':'none';
+  // Vermögen, Sparrate und Wunschrente sind im Paar-Modus Haushaltsgrössen —
+  // die Beschriftung muss das sagen, sonst trägt man versehentlich nur seinen Teil ein.
+  $('lblRate').innerHTML   = (paar?'Sparrate des Haushalts':'Sparrate pro Monat')+' <span class=sub>(real)</span>';
+  $('lblBedarf').innerHTML = (paar?'Wunsch-Nettorente zu zweit':'Wunsch-Nettorente')+' <span class=sub>(heutige Kaufkraft)</span>';
   const raAlter=+$('p_ra').value; $('p_ra_v').textContent=raAlter;
   const pz=id=>(+$(id).value).toLocaleString('de-DE',{minimumFractionDigits:1,maximumFractionDigits:1})+' %';
   $('p_gs_v').textContent=pz('p_gs');
@@ -233,20 +265,39 @@ function auswerten(){
   // genauso schnell wie die allgemeinen Löhne, bleiben die Punkte pro Jahr konstant.
   const gs=(+$('p_gs').value)/100, lw=(+$('p_lw').value)/100;
   const relWachstum=(1+gs)/(1+lw)-1;                      // Vorsprung gegenüber der Lohnentwicklung
-  const epJahr = entgeltpunkte(brutto,2026);              // Punkte im ersten Jahr
-  const epSelbstAngegeben = z('p_ep')!==null;
-  const epJetzt = epSelbstAngegeben ? z('p_ep') : Math.max(0,(alter-21))*epJahr;
-  let epKuenftig=0, epJahrEnde=epJahr;
-  for(let t=0;t<jahreBisRente;t++){
-    const anteil=epJahr*Math.pow(1+relWachstum,t);        // Gehalt als Vielfaches des Durchschnitts
-    const gedeckelt=epProJahrRelativ(anteil,2026);        // Beitragsbemessungsgrenze deckelt
-    epKuenftig+=gedeckelt; epJahrEnde=gedeckelt;
+  // Derselbe Rechenweg für beide Personen. Jede geht mit dem gewählten ALTER in
+  // Rente — bei unterschiedlichen Geburtsjahren also in unterschiedlichen Jahren.
+  // Daraus folgen eigener Ansparzeitraum, eigener Zugangsfaktor (die Regelalters-
+  // grenze hängt am Jahrgang) und ein eigener Besteuerungsanteil.
+  function renteFuer(gjX, bruttoX, epAngabe){
+    const alterX=jetzt-gjX, jahreX=Math.max(0,raAlter-alterX);
+    const epJahrX=entgeltpunkte(bruttoX,2026);            // Punkte im ersten Jahr
+    const selbst=epAngabe!==null;
+    const epJetztX=selbst?epAngabe:Math.max(0,(alterX-21))*epJahrX;
+    let epKuenftigX=0, epEndeX=epJahrX;
+    for(let t=0;t<jahreX;t++){
+      const anteil=epJahrX*Math.pow(1+relWachstum,t);      // Gehalt als Vielfaches des Durchschnitts
+      const gedeckelt=epProJahrRelativ(anteil,2026);       // Beitragsbemessungsgrenze deckelt
+      epKuenftigX+=gedeckelt; epEndeX=gedeckelt;
+    }
+    const epGes=epJetztX+epKuenftigX;
+    const zfX=zugangsfaktor(raAlter*12,gjX);
+    const bru=bruttoRente(epGes,zfX,RV.aktuellerRentenwert);
+    return { alter:alterX, jahreBisRente:jahreX, epJahr:epJahrX, epJetzt:epJetztX,
+             epKuenftig:epKuenftigX, epGesamt:epGes, epJahrEnde:epEndeX, selbst, zf:zfX, brutto:bru,
+             netto:nettoRente(bru,2026,false), regelalter:regelaltersgrenzeMonate(gjX)/12,
+             beginnJahr:gjX+raAlter };
   }
-  const epGesamt = epJetzt+epKuenftig;
-  const zf = zugangsfaktor(raAlter*12, gj);
-  const rentenBrutto = bruttoRente(epGesamt, zf, RV.aktuellerRentenwert);
-  const rentenNetto = nettoRente(rentenBrutto, 2026, false);
-  const regelalter = regelaltersgrenzeMonate(gj)/12;
+  const R1=renteFuer(gj,brutto,z('p_ep'));
+  const epJahr=R1.epJahr, epJetzt=R1.epJetzt, epKuenftig=R1.epKuenftig,
+        epGesamt=R1.epGesamt, epJahrEnde=R1.epJahrEnde;
+  const epSelbstAngegeben=R1.selbst, zf=R1.zf, regelalter=R1.regelalter;
+  const rentenBrutto=R1.brutto;
+
+  // Zweite Person: nur mitgerechnet, wenn Jahrgang UND Gehalt eingetragen sind.
+  const qGj=z('q_gj'), qBrutto=z('q_brutto');
+  const R2 = (paar && qGj && qBrutto) ? renteFuer(qGj,qBrutto,z('q_ep')) : null;
+  const rentenBruttoH = rentenBrutto + (R2?R2.brutto:0);   // Haushalt, vor Abzügen
 
   // --- Säule 2: Vermögen heute ---
   const depot=z('p_depot')||0, bank=z('p_bank')||0, immo=z('p_immo')||0,
@@ -294,12 +345,23 @@ function auswerten(){
   const bedarf=z('p_bedarf')||2500;
   // --- Steuer auf die gesetzliche Rente (nachgelagerte Besteuerung, § 22 EStG) ---
   // KV/PV-Beiträge sind Sonderausgaben, der Grundfreibetrag steckt im Tarif.
+  // Bei zwei Personen bleiben Freibetrag, Kassenbeiträge und Werbungskosten-
+  // Pauschbetrag PRO PERSON; zusammengelegt wird erst das zu versteuernde
+  // Einkommen — und nur bei Ehe läuft darauf der Splittingtarif (§ 32a Abs. 5).
   // Annahme: keine weiteren steuerpflichtigen Einkünfte im Ruhestand, keine Kirchensteuer.
   const beginnJahr = gj + raAlter;
   const bAnteil = besteuerungsanteil(beginnJahr);
-  const stRente = nettoRenteNachSteuer(rentenBrutto*12, 2026, false, beginnJahr);
+  const haushalt = [{jahresbrutto:rentenBrutto*12, rentenbeginnJahr:beginnJahr}]
+    .concat(R2?[{jahresbrutto:R2.brutto*12, rentenbeginnJahr:R2.beginnJahr}]:[]);
+  const stRente = nettoRenteHaushalt(haushalt, 2026, zusammen);
   const estMonat = (stRente.einkommensteuer||0)/12;
-  const renteNachSteuer = rentenNetto - estMonat;
+  const rentenNetto = (stRente.jahresbrutto - stRente.kvPvJahr)/12;   // nach KV/PV, vor Steuer
+  const renteNachSteuer = stRente.nettoMonat;
+  // Was der Trauschein hier wert ist — beide Veranlagungen auf denselben Renten.
+  // Bei gleich hohen Renten ist die Differenz exakt null; sie wächst mit dem Abstand.
+  const splittingVorteil = Math.max(0,
+    (nettoRenteHaushalt(haushalt, 2026, false).einkommensteuer
+     - nettoRenteHaushalt(haushalt, 2026, true).einkommensteuer) / 12);
 
   const luecke=Math.max(0,bedarf-renteNachSteuer);
   // Kapitalbedarf = Barwert einer realen Rente über die gewählte Ruhestandsdauer (Regler)
@@ -381,18 +443,25 @@ function auswerten(){
   $('bild').innerHTML=
    '<div class=station><b>①</b> Dein Stand heute</div>'+
    '<div class=saeulen>'+
-   '<div class="sae a"><div class=l>Gesetzliche Rente mit '+raAlter+', nach Steuer</div><div class=v>'+eur(renteNachSteuer)+'</div>'+
+   '<div class="sae a"><div class=l>'+(R2?'Gesetzliche Renten':'Gesetzliche Rente')+' mit '+raAlter+', nach Steuer</div><div class=v>'+eur(renteNachSteuer)+'</div>'+
      '<div class=s>Zahlbetrag '+eur(rentenNetto)+' nach Kranken- und Pflegeversicherung, davon gehen '+
-     (estMonat>0.5?'<b>'+eur(estMonat)+' Einkommensteuer</b> ab ('+Math.round(bAnteil*100)+' % steuerpflichtig bei Eintritt '+beginnJahr+')'
+     (estMonat>0.5?'<b>'+eur(estMonat)+' Einkommensteuer</b> ab ('+Math.round(bAnteil*100)+' % steuerpflichtig bei Eintritt '+beginnJahr+
+       (zusammen?', Splittingtarif':(R2?', getrennt veranlagt':''))+')'
                   :'praktisch keine Einkommensteuer ab')+
-     ' · Zugangsfaktor '+zf.toLocaleString('de-DE',{minimumFractionDigits:3,maximumFractionDigits:3})+
-     (raAlter<regelalter?' (Abschlag)':(raAlter>regelalter?' (Zuschlag)':''))+'<br>'+
-     '<b>'+ep1(epGesamt)+' Entgeltpunkte</b> = '+ep1(epJetzt)+' bereits erworben'+(epSelbstAngegeben?' (deine Angabe)':' (geschätzt)')+
+     (R2?'<br><b>Zwei Renten:</b> du '+eur(R1.brutto)+' brutto ('+ep1(R1.epGesamt)+' EP) · zweite Person '+eur(R2.brutto)+' brutto ('+ep1(R2.epGesamt)+' EP), Eintritt '+R2.beginnJahr
+        :' · Zugangsfaktor '+zf.toLocaleString('de-DE',{minimumFractionDigits:3,maximumFractionDigits:3})+
+         (raAlter<regelalter?' (Abschlag)':(raAlter>regelalter?' (Zuschlag)':'')))+'<br>'+
+     '<b>'+ep1(epGesamt)+' Entgeltpunkte</b>'+(R2?' bei dir':'')+' = '+ep1(epJetzt)+' bereits erworben'+(epSelbstAngegeben?' (deine Angabe)':' (geschätzt)')+
      ' + <b>'+ep1(epKuenftig)+' bis '+raAlter+'</b>'+(jahreBisRente>0?' ('+jahreBisRente+' Jahre × '+ep1(epJahr)+')':'')+'</div></div>'+
-   '<div class="sae b"><div class=l>Nettovermögen heute</div><div class=v>'+(hatVermoegen?eur(netto):'—')+'</div>'+
+   '<div class="sae b"><div class=l>Nettovermögen'+(paar?' des Haushalts':'')+' heute</div><div class=v>'+(hatVermoegen?eur(netto):'—')+'</div>'+
      '<div class=s>'+(hatVermoegen?('davon liquide '+eur(liquide)+(immo>0?' · Immobilie netto '+eur(immo-immoS):'')):'Noch keine Vermögensangaben')+'</div></div>'+
    '<div class="sae c"><div class=l>Mehr als … der Haushalte</div><div class=v>'+(rang!==null?p1(rang/100):'—')+'</div>'+
-     '<div class=s>'+(gruppe?(p1((100-rang)/100)+' haben mehr'+(rang>=50?' (oberes '+p1((100-rang)/100)+')':'')+' · Median der Altersgruppe '+gruppe.altersgruppe+': '+eur(gruppe.medianGruppe)+' · Erhebung '+VERMOEGEN_ERHEBUNGSJAHR):'Vermögen eintragen für die Einordnung')+'</div></div>'+
+     '<div class=s>'+(gruppe?(p1((100-rang)/100)+' haben mehr'+(rang>=50?' (oberes '+p1((100-rang)/100)+')':'')+' · Median der Altersgruppe '+gruppe.altersgruppe+': '+eur(gruppe.medianGruppe)+' · Erhebung '+VERMOEGEN_ERHEBUNGSJAHR+
+       // Die PHF-Verteilung misst HAUSHALTE. Zu zweit passt der Vergleich also genau;
+       // allein wird ein Einzelvermögen gegen Haushalte gehalten und fällt zu niedrig aus.
+       (paar?' · verglichen wird Haushalt mit Haushalt'
+            :' · die Verteilung misst <b>Haushalte</b> — ein Einzelvermögen landet darin tendenziell zu weit unten')
+       ):'Vermögen eintragen für die Einordnung')+'</div></div>'+
    '</div>'+
    '<div class=station><b>②</b> Dein Ruhestand — gerechnet mit glatten '+p1(rReal)+' real</div>'+
    '<div class=saeulen>'+
@@ -421,6 +490,7 @@ function auswerten(){
        bRente:bedarfRente, bKredit:bedarfKredit, kJahre:restJahreKredit, kRate:krate/12,
        bPuffer:bedarfPuffer, puffer:puffer, bedarfWunsch:bedarf, renteKV:rentenNetto,
        estMonat:estMonat, bAnteil:bAnteil, beginnJahr:beginnJahr,
+       zwei:!!R2, zusammen:zusammen, splitting:splittingVorteil,
        entnSteuer:entnSteuer, gewinnanteil:gewinnanteil, gewinnEnde:gewinnEnde, sEnde:sSatz(jahreRuhestand)})+
      '</details>':'')+
    zeitreihenTest({liquide:liquide, rate:rate, jahreBisRente:jahreBisRente, verkaufserloes:verkaufserloes,
@@ -450,6 +520,16 @@ function auswerten(){
     : (relWachstum>0
       ? 'Dein Gehalt wächst <b>'+(relWachstum*100).toLocaleString('de-DE',{maximumFractionDigits:2})+' % pro Jahr schneller</b> als der Durchschnitt — die Entgeltpunkte steigen von '+ep1(epJahr)+' auf <b>'+ep1(epJahrEnde)+'</b> im letzten Jahr.'
       : 'Dein Gehalt bleibt <b>'+(Math.abs(relWachstum)*100).toLocaleString('de-DE',{maximumFractionDigits:2})+' % pro Jahr hinter</b> der allgemeinen Lohnentwicklung zurück — die Entgeltpunkte sinken von '+ep1(epJahr)+' auf <b>'+ep1(epJahrEnde)+'</b> im letzten Jahr.');
+
+  $('partner_h').innerHTML = !paar ? '' : (!R2
+    ? 'Jahrgang <b>und</b> Gehalt der zweiten Person eintragen — dann kommt ihre Rente dazu. Vermögen, Sparrate und Wunschrente gelten ohnehin schon für den ganzen Haushalt.'
+    : 'Gerechnet wird mit demselben Renteneintrittsalter für beide: die zweite Person geht '+
+      (R2.beginnJahr===beginnJahr?'im selben Jahr':(R2.beginnJahr>beginnJahr?R2.beginnJahr-beginnJahr+' Jahre später':(beginnJahr-R2.beginnJahr)+' Jahre früher'))+
+      ' in Rente ('+R2.beginnJahr+'), weil sie '+Math.abs(R2.alter-alter)+' Jahre '+(R2.alter<alter?'jünger':'älter')+' ist. '+
+      (zusammen
+        ? 'Der <b>Splittingtarif</b> spart hier <b>'+eur(splittingVorteil)+' Steuer im Monat</b> gegenüber getrennter Veranlagung'+
+          (splittingVorteil<1?' — bei annähernd gleich hohen Renten ist der Vorteil naturgemäß fast null.':'.')
+        : 'Ohne Trauschein veranlagt jede Person einzeln; der Splittingtarif würde <b>'+eur(splittingVorteil)+' im Monat</b> sparen.'));
 
   $('ep_hinweis').innerHTML = epSelbstAngegeben
     ? 'Deine Angabe wird für die bereits erworbenen Punkte verwendet. Die künftigen Jahre bis '+raAlter+' kommen mit dem heutigen Gehalt hinzu.'
@@ -698,8 +778,10 @@ function herleitung(H){
    '<table class=hltab><tbody>'+
    (H.luecke>0?
      '<tr><td>Wunsch-Nettorente</td><td class=r>'+eur(H.bedarfWunsch)+'</td></tr>'+
-     '<tr><td>gesetzliche Rente nach Kranken- und Pflegeversicherung</td><td class=r>'+eur(H.renteKV)+'</td></tr>'+
-     (H.estMonat>0.5?'<tr><td>− Einkommensteuer auf die Rente ('+Math.round(H.bAnteil*100)+' % steuerpflichtig, Eintritt '+H.beginnJahr+')</td><td class=r>'+eur(H.estMonat)+'</td></tr>':'')+
+     '<tr><td>'+(H.zwei?'beide gesetzlichen Renten':'gesetzliche Rente')+' nach Kranken- und Pflegeversicherung</td><td class=r>'+eur(H.renteKV)+'</td></tr>'+
+     (H.estMonat>0.5?'<tr><td>− Einkommensteuer auf die Rente ('+Math.round(H.bAnteil*100)+' % steuerpflichtig, Eintritt '+H.beginnJahr+
+       (H.zwei?(H.zusammen?', Splittingtarif':', getrennt veranlagt'):'')+')</td><td class=r>'+eur(H.estMonat)+'</td></tr>':'')+
+     (H.zwei&&H.zusammen&&H.splitting>0.5?'<tr><td class=sub>darin enthalten: Ersparnis gegenüber getrennter Veranlagung</td><td class=r>−'+eur(H.splitting)+'</td></tr>':'')+
      '<tr><td><b>= monatliche Lücke</b>, Wunsch gegen Rente nach Steuer</td><td class=r>'+eur(H.luecke)+'</td></tr>'+
      (H.entnSteuer>0.001?'<tr><td>+ Entnahmesteuer: der Gewinnanteil steigt von ~'+Math.round(H.gewinnanteil*100)+' % auf ~'+Math.round(H.gewinnEnde*100)+' % → <b>brutto im Mittel</b></td><td class=r>'+eur(H.lueckeBrutto)+'</td></tr>':'')+
      '<tr><td>× 12 Monate = jährliche Entnahme (Durchschnitt)</td><td class=r>'+eur(jl)+'</td></tr>'+
@@ -722,6 +804,9 @@ function herleitung(H){
      ? 'Am Ende der '+H.jahre+' Jahre bleibt planmäßig der Sicherheitspuffer von '+eur(H.puffer)+' stehen — dafür ist der Bedarf um '+eur(H.bPuffer)+' höher.'
      : 'Das Kapital ist am Ende der '+H.jahre+' Jahre planmäßig aufgebraucht.')+'</div>':'')+
    '<div class=hlf><b>Steuerannahmen.</b> Die Rente wird nachgelagert besteuert (§ 22 EStG): bei Eintritt '+H.beginnJahr+' sind '+Math.round(H.bAnteil*100)+' % steuerpflichtig, die Kassenbeiträge sind als Sonderausgaben abgezogen, der Grundfreibetrag steckt im Tarif (§ 32a, Stand 2026); unterstellt sind keine weiteren Einkünfte und keine Kirchensteuer. '+
+   (H.zwei?'Bei zwei Personen bleiben Rentenfreibetrag, Kassenbeiträge und Werbungskosten-Pauschbetrag <b>je Person</b>; zusammengelegt wird erst das zu versteuernde Einkommen. '+
+     (H.zusammen?'Darauf läuft der <b>Splittingtarif</b> (§ 32a Abs. 5): Steuer auf das halbe gemeinsame Einkommen, mal zwei. Sein Vorteil entsteht allein aus der Progression und ist bei gleich hohen Renten null.'
+               :'Ohne Ehe gibt jede Person eine eigene Erklärung ab — eigenes zu versteuerndes Einkommen, eigener Tarif, eigener Grundfreibetrag.')+' Beide gehen mit demselben Alter in Rente, wegen der Jahrgänge aber gegebenenfalls in verschiedenen Jahren. ':'')+
    'Entnahmen aus dem Depot: 26,375 % Abgeltungsteuer inklusive Soli auf den <b>nominalen</b> Gewinnanteil, nach 30 % Teilfreistellung (Aktienfonds). Der Gewinnanteil wächst während der Entnahmephase weiter — der effektive Satz steigt von '+pz(H.entnSteuer)+' im ersten auf '+pz(H.sEnde)+' im letzten Jahr und ist jahresgenau eingerechnet. '+
    'Das heutige Depot zählt dabei als Anschaffungskosten (untertreibt die Steuer, falls Gewinne drinstecken), der Sparer-Pauschbetrag bleibt unberücksichtigt (übertreibt sie leicht); ein Immobilienerlös ist nach § 23 EStG steuerfrei.</div>'+
    (H.bKredit>0?'<div class=hlf>Die Kreditrate ist <b>nominal fest</b> — sie wird deshalb nominal abgezinst und anschließend in heutige Kaufkraft umgerechnet. Dadurch wiegt sie mit den Jahren real leichter. Wird die Immobilie zum Renteneintritt verkauft, entfällt dieser Posten, weil die Restschuld aus dem Erlös getilgt wird.</div>':'')+
@@ -747,15 +832,18 @@ window.addEventListener('load',()=>{
     el.value = el.classList.contains('eurin') ? Math.round(o[k]).toLocaleString('de-DE') : o[k];}});
   if(o.bedarf!=null)$('p_bedarf').value=Math.round(o.bedarf).toLocaleString('de-DE');
   if(o.renteAlter!=null)$('p_ra').value=o.renteAlter;
+  // Haushaltsform wiederherstellen: der Umschalter ist Teil des Profils
+  if(o.paar) {$('hAllein').classList.remove('on'); $('hPaar').classList.add('on');}
+  if(o.veranlagung==='einzeln'){$('eVerh').classList.remove('on'); $('eLedig').classList.add('on');}
 
   document.querySelectorAll('input.eurin').forEach(el=>el.addEventListener('input',()=>{eurin(el);auswerten();}));
-  ['p_gj','p_ep','p_ra','p_gs','p_rd','p_rn','p_inf','p_kz'].forEach(id=>{
+  ['p_gj','p_ep','p_ra','p_gs','p_rd','p_rn','p_inf','p_kz','q_gj','q_ep'].forEach(id=>{
     const el=$(id); if(el) el.addEventListener('input',auswerten);
   });
   const lw=$('p_lw'); if(lw) lw.addEventListener('change',auswerten);
   // Umschalter über Delegation — bleibt auch dann funktionsfähig, wenn ein Element fehlt
   document.addEventListener('click',e=>{
-    const b=e.target.closest('#immonutzbox .seg button'); if(!b) return;
+    const b=e.target.closest('#immonutzbox .seg button, #segHaushalt button, #segEhe button'); if(!b) return;
     b.parentElement.querySelectorAll('button').forEach(x=>x.classList.remove('on'));
     b.classList.add('on'); auswerten();
   });
@@ -768,8 +856,11 @@ window.addEventListener('load',()=>{
   });
   $('bLeeren').addEventListener('click',()=>{
     Profil.leeren();
-    document.querySelectorAll('#p_gj,#p_ep,input.eurin').forEach(el=>el.value='');
-    $('p_ra').value=67; auswerten();
+    document.querySelectorAll('#p_gj,#p_ep,#q_gj,#q_ep,input.eurin').forEach(el=>el.value='');
+    $('p_ra').value=67;
+    $('hPaar').classList.remove('on'); $('hAllein').classList.add('on');
+    $('eLedig').classList.remove('on'); $('eVerh').classList.add('on');
+    auswerten();
   });
   auswerten();
 });

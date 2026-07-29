@@ -8,15 +8,15 @@
 <meta property=og:description content="Diese Seite prüft die gemeinsamen Rechenbibliotheken gegen bekannte Sollwerte und kontrolliert, ob alle Seiten des Projekts erreichbar und korrekt eingebunden sind. Sie ist nach jedem Umbau…">
 <meta property=og:url content="https://nickischicki.github.io/finanzanalysen/Selbsttest.html">
 <meta name=twitter:card content=summary>
-<link rel=stylesheet href="assets/site.css?v=31">
-<script defer src="assets/site-map.js?v=31"></script>
-<script defer src="assets/datenstand.js?v=31"></script>
-<script defer src="assets/site.js?v=31"></script>
-<script defer src="assets/de-rente.js?v=31"></script>
-<script defer src="assets/de-kapitalertrag.js?v=31"></script>
-<script defer src="assets/de-vermoegen.js?v=31"></script>
-<script defer src="assets/profil.js?v=31"></script>
-<script defer src="assets/reihen.js?v=31"></script>
+<link rel=stylesheet href="assets/site.css?v=32">
+<script defer src="assets/site-map.js?v=32"></script>
+<script defer src="assets/datenstand.js?v=32"></script>
+<script defer src="assets/site.js?v=32"></script>
+<script defer src="assets/de-rente.js?v=32"></script>
+<script defer src="assets/de-kapitalertrag.js?v=32"></script>
+<script defer src="assets/de-vermoegen.js?v=32"></script>
+<script defer src="assets/profil.js?v=32"></script>
+<script defer src="assets/reihen.js?v=32"></script>
 <style>
 .sum{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:12px;margin-bottom:22px}
 .sc{background:var(--card);border:1px solid var(--rule);border-radius:12px;padding:15px 17px}
@@ -83,6 +83,55 @@ function run(){
     chkTrue(G1,'Rente nach Steuer ohne expliziten Freibetrag rechenbar', isFinite(s.nettoMonat),'Freibetrag wird aus dem Rentenbeginn hergeleitet');
     chk(G1,'Eckrente, Eintritt 2052: Einkommensteuer', s.einkommensteuer, 1398, 1,'97 % steuerpflichtig, Kassenbeiträge als Sonderausgaben');
     chk(G1,'Eckrente, Eintritt 2052: Zahlbetrag nach Steuer', s.nettoMonat, 1561, 1,'1.677 € nach Kassen − 117 € Steuer');
+  })();
+
+  // ---------- Haushalt: Veranlagung und Splitting ----------
+  const G8='Veranlagung & Splitting (§ 32a Abs. 5)';
+  chk(G8,'Splitting = 2 × Tarif auf halbes zvE', einkommensteuerVeranlagt(40000,2026,true),
+      2*einkommensteuer(20000,2026), 0, 'gesetzliche Definition, direkt nachgebildet');
+  chk(G8,'Ohne Splitting bleibt der Grundtarif', einkommensteuerVeranlagt(40000,2026,false),
+      einkommensteuer(40000,2026), 0);
+  // Der Vorteil ist nie negativ und bei gleichen Einkommen exakt null — das ist
+  // die Kernaussage des Tarifs und der schärfste Test dafür, dass er stimmt.
+  (function(){
+    let minV=Infinity, maxAbwGleich=0;
+    for(let a=0;a<=60000;a+=2500) for(let b=0;b<=60000;b+=2500){
+      const H=[{jahresbrutto:a,rentenbeginnJahr:2053},{jahresbrutto:b,rentenbeginnJahr:2053}];
+      const v=nettoRenteHaushalt(H,2026,false).einkommensteuer-nettoRenteHaushalt(H,2026,true).einkommensteuer;
+      minV=Math.min(minV,v);
+      if(a===b) maxAbwGleich=Math.max(maxAbwGleich,Math.abs(v));
+    }
+    chkTrue(G8,'Splitting ist nie teurer als getrennte Veranlagung', minV>=-0.5,
+      'über 625 Einkommenspaare geprüft, kleinster Vorteil '+minV.toFixed(2)+' €');
+    chk(G8,'Bei gleich hohen Renten ist der Vorteil null', maxAbwGleich, 0, 0.5,
+      'Progression wirkt nur auf die Differenz');
+  })();
+  // Eine Person, getrennt veranlagt: muss dem alten Einzelweg exakt gleichen
+  (function(){
+    let maxAbw=0;
+    [[18000,2035],[30000,2045],[60000,2052],[90000,2060]].forEach(([b,j])=>{
+      const a=nettoRenteNachSteuer(b,2026,false,j);
+      const h=nettoRenteHaushalt([{jahresbrutto:b,rentenbeginnJahr:j}],2026,false);
+      maxAbw=Math.max(maxAbw,Math.abs(a.nettoJahr-h.nettoJahr),Math.abs(a.einkommensteuer-h.einkommensteuer));
+    });
+    chk(G8,'Haushalt mit einer Person = bisheriger Einzelweg', maxAbw, 0, 0.005,
+      'der Umbau darf bestehende Ergebnisse nicht verschieben');
+  })();
+  // Getrennte Veranlagung ist additiv: zwei eigene Erklärungen, nicht ein Topf
+  (function(){
+    const H=[{jahresbrutto:24000,rentenbeginnJahr:2053},{jahresbrutto:14000,rentenbeginnJahr:2055}];
+    const summe=nettoRenteNachSteuer(24000,2026,false,2053).einkommensteuer
+               +nettoRenteNachSteuer(14000,2026,false,2055).einkommensteuer;
+    chk(G8,'Getrennt veranlagt = Summe zweier Einzelfälle',
+        nettoRenteHaushalt(H,2026,false).einkommensteuer, summe, 0.005,
+        'jede Person mit eigenem Freibetrag und eigenem Grundfreibetrag');
+  })();
+  // Nachgerechnetes Beispiel aus Mein_Vermoegensbild (2.149 € und 904 € brutto)
+  (function(){
+    const H=[{jahresbrutto:2149*12,rentenbeginnJahr:2052},{jahresbrutto:904*12,rentenbeginnJahr:2055}];
+    chk(G8,'Beispielpaar: Steuer getrennt', nettoRenteHaushalt(H,2026,false).einkommensteuer/12, 166.17, 0.5);
+    chk(G8,'Beispielpaar: Steuer mit Splitting', nettoRenteHaushalt(H,2026,true).einkommensteuer/12, 87, 0.5,
+        'ungenutzter Grundfreibetrag der zweiten Person wird wirksam');
   })();
 
   // ---------- Gemeinsames Profil ----------
@@ -269,6 +318,27 @@ async function pruefeSeiten(){
       ohneProfil.length?('fehlt: '+ohneProfil.join(', ')):RECHNER.length+' Rechner geprüft');
     chkTrue(G4,'Alle Rechner belegen aus dem Profil vor', ohneVorbelegung.length===0,
       ohneVorbelegung.length?('ohne: '+ohneVorbelegung.join(', ')):'das Versprechen der Startseite ist eingelöst');
+    // Wer nach der Veranlagung fragt, soll die Antwort aus dem Profil nehmen,
+    // statt sie ein zweites Mal abzufragen
+    const MIT_VERANLAGUNG=['Depot_Steuern_Kosten.html','Tilgen_oder_Investieren.html',
+      'Immobilien_Investitionsrechner.html'];
+    const ohneVeranlagung=[];
+    await Promise.all(MIT_VERANLAGUNG.map(async f=>{
+      try{
+        const txt=await (await fetch(f,{cache:'no-store'})).text();
+        if(!/Profil\.get\(['"]veranlagung['"]\)/.test(txt)) ohneVeranlagung.push(f);
+      }catch(e){ ohneVeranlagung.push(f); }
+    }));
+    chkTrue(G4,'Veranlagung wird aus dem Profil übernommen', ohneVeranlagung.length===0,
+      ohneVeranlagung.length?('fragt erneut: '+ohneVeranlagung.join(', ')):'Splitting und doppelter Pauschbetrag folgen dem Profil');
+    // Der Paar-Modus im Vermögensbild: Umschalter, Partnerfelder, Haushaltssteuer
+    try{
+      const vb=await (await fetch('Mein_Vermoegensbild.html',{cache:'no-store'})).text();
+      const fehlt=['id=hPaar','id=eVerh','id=q_gj','id=q_brutto','nettoRenteHaushalt(']
+        .filter(s=>!vb.includes(s));
+      chkTrue(G4,'Vermögensbild kennt den Paar-Modus', fehlt.length===0,
+        fehlt.length?('fehlt: '+fehlt.join(', ')):'Umschalter, zweite Person und Haushaltsbesteuerung vorhanden');
+    }catch(e){ chkTrue(G4,'Vermögensbild kennt den Paar-Modus', false, String(e)); }
     // Metadaten für geteilte Links
     const ohneMeta=[];
     await Promise.all(M.map(async p=>{

@@ -153,6 +153,51 @@ function nettoRenteNachSteuer(jahresbrutto, jahr, kinderlos, rentenbeginnJahr, f
            nettoJahr: jahresbrutto - kvPvJahr - est, nettoMonat: (jahresbrutto - kvPvJahr - est) / 12 };
 }
 
+// --- (7b) VERANLAGUNG: EINZELN ODER ZUSAMMEN (SPLITTING, § 32a Abs. 5 EStG) ---
+// Beim Splitting wird der Tarif auf das HALBE gemeinsame zvE angewandt und das
+// Ergebnis verdoppelt. Der Vorteil entsteht allein aus der Progression: bei
+// gleich hohen Einkommen ist er null, bei einem Alleinverdiener am groessten.
+function einkommensteuerVeranlagt(zvE, jahr = 2026, zusammen = false) {
+  return zusammen ? 2 * einkommensteuer(zvE / 2, jahr) : einkommensteuer(zvE, jahr);
+}
+
+// Nettorente eines HAUSHALTS aus einer oder zwei Renten.
+// personen = [{ jahresbrutto, rentenbeginnJahr, kinderlos, freibetragFix? }]
+// Freibetrag, KV/PV und der Werbungskosten-Pauschbetrag bleiben PRO PERSON —
+// zusammengelegt wird erst das zu versteuernde Einkommen. Mit einer Person und
+// zusammen=false ist das Ergebnis identisch mit nettoRenteNachSteuer().
+function nettoRenteHaushalt(personen, jahr = 2026, zusammen = false, opts = {}) {
+  const liste = (personen || []).filter(p => p && p.jahresbrutto > 0);
+  let jahresbrutto = 0, kvPvJahr = 0;
+  const einzeln = liste.map(p => {
+    const d = nettoRenteDetail(p.jahresbrutto / 12, jahr, !!p.kinderlos, opts);
+    const kv = (d.kvBeitrag + d.pvBeitrag) * 12;
+    jahresbrutto += p.jahresbrutto;
+    kvPvJahr += kv;
+    const fb = (p.freibetragFix != null) ? p.freibetragFix
+             : rentenfreibetrag(p.jahresbrutto, p.rentenbeginnJahr);
+    return { stpfl: steuerpflichtigeRente(p.jahresbrutto, fb),
+             // Kinderlosenzuschlag ist nicht als Sonderausgabe abziehbar
+             kvAbz: p.kinderlos ? kv - p.jahresbrutto * 0.006 : kv };
+  });
+  // § 9a Nr. 3 je Person mit sonstigen Einkuenften; § 10c 36 EUR, bei Zusammenveranlagung 72 EUR.
+  // OHNE Splitting gibt jede Person eine eigene Erklaerung ab: eigenes zvE, eigener Tarif.
+  // MIT Splitting entsteht ein gemeinsames zvE, auf dessen Haelfte der Tarif laeuft.
+  let zvE, est;
+  if (zusammen) {
+    zvE = Math.max(0, einzeln.reduce((s, p) => s + p.stpfl - RV.wkPauschbetragRente - p.kvAbz, 0)
+                      - 2 * RV.saPauschbetrag);
+    est = einkommensteuerVeranlagt(zvE, jahr, true);
+  } else {
+    const je = einzeln.map(p => Math.max(0, p.stpfl - RV.wkPauschbetragRente - p.kvAbz - RV.saPauschbetrag));
+    zvE = je.reduce((s, z) => s + z, 0);
+    est = je.reduce((s, z) => s + einkommensteuer(z, jahr), 0);
+  }
+  return { personen: liste.length, jahresbrutto, kvPvJahr, zvE, einkommensteuer: est,
+           nettoJahr: jahresbrutto - kvPvJahr - est,
+           nettoMonat: (jahresbrutto - kvPvJahr - est) / 12 };
+}
+
 // --- (8) RENTENLUECKE ---
 function rentenluecke(bedarf, nettoRente, opts = {}) {
   const luecke = Math.max(0, bedarf - nettoRente);

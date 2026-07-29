@@ -8,12 +8,12 @@
 <meta property=og:description content="Zwischen der Rendite, die ein Index ausweist, und dem Betrag, der am Ende auf dem Konto landet, liegen zwei Abzüge: die laufenden Kosten des Produkts und die deutsche Kapitalertragsbesteuerung.…">
 <meta property=og:url content="https://nickischicki.github.io/finanzanalysen/Depot_Steuern_Kosten.html">
 <meta name=twitter:card content=summary>
-<link rel=stylesheet href="assets/site.css?v=31">
-<script defer src="assets/site-map.js?v=31"></script>
-<script defer src="assets/datenstand.js?v=31"></script>
-<script src="assets/de-kapitalertrag.js?v=31"></script>
-<script defer src="assets/site.js?v=31"></script>
-<script defer src="assets/profil.js?v=31"></script>
+<link rel=stylesheet href="assets/site.css?v=32">
+<script defer src="assets/site-map.js?v=32"></script>
+<script defer src="assets/datenstand.js?v=32"></script>
+<script src="assets/de-kapitalertrag.js?v=32"></script>
+<script defer src="assets/site.js?v=32"></script>
+<script defer src="assets/profil.js?v=32"></script>
 <style>
 /* seitenspezifisch */
 .res3{display:grid;grid-template-columns:1fr;gap:12px;margin-bottom:16px}
@@ -604,10 +604,20 @@ upd();
       ? Math.round(wert).toLocaleString('de-DE') : wert;
     feuer(el, 'input'); feuer(el, 'change');
   }
+  /* Umschalter nicht nachbauen, sondern echt anklicken — dann läuft der
+     seiteneigene Handler samt „on"-Klasse und Neuberechnung. */
+  function klickeSeg(gruppeId, wert) {
+    var box = g(gruppeId); if (!box) return;
+    var b = box.querySelector('[data-v="' + wert + '"]'); if (b) b.click();
+  }
   function los() {
     if (!window.Profil || !Profil.gefuellt()) return;
     try {
   Profil.vorbelegen({ depotWert:'einmal', sparrateMonat:'rate' });
+  /* Zusammenveranlagung verdoppelt den Sparer-Pauschbetrag (§ 20 Abs. 9 EStG).
+     Nur setzen, wenn im Profil ausdrücklich „zusammen" steht — sonst bleibt
+     die Vorgabe der Seite stehen. */
+  if (Profil.get('veranlagung') === 'zusammen') klickeSeg('seg_frei', '2000');
     } catch (e) { /* Vorbelegung darf die Seite nie lahmlegen */ }
   }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', los);
